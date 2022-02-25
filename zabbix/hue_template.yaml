@@ -1,0 +1,315 @@
+zabbix_export:
+  version: '5.4'
+  date: '2022-02-25T13:57:06Z'
+  groups:
+    -
+      uuid: 4918b88734c54bd094cff7585b5d71fc
+      name: 'Templates/Network Devices'
+  templates:
+    -
+      uuid: ad60a5538c9e4f86a54435d3819b4100
+      template: 'Template Philips Hue'
+      name: 'Template Philips Hue'
+      description: 'Active template for Philips Hue.'
+      groups:
+        -
+          name: 'Templates/Network Devices'
+      items:
+        -
+          uuid: fdfa907f9d6d45e08cf99fd65bb48fdc
+          name: 'Bridge upgrade available'
+          type: ZABBIX_ACTIVE
+          key: 'hue.value[system,is_upgrade_available]'
+          delay: 1h
+          valuemap:
+            name: YesNo
+          tags:
+            -
+              tag: Application
+              value: Hue
+          triggers:
+            -
+              uuid: 8f8464e731e743aeac5371fb8199036c
+              expression: 'last(/Template Philips Hue/hue.value[system,is_upgrade_available])=1'
+              name: 'New bridge firmware available on {HOST.NAME}'
+              priority: WARNING
+              description: 'A new version of pfSense is available for update.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: Application
+                  value: Hue
+        -
+          uuid: ea3d0488de28430daafbbd3843ab1f91
+          name: 'Bridge version'
+          type: ZABBIX_ACTIVE
+          key: 'hue.value[system,version]'
+          delay: 1h
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Hue
+      discovery_rules:
+        -
+          uuid: f670d2887bb64fc3a4f6c591ed49ac7b
+          name: Batteries
+          type: ZABBIX_ACTIVE
+          key: 'hue.discovery[batteries]'
+          item_prototypes:
+            -
+              uuid: 2a8962a6856342a3a7815b08da35cecf
+              name: 'Battery level for {#NAME}'
+              type: ZABBIX_ACTIVE
+              key: 'hue.value[sensor,{#UNIQUE_ID},battery:level]'
+              value_type: FLOAT
+              units: '%'
+              tags:
+                -
+                  tag: Application
+                  value: Hue
+              trigger_prototypes:
+                -
+                  uuid: 377d4ad79cbc40fcbca959a4dbe00e32
+                  expression: 'last(/Template Philips Hue/hue.value[sensor,{#UNIQUE_ID},battery:level])<=5'
+                  name: 'Battery level for {#NAME} dropped below 5%'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: Application
+                      value: Hue
+                -
+                  uuid: 8284dcbd48334b5db671238271a2618e
+                  expression: 'last(/Template Philips Hue/hue.value[sensor,{#UNIQUE_ID},battery:level])<=25 and  last(/Template Philips Hue/hue.value[sensor,{#UNIQUE_ID},battery:level])>5'
+                  name: 'Battery level for {#NAME} dropped below 25%'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: Application
+                      value: Hue
+            -
+              uuid: 5e7adddb9b94455cbb66f03aec492bd7
+              name: 'Battery {#NAME} reachable'
+              type: ZABBIX_ACTIVE
+              key: 'hue.value[sensor,{#UNIQUE_ID},reachable]'
+              valuemap:
+                name: YesNo
+              tags:
+                -
+                  tag: Application
+                  value: Hue
+              trigger_prototypes:
+                -
+                  uuid: c74c78ce1f5d4c1a8b95c2a1edd46afb
+                  expression: 'last(/Template Philips Hue/hue.value[sensor,{#UNIQUE_ID},reachable])<>1'
+                  name: 'Battery {#NAME} unreachable'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: Application
+                      value: Hue
+          graph_prototypes:
+            -
+              uuid: 3960976ce12040858bd3d9298dc74b5e
+              name: 'Battery level for {#NAME}'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: 199C0D
+                  item:
+                    host: 'Template Philips Hue'
+                    key: 'hue.value[sensor,{#UNIQUE_ID},battery:level]'
+        -
+          uuid: 2aef0eabaf384b7e8ce80eb8787ccca0
+          name: Lights
+          type: ZABBIX_ACTIVE
+          key: 'hue.discovery[lights]'
+          delay: 10s
+          item_prototypes:
+            -
+              uuid: 04bdfe453a334fde94807b1b7eb098f4
+              name: 'Light {#NAME} upgrade available'
+              type: ZABBIX_ACTIVE
+              key: 'hue.value[light,{#UNIQUE_ID},is_upgrade_available]'
+              delay: 1h
+              valuemap:
+                name: YesNo
+              tags:
+                -
+                  tag: Application
+                  value: Hue
+              trigger_prototypes:
+                -
+                  uuid: 066e4f948c994c20b86b6020baa150d2
+                  expression: 'last(/Template Philips Hue/hue.value[light,{#UNIQUE_ID},is_upgrade_available])=1'
+                  name: 'Hue: {#NAME} firmware upgrade available'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: Application
+                      value: Hue
+            -
+              uuid: 9a451e7e17ec4506a78e13a42924ed54
+              name: 'Light {#NAME} reachable'
+              type: ZABBIX_ACTIVE
+              key: 'hue.value[light,{#UNIQUE_ID},reachable]'
+              delay: 30s
+              valuemap:
+                name: YesNo
+              tags:
+                -
+                  tag: Application
+                  value: Hue
+              trigger_prototypes:
+                -
+                  uuid: 3631309f903748c785352e225b6f59b3
+                  expression: 'last(/Template Philips Hue/hue.value[light,{#UNIQUE_ID},reachable])<>1'
+                  name: 'Hue: {#NAME} unreachable'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: Application
+                      value: Hue
+            -
+              uuid: b0854f52552145749e1ce2a860d853f1
+              name: 'Light {#NAME} status'
+              type: ZABBIX_ACTIVE
+              key: 'hue.value[light,{#UNIQUE_ID},status]'
+              delay: 30s
+              valuemap:
+                name: 'Device status'
+              tags:
+                -
+                  tag: Application
+                  value: Hue
+              trigger_prototypes:
+                -
+                  uuid: 2469a9ab4b53478cb5ef0e7b5c0ec7e0
+                  expression: 'last(/Template Philips Hue/hue.value[light,{#UNIQUE_ID},status])=1'
+                  name: 'Hue: {#NAME} on'
+                  tags:
+                    -
+                      tag: Application
+                      value: Hue
+            -
+              uuid: f230417bb9c74f4c93f545a97f508bb4
+              name: 'Light {#NAME} version'
+              type: ZABBIX_ACTIVE
+              key: 'hue.value[light,{#UNIQUE_ID},version]'
+              delay: 1h
+              trends: '0'
+              value_type: TEXT
+              tags:
+                -
+                  tag: Application
+                  value: Hue
+        -
+          uuid: e9975f03950f48b8a9deb811ee02ce52
+          name: 'Sensors: light'
+          key: 'hue.discovery[sensors:light]'
+          delay: 10s
+          item_prototypes:
+            -
+              uuid: 9529d9fe46d54e3482c23d498b01c89a
+              name: 'Light: level'
+              type: ZABBIX_ACTIVE
+              key: 'hue.value[sensor,{#UNIQUE_ID},light:level]'
+              delay: 10s
+              tags:
+                -
+                  tag: Application
+                  value: Hue
+          graph_prototypes:
+            -
+              uuid: 18da2e5c4130409dbf29c241000882ba
+              name: 'Light level for {#NAME}'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: 199C0D
+                  item:
+                    host: 'Template Philips Hue'
+                    key: 'hue.value[sensor,{#UNIQUE_ID},light:level]'
+        -
+          uuid: e727c24d616847e7a616db27dd6ad8a0
+          name: 'Sensors: presence'
+          key: 'hue.discovery[sensors:presence]'
+          delay: 10s
+          item_prototypes:
+            -
+              uuid: 12a11649cd734a868b923ca91ed91260
+              name: 'Presence on {#NAME}'
+              type: ZABBIX_ACTIVE
+              key: 'hue.value[sensor,{#UNIQUE_ID},presence]'
+              delay: 10s
+              valuemap:
+                name: YesNo
+              tags:
+                -
+                  tag: Application
+                  value: Hue
+              trigger_prototypes:
+                -
+                  uuid: aecb3043d3554335adcbf7bdf27d8e68
+                  expression: 'last(/Template Philips Hue/hue.value[sensor,{#UNIQUE_ID},presence])<>0'
+                  name: 'Presence detected on {#NAME}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: Application
+                      value: Hue
+        -
+          uuid: 0c872b19769b46a5b4dbab4650508033
+          name: 'Sensors: temperature'
+          key: 'hue.discovery[sensors:temperature]'
+          item_prototypes:
+            -
+              uuid: 35f2fa74eaf2426da65a343e8e57def1
+              name: 'Temperature on {#NAME}'
+              type: ZABBIX_ACTIVE
+              key: 'hue.value[sensor,{#UNIQUE_ID},temperature]'
+              units: C
+              tags:
+                -
+                  tag: Application
+                  value: Hue
+          graph_prototypes:
+            -
+              uuid: 1d5322c62c6e4b4cb807328fe367f2df
+              name: 'Temperature development on {#NAME}'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: 199C0D
+                  item:
+                    host: 'Template Philips Hue'
+                    key: 'hue.value[sensor,{#UNIQUE_ID},temperature]'
+      tags:
+        -
+          tag: Application
+          value: Hue
+      valuemaps:
+        -
+          uuid: 264cff25c74842a589ed7f6a7ec0006f
+          name: 'Device status'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Off'
+            -
+              value: '1'
+              newvalue: 'On'
+            -
+              type: DEFAULT
+              newvalue: Unkown
+        -
+          uuid: a63a560acafd4c01a3c0ca4ea48dff50
+          name: YesNo
+          mappings:
+            -
+              value: '0'
+              newvalue: 'No'
+            -
+              value: '1'
+              newvalue: 'Yes'
