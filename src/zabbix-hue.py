@@ -8,7 +8,7 @@ from urllib.request import urlopen
 
 import config
 
-COMMANDS = ["battery", "discover", "light", "system", "test"]
+COMMANDS = ["discover", "light", "sensor", "system", "test"]
 HUE_HUB_URL = f"http://{config.IP}/api/{config.KEY}"
 
 TYPE_SENSOR_LIGHT = "ZLLLightLevel"
@@ -22,30 +22,53 @@ def get_system_config():
   with urlopen(hue_url("config")) as response:
      return json.loads(response.read())
 
-def get_all_lights():
+def get_lights():
   with urlopen(hue_url("lights")) as response:
      return list(json.loads(response.read()).values())
 
 def get_light(unique_id):
   return list(filter( \
       lambda info:info["uniqueid"] == unique_id, \
-      get_all_lights()))[0]
+      get_lights()))[0]
 
-def get_battery_devices():
+def get_sensors():
   with urlopen(hue_url("sensors")) as response:
-    return filter( \
-            lambda s:"config" in s and "battery" in s["config"], \
-            list(json.loads(response.read()).values()))
+    return list(json.loads(response.read()).values())
 
-def get_battery_device(device_id):
+def get_sensor(device_id):
   return list(filter( \
-      lambda info:info["uniqueid"] == device_id, \
-      get_battery_devices()))[0]
+      lambda info:"uniqueid" in info and info["uniqueid"] == device_id, \
+      get_sensors()))[0]
 
-def print_battery_level(unique_id):
-  device = get_battery_device(unique_id)
+def print_sensor_battery_level(unique_id):
+  device = get_sensor(unique_id)
 
   print (float(device["config"]["battery"]))
+
+def print_sensor_light_level(unique_id):
+  device = get_sensor(unique_id)
+
+  print (float(device["state"]["lightlevel"]))
+
+def print_sensor_presence(unique_id):
+  device = get_sensor(unique_id)
+
+  print (int(device["state"]["presence"]))
+
+def print_sensor_reachable(unique_id):
+  device = get_sensor(unique_id)
+
+  print (int(device["config"]["reachable"]))
+
+def print_sensor_temperature(unique_id):
+  device = get_sensor(unique_id)
+
+  print (float(device["state"]["temperature"]/100))
+
+def print_light_reachable(unique_id):
+  light = get_light(unique_id)
+
+  print (int(light["state"]["reachable"]))
 
 def print_light_status(unique_id):
   light = get_light(unique_id)
@@ -90,11 +113,52 @@ def print_discover_lights():
                 "{#NAME}": light["name"],
                 "{#UNIQUE_ID}": light["uniqueid"],
             }], \
-            get_all_lights(), \
+            get_lights(), \
+            [])}))
+
+def print_discover_sensors_light():
+    sensors_light = filter( \
+            lambda sensor:"state" in sensor and "lightlevel" in sensor["state"],
+            get_sensors())
+
+    print (json.dumps({"data":reduce( \
+            lambda p, light:[*p, {
+                "{#NAME}": light["name"],
+                "{#UNIQUE_ID}": light["uniqueid"],
+            }], \
+            sensors_light, \
+            [])}))
+
+def print_discover_sensors_presence():
+    sensors_presence = filter( \
+            lambda sensor:"state" in sensor and "presence" in sensor["state"] and "recycle" not in sensor,
+            get_sensors())
+
+    print (json.dumps({"data":reduce( \
+            lambda p, light:[*p, {
+                "{#NAME}": light["name"],
+                "{#UNIQUE_ID}": light["uniqueid"],
+            }], \
+            sensors_presence, \
+            [])}))
+
+def print_discover_sensors_temperature():
+    sensors_temperature = filter( \
+            lambda sensor:"state" in sensor and "temperature" in sensor["state"],
+            get_sensors())
+
+    print (json.dumps({"data":reduce( \
+            lambda p, light:[*p, {
+                "{#NAME}": light["name"],
+                "{#UNIQUE_ID}": light["uniqueid"],
+            }], \
+            sensors_temperature, \
             [])}))
 
 def print_discover2():
   with urlopen(hue_url("sensors")) as response:
+      print (json.loads(response.read()))
+      exit (0)
       sensors = filter(lambda s:"uniqueid" in s and not "recycle" in s, list(json.loads(response.read()).values()))
 
       print (sensors)
@@ -112,21 +176,52 @@ def handle_discover_command(arguments):
   #   exit (1)
   discovery_type = arguments[0]
 
+  if discovery_type == "batteries":
+    print_discover_batteries()
+
   if discovery_type == "lights":
     print_discover_lights()
     return
 
-  if discovery_type == "batteries":
-    print_discover_batteries()
+  if discovery_type == "sensors:presence":
+    print_discover_sensors_presence()
+    return
 
-def handle_battery_command(arguments):
+  if discovery_type == "sensors:light":
+    print_discover_sensors_light()
+    return
+
+  if discovery_type == "sensors:temperature":
+    print_discover_sensors_temperature()
+    return
+
+def handle_sensor_command(arguments):
   # if (len(arguments) != 1):
   #   print (f"Expected exactly one argument for `status`, received {len(arguments)}")
   #   exit (1)
 
   device_id = arguments[0]
+  action = arguments[1]
 
-  print_battery_level(device_id)
+  if (action == "battery:level"):
+    print_sensor_battery_level(device_id)
+    return
+
+  if (action == "presence"):
+    print_sensor_presence(device_id)
+    return
+
+  if (action == "reachable"):
+    print_sensor_reachable(device_id)
+    return
+
+  if (action == "temperature"):
+    print_sensor_temperature(device_id)
+    return
+
+  if (action == "light:level"):
+    print_sensor_light_level(device_id)
+    return
 
 def handle_light_command(arguments):
   # if (len(arguments) != 1):
@@ -138,6 +233,10 @@ def handle_light_command(arguments):
 
   if (action == "is_upgrade_available"):
     print_light_upgrade_available(light_id)
+    return
+
+  if (action == "reachable"):
+    print_light_reachable(light_id)
     return
 
   if (action == "status"):
@@ -178,12 +277,12 @@ if __name__ == "__main__":
 
 
     arguments = sys.argv[2:]
-    if (command == "battery"):
-        handle_battery_command(arguments)
-        exit (0)
-
     if (command == "discover"):
         handle_discover_command(arguments)
+        exit (0)
+
+    if (command == "sensor"):
+        handle_sensor_command(arguments)
         exit (0)
 
     if (command == "light"):
@@ -199,4 +298,3 @@ if __name__ == "__main__":
         exit (0)
 
     print ("Something unexpected went wrong")
-
