@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from fcntl import LOCK_EX, LOCK_NB, fcntl, flock
+from fileinput import filename
 import json
 import logging
 import logging.config
@@ -72,18 +73,22 @@ class Api(ApiInterface):
 
 class CachedApi(ApiInterface):
   __LOCK_FILE = "/".join([tempfile.gettempdir(), "zabbix-hue.lock"])
-  __MAX_CACHE_AGE_MILLISECONDS = 10_000
+  __MAX_CACHE_AGE_SECONDS = 10
 
   def __init__(self, api: ApiInterface):
     self.api = api
 
+  def __tf(filename):
+    return "/".join([tempfile.gettempdir(), filename])
+
   def __cache(self, type: str, fn_call):
-    cache_file_path = "/".join([tempfile.gettempdir(),
-                               f"zabbix-hue.{type}.json"])
+    temp_filename = f"zabbix-hue.{type}"
+    cache_file_path = CachedApi.__tf(f"{temp_filename}.json")
+    lock_file = CachedApi.__tf(f"{temp_filename}.lock")
 
     does_cache_file_exist = exists(cache_file_path)
     is_cache_file_expired = not does_cache_file_exist or time.time(
-    ) - os.path.getmtime(cache_file_path) >= CachedApi.__MAX_CACHE_AGE_MILLISECONDS
+    ) - os.path.getmtime(cache_file_path) >= CachedApi.__MAX_CACHE_AGE_SECONDS
     is_cache_hit = not is_cache_file_expired
 
     if is_cache_hit:
@@ -91,11 +96,10 @@ class CachedApi(ApiInterface):
         LOG.debug("Cache hit (type=%s)", type)
         return json.loads(f_json.read())
 
-    with open(CachedApi.__LOCK_FILE, "w") as f_lock:
+    with open(lock_file, "w") as f_lock:
       try:
         flock(f_lock.fileno(), LOCK_EX | LOCK_NB)
-        LOG.debug("Acquired lock successfully (file=%s)",
-                  CachedApi.__LOCK_FILE)
+        LOG.debug("Acquired lock successfully (file=%s)", lock_file)
 
         fd, tmp_file_path = mkstemp()
         with open(tmp_file_path, "w") as f_tmp:
@@ -108,8 +112,7 @@ class CachedApi(ApiInterface):
         with open(cache_file_path) as f_json:
           return json.loads(f_json.read())
       except:
-        LOG.debug("Failed to acquire lock, cache hit (file=%s)",
-                  CachedApi.__LOCK_FILE)
+        LOG.debug("Failed to acquire lock, cache hit (file=%s)", lock_file)
 
     if not does_cache_file_exist:
       return []
