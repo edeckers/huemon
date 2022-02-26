@@ -82,15 +82,16 @@ class Discover:
 
 
 class Command:
-  def __get_light(unique_id):
+  def __get_by_unique_id(unique_id: str, items: list) -> list:
     return list(filter(
-        lambda info: info["uniqueid"] == unique_id,
-        Api.get_lights()))[0]
+        lambda info: "uniqueid" in info and info["uniqueid"] == unique_id,
+        items))[0]
+
+  def __get_light(unique_id):
+    return Command.__get_by_unique_id(unique_id, Api.get_lights())
 
   def __get_sensor(device_id):
-    return list(filter(
-        lambda info: "uniqueid" in info and info["uniqueid"] == device_id,
-        Api.get_sensors()))[0]
+    return Command.__get_by_unique_id(device_id, Api.get_sensors())
 
   def __map_value(value, path, type):
     return type(reduce(lambda p, field: p[field], path.split("."), value))
@@ -107,15 +108,7 @@ class Command:
   def __map_sensor(unique_id, mapper):
     return mapper(Command.__get_sensor(unique_id))
 
-  __MAPPER_BATTERY = __mapper("config.battery", float)
-  __MAPPER_LIGHT_LEVEL = __mapper("state.lightlevel", float)
-  __MAPPER_PRESENCE = __mapper("state.presence", int)
-  __MAPPER_SENSOR_REACHABLE = __mapper("config.reachable", int)
-  __MAPPER_LIGHT_REACHABLE = __mapper("state.reachable", int)
-  __MAPPER_STATE_ON = __mapper("state.on", int)
-  __MAPPER_VERSION = __mapper("swversion", str)
-
-  def __MAPPER_TEMPERATURE_REACHABLE(device): return float(
+  def __MAPPER_TEMPERATURE(device): return float(
       device["state"]["temperature"]/100)
 
   def __MAPPER_UPDATES_AVAILABLE(light): return int(
@@ -124,10 +117,29 @@ class Command:
   def __MAPPER_SYSTEM_UPGRADE_AVAILABLE(config): return int(
       config["swupdate2"]["state"] != "noupdates")
 
+  __MAPPER_BATTERY = __mapper("config.battery", float)
+  __MAPPER_LIGHT_LEVEL = __mapper("state.lightlevel", float)
+  __MAPPER_PRESENCE = __mapper("state.presence", int)
+  __MAPPER_SENSOR_REACHABLE = __mapper("config.reachable", int)
+  __MAPPER_LIGHT_REACHABLE = __mapper("state.reachable", int)
+  __MAPPER_STATE_ON = __mapper("state.on", int)
+  __MAPPER_VERSION = __mapper("swversion", str)
+
   __LIGHT_ACTION_MAP = {
       "is_upgrade_available": __MAPPER_UPDATES_AVAILABLE,
       "reachable": __MAPPER_LIGHT_REACHABLE,
       "status": __MAPPER_STATE_ON,
+      "version": __MAPPER_VERSION,
+  }
+  __SENSOR_ACTION_MAP = {
+      "battery:level": __MAPPER_BATTERY,
+      "presence": __MAPPER_PRESENCE,
+      "reachable": __MAPPER_SENSOR_REACHABLE,
+      "temperature": __MAPPER_TEMPERATURE,
+      "light:level": __MAPPER_LIGHT_LEVEL}
+
+  __SYSTEM_ACTION_MAP = {
+      "is_upgrade_available": __MAPPER_SYSTEM_UPGRADE_AVAILABLE,
       "version": __MAPPER_VERSION,
   }
 
@@ -142,27 +154,6 @@ class Command:
 
   def __process_system(mapper):
     Command.__process(Command.__map_config(mapper))
-
-  def __print_sensor_battery_level(unique_id):
-    Command.__process_sensor(unique_id, Command.__MAPPER_BATTERY)
-
-  def __print_sensor_light_level(unique_id):
-    Command.__process_sensor(unique_id, Command.__MAPPER_LIGHT_LEVEL)
-
-  def __print_sensor_presence(unique_id):
-    Command.__process_sensor(unique_id, Command.__MAPPER_PRESENCE)
-
-  def __print_sensor_reachable(unique_id):
-    Command.__process_sensor(unique_id, Command.__MAPPER_SENSOR_REACHABLE)
-
-  def __print_sensor_temperature(unique_id):
-    Command.__process_sensor(unique_id, Command.__MAPPER_TEMPERATURE_REACHABLE)
-
-  def __print_system_upgrade_available():
-    Command.__process_system(Command.__MAPPER_SYSTEM_UPGRADE_AVAILABLE)
-
-  def __print_system_version():
-    Command.__process_system(Command.__MAPPER_VERSION)
 
   def discover(arguments):
     # if (len(arguments) != 1):
@@ -180,25 +171,11 @@ class Command:
     device_id = arguments[0]
     action = arguments[1]
 
-    if (action == "battery:level"):
-      Command.__print_sensor_battery_level(device_id)
+    if action not in Command.__SENSOR_ACTION_MAP:
       return
 
-    if (action == "presence"):
-      Command.__print_sensor_presence(device_id)
-      return
-
-    if (action == "reachable"):
-      Command.__print_sensor_reachable(device_id)
-      return
-
-    if (action == "temperature"):
-      Command.__print_sensor_temperature(device_id)
-      return
-
-    if (action == "light:level"):
-      Command.__print_sensor_light_level(device_id)
-      return
+    Command.__process_sensor(
+        device_id, Command.__SENSOR_ACTION_MAP[action](device_id))
 
   def light(arguments):
     # if (len(arguments) != 1):
@@ -219,13 +196,10 @@ class Command:
 
     action = arguments[0]
 
-    if (action == "is_upgrade_available"):
-      Command.__print_system_upgrade_available()
+    if action not in Command.__SYSTEM_ACTION_MAP:
       return
 
-    if (action == "version"):
-      Command.__print_system_version()
-      return
+    Command.__process_system(Command.__SYSTEM_ACTION_MAP[action])
 
   __COMMAND_HANDLERS = {
       "discover": discover,
