@@ -94,60 +94,75 @@ class Command:
         lambda info: "uniqueid" in info and info["uniqueid"] == device_id,
         Api.get_sensors()))[0]
 
-  def __print_sensor_battery_level(unique_id):
-    device = Command.__get_sensor(unique_id)
+  def __map_value(value, path, type):
+    return type(reduce(lambda p, field: p[field], path.split("."), value))
 
-    print(float(device["config"]["battery"]))
+  def __mapper(path, type):
+    return lambda v: Command.__map_value(v, path, type)
+
+  def __map_config(mapper):
+    return mapper(Api.get_system_config())
+
+  def __map_light(unique_id, mapper):
+    return mapper(Command.__get_light(unique_id))
+
+  def __map_sensor(unique_id, mapper):
+    return mapper(Command.__get_sensor(unique_id))
+
+  def __process(value):
+    print(value)
+
+  def __print_sensor_battery_level(unique_id):
+    Command.__process(Command.__map_sensor(
+        unique_id,
+        Command.__mapper("config.battery", float)))
 
   def __print_sensor_light_level(unique_id):
-    device = Command.__get_sensor(unique_id)
-
-    print(float(device["state"]["lightlevel"]))
+    Command.__process(Command.__map_sensor(
+        unique_id,
+        Command.__mapper("state.lightlevel", float)))
 
   def __print_sensor_presence(unique_id):
-    device = Command.__get_sensor(unique_id)
-
-    print(int(device["state"]["presence"]))
+    Command.__process(Command.__map_sensor(
+        unique_id,
+        Command.__mapper("state.presence", int)))
 
   def __print_sensor_reachable(unique_id):
-    device = Command.__get_sensor(unique_id)
-
-    print(int(device["config"]["reachable"]))
+    Command.__process(Command.__map_sensor(
+        unique_id,
+        Command.__mapper("config.reachable", int)))
 
   def __print_sensor_temperature(unique_id):
-    device = Command.__get_sensor(unique_id)
-
-    print(float(device["state"]["temperature"]/100))
+    Command.__process(Command.__map_sensor(
+        unique_id,
+        lambda device: float(device["state"]["temperature"]/100)))
 
   def __print_light_reachable(unique_id):
-    light = Command.__get_light(unique_id)
-
-    print(int(light["state"]["reachable"]))
+    Command.__process(Command.__map_light(
+        unique_id,
+        Command.__mapper("state.reachable", int)))
 
   def __print_light_status(unique_id):
-    light = Command.__get_light(unique_id)
-
-    print(int(light["state"]["on"]))
+    Command.__process(Command.__map_light(
+        unique_id,
+        Command.__mapper("state.on", int)))
 
   def __print_light_upgrade_available(unique_id):
-    light = Command.__get_light(unique_id)
-
-    print(int(light["swupdate"]["state"] != "noupdates"))
+    Command.__process(Command.__map_light(
+        unique_id,
+        lambda light: int(light["swupdate"]["state"] != "noupdates")))
 
   def __print_light_version(unique_id):
-    light = Command.__get_light(unique_id)
-
-    print(light["swversion"])
+    Command.__process(Command.__map_light(
+        unique_id,
+        Command.__mapper("swversion", str)))
 
   def __print_system_upgrade_available():
-    config = Api.get_system_config()
-
-    print(int(config["swupdate2"]["state"] != "noupdates"))
+    Command.__process(Command.__map_config(
+        lambda config: int(config["swupdate2"]["state"] != "noupdates")))
 
   def __print_system_version():
-    config = Api.get_system_config()
-
-    print(config["swversion"])
+    Command.__process(Command.__map_config(Command.__mapper("swversion", str)))
 
   def discover(arguments):
     # if (len(arguments) != 1):
