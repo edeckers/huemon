@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
 from fcntl import LOCK_EX, LOCK_NB, flock
-from fileinput import filename
 import json
 import logging
 import logging.config
-import math
 import os
 import sys
 from tempfile import mkstemp
@@ -87,7 +85,8 @@ class CachedApi(ApiInterface):
     lock_file = CachedApi.__tf(f"{temp_filename}.lock")
 
     does_cache_file_exist = exists(cache_file_path)
-    cache_age_seconds = time.time() - os.path.getmtime(cache_file_path)
+    cache_age_seconds = time.time(
+    ) - os.path.getmtime(cache_file_path) if does_cache_file_exist else 0
     is_cache_file_expired = not does_cache_file_exist or cache_age_seconds >= MAX_CACHE_AGE_SECONDS
     is_cache_hit = not is_cache_file_expired
 
@@ -286,8 +285,8 @@ class CommandHandler:
       LOG.error("Received unknown action '%s' for `sensor` command", action)
       return
 
-    self.__process(self.__map_sensor(
-        device_id, CommandHandler.__SENSOR_ACTION_MAP[action](device_id)))
+    CommandHandler.__process(self.__map_sensor(
+        device_id, CommandHandler.__SENSOR_ACTION_MAP[action]))
     LOG.debug("Finished `sensor` command (arguments=%s)", arguments)
 
   def light(self, arguments):
