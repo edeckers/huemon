@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
 
 import json
+import logging
+import logging.config
 import sys
+import yaml
 
 from functools import reduce
 from urllib.request import urlopen
 
-import config
+with open("config.yml", "r") as f:
+  config = yaml.safe_load(f.read())
+  logging.config.dictConfig(config)
+
+
+logger = logging.getLogger("hue")
 
 
 class Api:
-  __HUE_HUB_URL = f"http://{config.IP}/api/{config.KEY}"
+  __HUE_HUB_URL = f"http://{config['ip']}/api/{config['key']}"
 
   def __hue_url(relative_url):
     return "/".join([Api.__HUE_HUB_URL, relative_url])
@@ -51,14 +59,20 @@ class Discover:
         items,
         [])}))
 
-  def __print_discover_sensors_type(field_name):
-    if field_name not in ["presence", "light", "temperature"]:
+  def __print_discover_sensors_type(sensor_type):
+    logger.debug(
+        "Running `discover sensor:*` command (sensor_type=%s)", sensor_type)
+    if sensor_type not in ["presence", "light", "temperature"]:
+      logger.error(
+          "Received unknown sensor type '%s' for `discover sensor:*` command", sensor_type)
       return
 
     Discover.__print_array_as_discovery(filter(
         Discover.__has_state_field(
-            "lightlevel" if field_name == "light" else field_name),
+            "lightlevel" if sensor_type == "light" else sensor_type),
         Api.get_sensors()))
+    logger.debug(
+        "Finished `discover sensor:*` command (sensor_type=%s)", sensor_type)
 
   __DISCOVERY_HANDLERS = {
       "batteries": lambda _: Discover.__print_array_as_discovery(Api.get_batteries()),
@@ -67,12 +81,18 @@ class Discover:
   }
 
   def discover(discovery_type):
+    logger.debug(
+        "Running `discover` command (discovery_type=%s)", discovery_type)
     target, maybe_sub_target, *_ = discovery_type.split(":") + [None]
 
     if target not in Discover.__DISCOVERY_HANDLERS:
+      logger.error(
+          "Received unknown target '%s' for `discover` command", target)
       return
 
     Discover.__DISCOVERY_HANDLERS[target](maybe_sub_target)
+    logger.debug(
+        "Finished `discover` command (discovery_type=%s)", discovery_type)
 
 
 class Command:
@@ -138,14 +158,17 @@ class Command:
     print(value)
 
   def discover(arguments):
+    logger.debug("Running `discover` command (arguments=%s)", arguments)
     # if (len(arguments) != 1):
     #   print (f"Expected exactly one argument for `discover`, received {len(arguments)}")
     #   exit (1)
     discovery_type, *_ = arguments
 
     Discover.discover(discovery_type)
+    logger.debug("Finished `discover` command (arguments=%s)", arguments)
 
   def sensor(arguments):
+    logger.debug("Running `sensor` command (arguments=%s)", arguments)
     # if (len(arguments) != 1):
     #   print (f"Expected exactly one argument for `sensor`, received {len(arguments)}")
     #   exit (1)
@@ -153,12 +176,15 @@ class Command:
     device_id, action = arguments
 
     if action not in Command.__SENSOR_ACTION_MAP:
+      logger.error("Received unknown action '%s' for `sensor` command", action)
       return
 
     Command.__process(Command.__map_sensor(
         device_id, Command.__SENSOR_ACTION_MAP[action](device_id)))
+    logger.debug("Finished `sensor` command (arguments=%s)", arguments)
 
   def light(arguments):
+    logger.debug("Running `light` command (arguments=%s)", arguments)
     # if (len(arguments) != 1):
     #   print (f"Expected exactly one argument for `light`, received {len(arguments)}")
     #   exit (1)
@@ -166,12 +192,15 @@ class Command:
     light_id, action = arguments
 
     if action not in Command.__LIGHT_ACTION_MAP:
+      logger.error("Received unknown action '%s' for `light` command", action)
       return
 
     Command.__process(Command.__map_light(
         light_id, Command.__LIGHT_ACTION_MAP[action]))
+    logger.debug("Finished `light` command (arguments=%s)", arguments)
 
   def system(arguments):
+    logger.debug("Running `system` command (arguments=%s)", arguments)
     # if (len(arguments) != 1):
     #   print (f"Expected exactly one argument for `system`, received {len(arguments)}")
     #   exit (1)
@@ -179,10 +208,12 @@ class Command:
     action, *_ = arguments
 
     if action not in Command.__SYSTEM_ACTION_MAP:
+      logger.error("Received unknown action '%s' for `system` command", action)
       return
 
     Command.__process(Command.__map_config(
         Command.__SYSTEM_ACTION_MAP[action]))
+    logger.debug("Finished `system` command (arguments=%s)", arguments)
 
   __COMMAND_HANDLERS = {
       "discover": discover,
@@ -192,21 +223,28 @@ class Command:
   }
 
   def exec(command: str, arguments):
+    logger.debug("Running command `%s` (arguments=%s)", command, arguments)
     is_valid_command = command in Command.__COMMAND_HANDLERS
     if not is_valid_command:
+      logger.error("Received unknown command `%s`", command)
       print(
           f"Unexpected command `{command}`, expected one of {list(Command.__COMMAND_HANDLERS.keys())}")
       exit(1)
 
     Command.__COMMAND_HANDLERS[command](arguments)
+    logger.debug("Finished command `%s` (arguments=%s)", command, arguments)
 
 
 if __name__ == "__main__":
+  logger.debug("Running script (parameters=%s)", sys.argv[1:])
   if len(sys.argv) <= 1:
     print("Did not receive enough arguments, expected at least one command argument")
+    logger.error(
+        "Did not receive enough arguments (arguments=%s)", sys.argv[1:])
     exit(1)
 
   command, *arguments = sys.argv[1:]
 
   Command.exec(command, arguments)
+  logger.debug("Finished script (parameters=%s)", sys.argv[1:])
   exit(0)
