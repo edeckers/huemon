@@ -51,12 +51,6 @@ class Discover:
         items,
         [])}))
 
-  def __print_discover_batteries():
-    Discover.__print_array_as_discovery(Api.get_batteries())
-
-  def __print_discover_lights():
-    Discover.__print_array_as_discovery(Api.get_lights())
-
   def __print_discover_sensors_type(field_name):
     if field_name not in ["presence", "light", "temperature"]:
       return
@@ -67,8 +61,8 @@ class Discover:
         Api.get_sensors()))
 
   __DISCOVERY_HANDLERS = {
-      "batteries": lambda _: Discover.__print_discover_batteries(),
-      "lights": lambda _: Discover.__print_discover_lights(),
+      "batteries": lambda _: Discover.__print_array_as_discovery(Api.get_batteries()),
+      "lights": lambda _: Discover.__print_array_as_discovery(Api.get_lights()),
       "sensors": __print_discover_sensors_type
   }
 
