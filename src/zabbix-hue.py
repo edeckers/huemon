@@ -93,11 +93,8 @@ class Command:
   def __get_sensor(device_id):
     return Command.__get_by_unique_id(device_id, Api.get_sensors())
 
-  def __map_value(value, path, type):
-    return type(reduce(lambda p, field: p[field], path.split("."), value))
-
   def __mapper(path, type):
-    return lambda v: Command.__map_value(v, path, type)
+    return lambda value: type(reduce(lambda p, field: p[field], path.split("."), value))
 
   def __map_config(mapper):
     return mapper(Api.get_system_config())
@@ -146,15 +143,6 @@ class Command:
   def __process(value):
     print(value)
 
-  def __process_light(unique_id: str, mapper):
-    Command.__process(Command.__map_light(unique_id, mapper))
-
-  def __process_sensor(unique_id: str, mapper):
-    Command.__process(Command.__map_sensor(unique_id, mapper))
-
-  def __process_system(mapper):
-    Command.__process(Command.__map_config(mapper))
-
   def discover(arguments):
     # if (len(arguments) != 1):
     #   print (f"Expected exactly one argument for `discover`, received {len(arguments)}")
@@ -168,14 +156,13 @@ class Command:
     #   print (f"Expected exactly one argument for `status`, received {len(arguments)}")
     #   exit (1)
 
-    device_id = arguments[0]
-    action = arguments[1]
+    device_id, action = arguments
 
     if action not in Command.__SENSOR_ACTION_MAP:
       return
 
-    Command.__process_sensor(
-        device_id, Command.__SENSOR_ACTION_MAP[action](device_id))
+    Command.__process(Command.__map_sensor(
+        device_id, Command.__SENSOR_ACTION_MAP[action](device_id)))
 
   def light(arguments):
     # if (len(arguments) != 1):
@@ -187,19 +174,21 @@ class Command:
     if action not in Command.__LIGHT_ACTION_MAP:
       return
 
-    Command.__process_light(light_id, Command.__LIGHT_ACTION_MAP[action])
+    Command.__process(Command.__map_light(
+        light_id, Command.__LIGHT_ACTION_MAP[action]))
 
   def system(arguments):
     # if (len(arguments) != 1):
     #   print (f"Expected exactly one argument for `status`, received {len(arguments)}")
     #   exit (1)
 
-    action = arguments[0]
+    action, *_ = arguments
 
     if action not in Command.__SYSTEM_ACTION_MAP:
       return
 
-    Command.__process_system(Command.__SYSTEM_ACTION_MAP[action])
+    Command.__process(Command.__map_config(
+        Command.__SYSTEM_ACTION_MAP[action]))
 
   __COMMAND_HANDLERS = {
       "discover": discover,
@@ -223,9 +212,7 @@ if __name__ == "__main__":
     print("Did not receive enough arguments, expected at least one command argument")
     exit(1)
 
-  command = sys.argv[1]
-
-  arguments = sys.argv[2:]
+  command, *arguments = sys.argv[1:]
 
   Command.exec(command, arguments)
   exit(0)
