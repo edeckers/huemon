@@ -124,6 +124,13 @@ class Command:
   def __MAPPER_SYSTEM_UPGRADE_AVAILABLE(config): return int(
       config["swupdate2"]["state"] != "noupdates")
 
+  __LIGHT_ACTION_MAP = {
+      "is_upgrade_available": __MAPPER_UPDATES_AVAILABLE,
+      "reachable": __MAPPER_LIGHT_REACHABLE,
+      "status": __MAPPER_STATE_ON,
+      "version": __MAPPER_VERSION,
+  }
+
   def __process(value):
     print(value)
 
@@ -150,18 +157,6 @@ class Command:
 
   def __print_sensor_temperature(unique_id):
     Command.__process_sensor(unique_id, Command.__MAPPER_TEMPERATURE_REACHABLE)
-
-  def __print_light_reachable(unique_id):
-    Command.__process_light(unique_id, Command.__MAPPER_LIGHT_REACHABLE)
-
-  def __print_light_status(unique_id):
-    Command.__process_light(unique_id, Command.__MAPPER_STATE_ON)
-
-  def __print_light_upgrade_available(unique_id):
-    Command.__process_light(unique_id, Command.__MAPPER_UPDATES_AVAILABLE)
-
-  def __print_light_version(unique_id):
-    Command.__process_light(unique_id, Command.__MAPPER_VERSION)
 
   def __print_system_upgrade_available():
     Command.__process_system(Command.__MAPPER_SYSTEM_UPGRADE_AVAILABLE)
@@ -205,45 +200,17 @@ class Command:
       Command.__print_sensor_light_level(device_id)
       return
 
-  def exec(command: str, arguments):
-    COMMAND_HANDLERS = {
-        "discover": Command.discover,
-        "light": Command.light,
-        "sensor": Command.sensor,
-        "system": Command.system
-    }
-
-    is_valid_command = command in COMMAND_HANDLERS
-    if not is_valid_command:
-      print(
-          f"Unexpected command `{command}`, expected one of {list(COMMAND_HANDLERS.keys())}")
-      exit(1)
-
-    COMMAND_HANDLERS[command](arguments)
-
   def light(arguments):
     # if (len(arguments) != 1):
     #   print (f"Expected exactly one argument for `status`, received {len(arguments)}")
     #   exit (1)
 
-    light_id = arguments[0]
-    action = arguments[1]
+    light_id, action = arguments
 
-    if (action == "is_upgrade_available"):
-      Command.__print_light_upgrade_available(light_id)
+    if action not in Command.__LIGHT_ACTION_MAP:
       return
 
-    if (action == "reachable"):
-      Command.__print_light_reachable(light_id)
-      return
-
-    if (action == "status"):
-      Command.__print_light_status(light_id)
-      return
-
-    if (action == "version"):
-      Command.__print_light_version(light_id)
-      return
+    Command.__process_light(light_id, Command.__LIGHT_ACTION_MAP[action])
 
   def system(arguments):
     # if (len(arguments) != 1):
@@ -259,6 +226,22 @@ class Command:
     if (action == "version"):
       Command.__print_system_version()
       return
+
+  __COMMAND_HANDLERS = {
+      "discover": discover,
+      "light": light,
+      "sensor": sensor,
+      "system": system
+  }
+
+  def exec(command: str, arguments):
+    is_valid_command = command in Command.__COMMAND_HANDLERS
+    if not is_valid_command:
+      print(
+          f"Unexpected command `{command}`, expected one of {list(Command.__COMMAND_HANDLERS.keys())}")
+      exit(1)
+
+    Command.__COMMAND_HANDLERS[command](arguments)
 
 
 if __name__ == "__main__":
