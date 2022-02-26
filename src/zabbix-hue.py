@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 
+from fcntl import LOCK_EX, LOCK_NB, fcntl, flock
 import json
 import logging
 import logging.config
+import os
 import sys
+from tempfile import mkstemp, tempdir
+import tempfile
+import time
 import yaml
 
 from functools import reduce
+from os.path import exists
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -65,20 +71,63 @@ class Api(ApiInterface):
 
 
 class CachedApi(ApiInterface):
+  __LOCK_FILE = "/".join([tempfile.gettempdir(), "zabbix-hue.lock"])
+  __MAX_CACHE_AGE_MILLISECONDS = 10_000
+
   def __init__(self, api: ApiInterface):
     self.api = api
 
+  def __cache(self, type: str, fn_call):
+    cache_file_path = "/".join([tempfile.gettempdir(),
+                               f"zabbix-hue.{type}.json"])
+
+    does_cache_file_exist = exists(cache_file_path)
+    is_cache_file_expired = not does_cache_file_exist or time.time(
+    ) - os.path.getmtime(cache_file_path) >= CachedApi.__MAX_CACHE_AGE_MILLISECONDS
+    is_cache_hit = not is_cache_file_expired
+
+    if is_cache_hit:
+      with open(cache_file_path, "r") as f_json:
+        LOG.debug("Cache hit (type=%s)", type)
+        return json.loads(f_json.read())
+
+    with open(CachedApi.__LOCK_FILE, "w") as f_lock:
+      try:
+        flock(f_lock.fileno(), LOCK_EX | LOCK_NB)
+        LOG.debug("Acquired lock successfully (file=%s)",
+                  CachedApi.__LOCK_FILE)
+
+        fd, tmp_file_path = mkstemp()
+        with open(tmp_file_path, "w") as f_tmp:
+          f_tmp.write(json.dumps(fn_call()))
+
+        os.close(fd)
+
+        os.rename(tmp_file_path, cache_file_path)
+
+        with open(cache_file_path) as f_json:
+          return json.loads(f_json.read())
+      except:
+        LOG.debug("Failed to acquire lock, cache hit (file=%s)",
+                  CachedApi.__LOCK_FILE)
+
+    if not does_cache_file_exist:
+      return []
+
+    with open(cache_file_path) as f_json:
+      return json.loads(f_json.read())
+
   def get_system_config(self):
-    return self.api.get_system_config()
+    return self.__cache("system", self.api.get_system_config)
 
   def get_lights(self):
-    return self.api.get_lights()
+    return self.__cache("lights", self.api.get_lights)
 
   def get_sensors(self):
-    return self.api.get_sensors()
+    return self.__cache("sensors", self.api.get_sensors)
 
   def get_batteries(self):
-    return self.api.get_batteries()
+    return self.__cache("batteries", self.api.get_batteries)
 
 
 class Discover:
