@@ -191,6 +191,59 @@ class Discover:
         "Finished `discover` command (discovery_type=%s)", discovery_type)
 
 
+class HueCommand:
+  def _process(value):
+    print(value)
+
+  def _mapper(path, type):
+    return lambda value: type(reduce(lambda p, field: p[field], path.split("."), value))
+
+  def name():
+    pass
+
+  def exec():
+    pass
+
+
+class SystemCommand(HueCommand):
+  def __map_config(self, mapper):
+    return mapper(self.api.get_system_config())
+
+  def __MAPPER_SYSTEM_UPGRADE_AVAILABLE(config): return int(
+      config["swupdate2"]["state"] != "noupdates")
+  __MAPPER_VERSION = HueCommand._mapper("swversion", str)
+
+  __SYSTEM_ACTION_MAP = {
+      "is_upgrade_available": __MAPPER_SYSTEM_UPGRADE_AVAILABLE,
+      "version": __MAPPER_VERSION,
+  }
+
+  def __init__(self, api, arguments):
+    self.arguments = arguments
+    self.api = api
+
+  def name():
+    return "system"
+
+  def exec(self):
+    LOG.debug("Running `system` command (arguments=%s)", self.arguments)
+    if (len(self.arguments) != 1):
+      LOG.error(
+          "Expected exactly one argument for `system`, received %s", len(self.arguments))
+      print(
+          f"Expected exactly one argument for `system`, received {len(self.arguments)}")
+      exit(1)
+
+    action, *_ = arguments
+
+    if action not in self.__SYSTEM_ACTION_MAP:
+      LOG.error("Received unknown action '%s' for `system` command", action)
+      return
+
+    HueCommand._process(self.__map_config(self.__SYSTEM_ACTION_MAP[action]))
+    LOG.debug("Finished `system` command (arguments=%s)", arguments)
+
+
 class CommandHandler:
   def __init__(self, api: ApiInterface):
     self.api = api
@@ -210,9 +263,6 @@ class CommandHandler:
   def __mapper(path, type):
     return lambda value: type(reduce(lambda p, field: p[field], path.split("."), value))
 
-  def __map_config(self, mapper):
-    return mapper(self.api.get_system_config())
-
   def __map_light(self, unique_id, mapper):
     return mapper(self.__get_light(unique_id))
 
@@ -224,9 +274,6 @@ class CommandHandler:
 
   def __MAPPER_UPDATES_AVAILABLE(light): return int(
       light["swupdate"]["state"] != "noupdates")
-
-  def __MAPPER_SYSTEM_UPGRADE_AVAILABLE(config): return int(
-      config["swupdate2"]["state"] != "noupdates")
 
   __MAPPER_BATTERY = __mapper("config.battery", float)
   __MAPPER_LIGHT_LEVEL = __mapper("state.lightlevel", float)
@@ -248,10 +295,6 @@ class CommandHandler:
       "reachable": __MAPPER_SENSOR_REACHABLE,
       "temperature": __MAPPER_TEMPERATURE,
       "light:level": __MAPPER_LIGHT_LEVEL
-  }
-  __SYSTEM_ACTION_MAP = {
-      "is_upgrade_available": __MAPPER_SYSTEM_UPGRADE_AVAILABLE,
-      "version": __MAPPER_VERSION,
   }
 
   def __process(value):
@@ -309,23 +352,7 @@ class CommandHandler:
     LOG.debug("Finished `light` command (arguments=%s)", arguments)
 
   def system(self, arguments):
-    LOG.debug("Running `system` command (arguments=%s)", arguments)
-    if (len(arguments) != 1):
-      LOG.error(
-          "Expected exactly one argument for `system`, received %s", len(arguments))
-      print(
-          f"Expected exactly one argument for `system`, received {len(arguments)}")
-      exit(1)
-
-    action, *_ = arguments
-
-    if action not in self.__SYSTEM_ACTION_MAP:
-      LOG.error("Received unknown action '%s' for `system` command", action)
-      return
-
-    CommandHandler.__process(self.__map_config(
-        self.__SYSTEM_ACTION_MAP[action]))
-    LOG.debug("Finished `system` command (arguments=%s)", arguments)
+    return SystemCommand(self.api, arguments).exec()
 
   __COMMAND_HANDLERS = {
       "discover": discover,
