@@ -160,9 +160,12 @@ class Command:
 
   def discover(arguments):
     logger.debug("Running `discover` command (arguments=%s)", arguments)
-    # if (len(arguments) != 1):
-    #   print (f"Expected exactly one argument for `discover`, received {len(arguments)}")
-    #   exit (1)
+    if (len(arguments) != 1):
+      logger.error(
+          "Expected exactly one arguments for `discover`, received %s", len(arguments))
+      print(
+          f"Expected exactly one argument for `discover`, received {len(arguments)}")
+      exit(1)
     discovery_type, *_ = arguments
 
     Discover.discover(discovery_type)
@@ -170,9 +173,12 @@ class Command:
 
   def sensor(arguments):
     logger.debug("Running `sensor` command (arguments=%s)", arguments)
-    # if (len(arguments) != 1):
-    #   print (f"Expected exactly one argument for `sensor`, received {len(arguments)}")
-    #   exit (1)
+    if (len(arguments) != 2):
+      logger.error(
+          "Expected exactly two arguments for `sensor`, received %s", len(arguments))
+      print(
+          f"Expected exactly two arguments for `sensor`, received {len(arguments)}")
+      exit(1)
 
     device_id, action = arguments
 
@@ -186,9 +192,12 @@ class Command:
 
   def light(arguments):
     logger.debug("Running `light` command (arguments=%s)", arguments)
-    # if (len(arguments) != 1):
-    #   print (f"Expected exactly one argument for `light`, received {len(arguments)}")
-    #   exit (1)
+    if (len(arguments) != 2):
+      logger.error(
+          "Expected exactly two arguments for `light`, received %s", len(arguments))
+      print(
+          f"Expected exactly two arguments for `light`, received {len(arguments)}")
+      exit(1)
 
     light_id, action = arguments
 
@@ -202,9 +211,12 @@ class Command:
 
   def system(arguments):
     logger.debug("Running `system` command (arguments=%s)", arguments)
-    # if (len(arguments) != 1):
-    #   print (f"Expected exactly one argument for `system`, received {len(arguments)}")
-    #   exit (1)
+    if (len(arguments) != 1):
+      logger.error(
+          "Expected exactly one argument for `system`, received %s", len(arguments))
+      print(
+          f"Expected exactly one argument for `system`, received {len(arguments)}")
+      exit(1)
 
     action, *_ = arguments
 
