@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-from fcntl import LOCK_EX, LOCK_NB, fcntl, flock
+from fcntl import LOCK_EX, LOCK_NB, flock
 from fileinput import filename
 import json
 import logging
 import logging.config
+import math
 import os
 import sys
-from tempfile import mkstemp, tempdir
+from tempfile import mkstemp
 import tempfile
 import time
 import yaml
@@ -25,6 +26,8 @@ with open("/".join([str(Path(__file__).parent), "config.yml"]), "r") as f:
 LOG = logging.getLogger("hue")
 
 HUE_HUB_URL = f"http://{config['ip']}/api/{config['key']}"
+
+MAX_CACHE_AGE_SECONDS = int(config["cache"]["max_age_seconds"])
 
 
 class ApiInterface:
@@ -72,9 +75,6 @@ class Api(ApiInterface):
 
 
 class CachedApi(ApiInterface):
-  __LOCK_FILE = "/".join([tempfile.gettempdir(), "zabbix-hue.lock"])
-  __MAX_CACHE_AGE_SECONDS = 10
-
   def __init__(self, api: ApiInterface):
     self.api = api
 
@@ -87,13 +87,14 @@ class CachedApi(ApiInterface):
     lock_file = CachedApi.__tf(f"{temp_filename}.lock")
 
     does_cache_file_exist = exists(cache_file_path)
-    is_cache_file_expired = not does_cache_file_exist or time.time(
-    ) - os.path.getmtime(cache_file_path) >= CachedApi.__MAX_CACHE_AGE_SECONDS
+    cache_age_seconds = time.time() - os.path.getmtime(cache_file_path)
+    is_cache_file_expired = not does_cache_file_exist or cache_age_seconds >= MAX_CACHE_AGE_SECONDS
     is_cache_hit = not is_cache_file_expired
 
     if is_cache_hit:
       with open(cache_file_path, "r") as f_json:
-        LOG.debug("Cache hit (type=%s)", type)
+        LOG.debug("Cache hit (type=%s,age_seconds=%s,max_cache_age_seconds=%s)",
+                  type, round(cache_age_seconds, 1), MAX_CACHE_AGE_SECONDS)
         return json.loads(f_json.read())
 
     with open(lock_file, "w") as f_lock:
