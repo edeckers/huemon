@@ -7,9 +7,10 @@ import sys
 import yaml
 
 from functools import reduce
+from pathlib import Path
 from urllib.request import urlopen
 
-with open("config.yml", "r") as f:
+with open("/".join([str(Path(__file__).parent), "config.yml"]), "r") as f:
   config = yaml.safe_load(f.read())
   logging.config.dictConfig(config)
 
