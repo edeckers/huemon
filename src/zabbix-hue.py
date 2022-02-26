@@ -58,29 +58,27 @@ class Discover:
     Discover.__print_array_as_discovery(Api.get_lights())
 
   def __print_discover_sensors_type(field_name):
+    if field_name not in ["presence", "light", "temperature"]:
+      return
+
     Discover.__print_array_as_discovery(filter(
-        Discover.__has_state_field(field_name),
+        Discover.__has_state_field(
+            "lightlevel" if field_name == "light" else field_name),
         Api.get_sensors()))
 
+  __DISCOVERY_HANDLERS = {
+      "batteries": lambda _: Discover.__print_discover_batteries(),
+      "lights": lambda _: Discover.__print_discover_lights(),
+      "sensors": __print_discover_sensors_type
+  }
+
   def discover(discovery_type):
-    if discovery_type == "batteries":
-      Discover.__print_discover_batteries()
+    target, maybe_sub_target, *_ = discovery_type.split(":") + [None]
 
-    if discovery_type == "lights":
-      Discover.__print_discover_lights()
+    if target not in Discover.__DISCOVERY_HANDLERS:
       return
 
-    if discovery_type == "sensors:presence":
-      Discover.__print_discover_sensors_type("presence")
-      return
-
-    if discovery_type == "sensors:light":
-      Discover.__print_discover_sensors_type("lightlevel")
-      return
-
-    if discovery_type == "sensors:temperature":
-      Discover.__print_discover_sensors_type("temperature")
-      return
+    Discover.__DISCOVERY_HANDLERS[target](maybe_sub_target)
 
 
 class Command:
@@ -109,60 +107,67 @@ class Command:
   def __map_sensor(unique_id, mapper):
     return mapper(Command.__get_sensor(unique_id))
 
+  __MAPPER_BATTERY = __mapper("config.battery", float)
+  __MAPPER_LIGHT_LEVEL = __mapper("state.lightlevel", float)
+  __MAPPER_PRESENCE = __mapper("state.presence", int)
+  __MAPPER_SENSOR_REACHABLE = __mapper("config.reachable", int)
+  __MAPPER_LIGHT_REACHABLE = __mapper("state.reachable", int)
+  __MAPPER_STATE_ON = __mapper("state.on", int)
+  __MAPPER_VERSION = __mapper("swversion", str)
+
+  def __MAPPER_TEMPERATURE_REACHABLE(device): return float(
+      device["state"]["temperature"]/100)
+
+  def __MAPPER_UPDATES_AVAILABLE(light): return int(
+      light["swupdate"]["state"] != "noupdates")
+
+  def __MAPPER_SYSTEM_UPGRADE_AVAILABLE(config): return int(
+      config["swupdate2"]["state"] != "noupdates")
+
   def __process(value):
     print(value)
 
+  def __process_light(unique_id: str, mapper):
+    Command.__process(Command.__map_light(unique_id, mapper))
+
+  def __process_sensor(unique_id: str, mapper):
+    Command.__process(Command.__map_sensor(unique_id, mapper))
+
+  def __process_system(mapper):
+    Command.__process(Command.__map_config(mapper))
+
   def __print_sensor_battery_level(unique_id):
-    Command.__process(Command.__map_sensor(
-        unique_id,
-        Command.__mapper("config.battery", float)))
+    Command.__process_sensor(unique_id, Command.__MAPPER_BATTERY)
 
   def __print_sensor_light_level(unique_id):
-    Command.__process(Command.__map_sensor(
-        unique_id,
-        Command.__mapper("state.lightlevel", float)))
+    Command.__process_sensor(unique_id, Command.__MAPPER_LIGHT_LEVEL)
 
   def __print_sensor_presence(unique_id):
-    Command.__process(Command.__map_sensor(
-        unique_id,
-        Command.__mapper("state.presence", int)))
+    Command.__process_sensor(unique_id, Command.__MAPPER_PRESENCE)
 
   def __print_sensor_reachable(unique_id):
-    Command.__process(Command.__map_sensor(
-        unique_id,
-        Command.__mapper("config.reachable", int)))
+    Command.__process_sensor(unique_id, Command.__MAPPER_SENSOR_REACHABLE)
 
   def __print_sensor_temperature(unique_id):
-    Command.__process(Command.__map_sensor(
-        unique_id,
-        lambda device: float(device["state"]["temperature"]/100)))
+    Command.__process_sensor(unique_id, Command.__MAPPER_TEMPERATURE_REACHABLE)
 
   def __print_light_reachable(unique_id):
-    Command.__process(Command.__map_light(
-        unique_id,
-        Command.__mapper("state.reachable", int)))
+    Command.__process_light(unique_id, Command.__MAPPER_LIGHT_REACHABLE)
 
   def __print_light_status(unique_id):
-    Command.__process(Command.__map_light(
-        unique_id,
-        Command.__mapper("state.on", int)))
+    Command.__process_light(unique_id, Command.__MAPPER_STATE_ON)
 
   def __print_light_upgrade_available(unique_id):
-    Command.__process(Command.__map_light(
-        unique_id,
-        lambda light: int(light["swupdate"]["state"] != "noupdates")))
+    Command.__process_light(unique_id, Command.__MAPPER_UPDATES_AVAILABLE)
 
   def __print_light_version(unique_id):
-    Command.__process(Command.__map_light(
-        unique_id,
-        Command.__mapper("swversion", str)))
+    Command.__process_light(unique_id, Command.__MAPPER_VERSION)
 
   def __print_system_upgrade_available():
-    Command.__process(Command.__map_config(
-        lambda config: int(config["swupdate2"]["state"] != "noupdates")))
+    Command.__process_system(Command.__MAPPER_SYSTEM_UPGRADE_AVAILABLE)
 
   def __print_system_version():
-    Command.__process(Command.__map_config(Command.__mapper("swversion", str)))
+    Command.__process_system(Command.__MAPPER_VERSION)
 
   def discover(arguments):
     # if (len(arguments) != 1):
