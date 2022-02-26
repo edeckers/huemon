@@ -127,8 +127,8 @@ class Command:
       "presence": __MAPPER_PRESENCE,
       "reachable": __MAPPER_SENSOR_REACHABLE,
       "temperature": __MAPPER_TEMPERATURE,
-      "light:level": __MAPPER_LIGHT_LEVEL}
-
+      "light:level": __MAPPER_LIGHT_LEVEL
+  }
   __SYSTEM_ACTION_MAP = {
       "is_upgrade_available": __MAPPER_SYSTEM_UPGRADE_AVAILABLE,
       "version": __MAPPER_VERSION,
@@ -141,13 +141,13 @@ class Command:
     # if (len(arguments) != 1):
     #   print (f"Expected exactly one argument for `discover`, received {len(arguments)}")
     #   exit (1)
-    discovery_type = arguments[0]
+    discovery_type, *_ = arguments
 
     Discover.discover(discovery_type)
 
   def sensor(arguments):
     # if (len(arguments) != 1):
-    #   print (f"Expected exactly one argument for `status`, received {len(arguments)}")
+    #   print (f"Expected exactly one argument for `sensor`, received {len(arguments)}")
     #   exit (1)
 
     device_id, action = arguments
@@ -160,7 +160,7 @@ class Command:
 
   def light(arguments):
     # if (len(arguments) != 1):
-    #   print (f"Expected exactly one argument for `status`, received {len(arguments)}")
+    #   print (f"Expected exactly one argument for `light`, received {len(arguments)}")
     #   exit (1)
 
     light_id, action = arguments
@@ -173,7 +173,7 @@ class Command:
 
   def system(arguments):
     # if (len(arguments) != 1):
-    #   print (f"Expected exactly one argument for `status`, received {len(arguments)}")
+    #   print (f"Expected exactly one argument for `system`, received {len(arguments)}")
     #   exit (1)
 
     action, *_ = arguments
