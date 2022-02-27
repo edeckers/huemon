@@ -6,6 +6,9 @@ LOG = create_logger()
 
 
 class SystemCommand(HueCommand):
+  def __init__(self, config: dict, api: ApiInterface):
+    self.api = api
+
   def __map_config(self, mapper):
     return mapper(self.api.get_system_config())
 
@@ -18,27 +21,23 @@ class SystemCommand(HueCommand):
       "version": __MAPPER_VERSION,
   }
 
-  def __init__(self, api: ApiInterface, arguments):
-    self.arguments = arguments
-    self.api = api
-
-  def name(self):
+  def name():
     return "system"
 
-  def exec(self):
-    LOG.debug("Running `system` command (arguments=%s)", self.arguments)
-    if (len(self.arguments) != 1):
+  def exec(self, arguments):
+    LOG.debug("Running `system` command (arguments=%s)", arguments)
+    if (len(arguments) != 1):
       LOG.error(
-          "Expected exactly one argument for `system`, received %s", len(self.arguments))
+          "Expected exactly one argument for `system`, received %s", len(arguments))
       print(
-          f"Expected exactly one argument for `system`, received {len(self.arguments)}")
+          f"Expected exactly one argument for `system`, received {len(arguments)}")
       exit(1)
 
-    action, *_ = self.arguments
+    action, *_ = arguments
 
     if action not in self.__SYSTEM_ACTION_MAP:
       LOG.error("Received unknown action '%s' for `system` command", action)
       return
 
     HueCommand._process(self.__map_config(self.__SYSTEM_ACTION_MAP[action]))
-    LOG.debug("Finished `system` command (arguments=%s)", self.arguments)
+    LOG.debug("Finished `system` command (arguments=%s)", arguments)

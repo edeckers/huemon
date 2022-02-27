@@ -1,4 +1,3 @@
-
 from functools import reduce
 from api_interface import ApiInterface
 from hue_command_interface import HueCommand
@@ -8,6 +7,9 @@ LOG = create_logger()
 
 
 class SensorCommand(HueCommand):
+  def __init__(self, config: dict, api: ApiInterface):
+    self.api = api
+
   def __get_sensor(self, device_id):
     return HueCommand.get_by_unique_id(device_id, self.api.get_sensors())
 
@@ -33,23 +35,19 @@ class SensorCommand(HueCommand):
       "light:level": __MAPPER_LIGHT_LEVEL
   }
 
-  def __init__(self, api: ApiInterface, arguments):
-    self.api = api
-    self.arguments = arguments
-
   def name():
     return "sensor"
 
-  def exec(self):
-    LOG.debug("Running `sensor` command (arguments=%s)", self.arguments)
-    if (len(self.arguments) != 2):
+  def exec(self, arguments):
+    LOG.debug("Running `sensor` command (arguments=%s)", arguments)
+    if (len(arguments) != 2):
       LOG.error(
-          "Expected exactly two arguments for `sensor`, received %s", len(self.arguments))
+          "Expected exactly two arguments for `sensor`, received %s", len(arguments))
       print(
-          f"Expected exactly two arguments for `sensor`, received {len(self.arguments)}")
+          f"Expected exactly two arguments for `sensor`, received {len(arguments)}")
       exit(1)
 
-    device_id, action = self.arguments
+    device_id, action = arguments
 
     if action not in SensorCommand.__SENSOR_ACTION_MAP:
       LOG.error("Received unknown action '%s' for `sensor` command", action)
@@ -57,4 +55,4 @@ class SensorCommand(HueCommand):
 
     HueCommand._process(self.__map_sensor(
         device_id, SensorCommand.__SENSOR_ACTION_MAP[action]))
-    LOG.debug("Finished `sensor` command (arguments=%s)", self.arguments)
+    LOG.debug("Finished `sensor` command (arguments=%s)", arguments)

@@ -66,19 +66,21 @@ class Discover:
 
 
 class DiscoverCommand(HueCommand):
-  def __init__(self, api: ApiInterface, arguments):
-    self.arguments = arguments
+  def __init__(self, config: dict, api: ApiInterface):
     self.discovery = Discover(api)
 
-  def exec(self):
-    LOG.debug("Running `discover` command (arguments=%s)", self.arguments)
-    if (len(self.arguments) != 1):
+  def name():
+    return "discover"
+
+  def exec(self, arguments):
+    LOG.debug("Running `discover` command (arguments=%s)", arguments)
+    if (len(arguments) != 1):
       LOG.error(
-          "Expected exactly one arguments for `discover`, received %s", len(self.arguments))
+          "Expected exactly one arguments for `discover`, received %s", len(arguments))
       print(
-          f"Expected exactly one argument for `discover`, received {len(self.arguments)}")
+          f"Expected exactly one argument for `discover`, received {len(arguments)}")
       exit(1)
-    discovery_type, *_ = self.arguments
+    discovery_type, *_ = arguments
 
     self.discovery.discover(discovery_type)
-    LOG.debug("Finished `discover` command (arguments=%s)", self.arguments)
+    LOG.debug("Finished `discover` command (arguments=%s)", arguments)

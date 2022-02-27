@@ -1,4 +1,5 @@
 config.yml
+commands_enabled
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

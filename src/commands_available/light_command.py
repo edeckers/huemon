@@ -6,6 +6,9 @@ LOG = create_logger()
 
 
 class LightCommand(HueCommand):
+  def __init__(self, config: dict, api: ApiInterface):
+    self.api = api
+
   def __MAPPER_UPDATES_AVAILABLE(light): return int(
       light["swupdate"]["state"] != "noupdates")
 
@@ -26,23 +29,19 @@ class LightCommand(HueCommand):
   def __map_light(self, unique_id, mapper):
     return mapper(self.__get_light(unique_id))
 
-  def __init__(self, api: ApiInterface, arguments):
-    self.api = api
-    self.arguments = arguments
-
-  def name(self):
+  def name():
     return "light"
 
-  def exec(self):
-    LOG.debug("Running `light` command (arguments=%s)", self.arguments)
-    if (len(self.arguments) != 2):
+  def exec(self, arguments):
+    LOG.debug("Running `light` command (arguments=%s)", arguments)
+    if (len(arguments) != 2):
       LOG.error(
-          "Expected exactly two arguments for `light`, received %s", len(self.arguments))
+          "Expected exactly two arguments for `light`, received %s", len(arguments))
       print(
-          f"Expected exactly two arguments for `light`, received {len(self.arguments)}")
+          f"Expected exactly two arguments for `light`, received {len(arguments)}")
       exit(1)
 
-    light_id, action = self.arguments
+    light_id, action = arguments
 
     if action not in self.__LIGHT_ACTION_MAP:
       LOG.error("Received unknown action '%s' for `light` command", action)
@@ -50,4 +49,4 @@ class LightCommand(HueCommand):
 
     HueCommand._process(self.__map_light(
         light_id, self.__LIGHT_ACTION_MAP[action]))
-    LOG.debug("Finished `light` command (arguments=%s)", self.arguments)
+    LOG.debug("Finished `light` command (arguments=%s)", arguments)
