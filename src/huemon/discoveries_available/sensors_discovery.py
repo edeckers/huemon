@@ -10,6 +10,16 @@ from huemon.util import exit_fail
 
 LOG = create_logger()
 
+TYPE_LIGHT = "light"
+TYPE_PRESENCE = "presence"
+TYPE_TEMPERATURE = "temperature"
+
+SENSOR_TYPES = [
+    TYPE_LIGHT,
+    TYPE_PRESENCE,
+    TYPE_TEMPERATURE
+]
+
 
 class SensorsDiscovery(Discovery):
   def __init__(self, api: ApiInterface):
@@ -27,10 +37,11 @@ class SensorsDiscovery(Discovery):
 
     LOG.debug(
         "Running `discover sensor:*` command (sensor_type=%s)", sensor_type)
-    if sensor_type not in ["presence", "light", "temperature"]:
-      LOG.error(
-          "Received unknown sensor type '%s' for `discover sensor:*` command", sensor_type)
-      return
+    if sensor_type not in SENSOR_TYPES:
+      exit_fail(
+          "Received unknown sensor type '%s' for `discover sensor:*` command (expected=%s)",
+          sensor_type,
+          SENSOR_TYPES)
 
     Discovery._print_array_as_discovery(filter(
         Discovery._has_state_field(
