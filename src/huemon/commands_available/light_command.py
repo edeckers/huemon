@@ -44,7 +44,7 @@ class LightCommand(HueCommand):
     assert_exists(list(LightCommand.__LIGHT_ACTION_MAP), action)
 
     HueCommand._process(
-        LightCommand.__map_light(light_id, LightCommand.__LIGHT_ACTION_MAP[action]))
+        self.__map_light(light_id, LightCommand.__LIGHT_ACTION_MAP[action]))
 
     LOG.debug(
         "Finished `%s` command (arguments=%s)",
