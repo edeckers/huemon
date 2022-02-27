@@ -198,11 +198,59 @@ class HueCommand:
   def _mapper(path, type):
     return lambda value: type(reduce(lambda p, field: p[field], path.split("."), value))
 
-  def name():
+  def name(self):
     pass
 
-  def exec():
+  def exec(self):
     pass
+
+
+class LightCommand(HueCommand):
+  def __MAPPER_UPDATES_AVAILABLE(light): return int(
+      light["swupdate"]["state"] != "noupdates")
+
+  __MAPPER_LIGHT_REACHABLE = HueCommand._mapper("state.reachable", int)
+  __MAPPER_STATE_ON = HueCommand._mapper("state.on", int)
+  __MAPPER_VERSION = HueCommand._mapper("swversion", str)
+
+  __LIGHT_ACTION_MAP = {
+      "is_upgrade_available": __MAPPER_UPDATES_AVAILABLE,
+      "reachable": __MAPPER_LIGHT_REACHABLE,
+      "status": __MAPPER_STATE_ON,
+      "version": __MAPPER_VERSION,
+  }
+
+  def __get_light(self, unique_id):
+    return CommandHandler.get_by_unique_id(unique_id, self.api.get_lights())
+
+  def __map_light(self, unique_id, mapper):
+    return mapper(self.__get_light(unique_id))
+
+  def __init__(self, api, arguments):
+    self.api = api
+    self.arguments = arguments
+
+  def name(self):
+    return "light"
+
+  def exec(self):
+    LOG.debug("Running `light` command (arguments=%s)", self.arguments)
+    if (len(self.arguments) != 2):
+      LOG.error(
+          "Expected exactly two arguments for `light`, received %s", len(self.arguments))
+      print(
+          f"Expected exactly two arguments for `light`, received {len(self.arguments)}")
+      exit(1)
+
+    light_id, action = self.arguments
+
+    if action not in self.__LIGHT_ACTION_MAP:
+      LOG.error("Received unknown action '%s' for `light` command", action)
+      return
+
+    HueCommand._process(self.__map_light(
+        light_id, self.__LIGHT_ACTION_MAP[action]))
+    LOG.debug("Finished `light` command (arguments=%s)", arguments)
 
 
 class SystemCommand(HueCommand):
@@ -222,7 +270,7 @@ class SystemCommand(HueCommand):
     self.arguments = arguments
     self.api = api
 
-  def name():
+  def name(self):
     return "system"
 
   def exec(self):
@@ -249,22 +297,16 @@ class CommandHandler:
     self.api = api
     self.discovery = Discover(api)
 
-  def __get_by_unique_id(unique_id: str, items: list) -> list:
+  def get_by_unique_id(unique_id: str, items: list) -> list:
     return list(filter(
         lambda info: "uniqueid" in info and info["uniqueid"] == unique_id,
         items))[0]
 
-  def __get_light(self, unique_id):
-    return CommandHandler.__get_by_unique_id(unique_id, self.api.get_lights())
-
   def __get_sensor(self, device_id):
-    return CommandHandler.__get_by_unique_id(device_id, self.api.get_sensors())
+    return CommandHandler.get_by_unique_id(device_id, self.api.get_sensors())
 
   def __mapper(path, type):
     return lambda value: type(reduce(lambda p, field: p[field], path.split("."), value))
-
-  def __map_light(self, unique_id, mapper):
-    return mapper(self.__get_light(unique_id))
 
   def __map_sensor(self, unique_id, mapper):
     return mapper(self.__get_sensor(unique_id))
@@ -272,23 +314,11 @@ class CommandHandler:
   def __MAPPER_TEMPERATURE(device): return float(
       device["state"]["temperature"]/100)
 
-  def __MAPPER_UPDATES_AVAILABLE(light): return int(
-      light["swupdate"]["state"] != "noupdates")
-
   __MAPPER_BATTERY = __mapper("config.battery", float)
   __MAPPER_LIGHT_LEVEL = __mapper("state.lightlevel", float)
   __MAPPER_PRESENCE = __mapper("state.presence", int)
   __MAPPER_SENSOR_REACHABLE = __mapper("config.reachable", int)
-  __MAPPER_LIGHT_REACHABLE = __mapper("state.reachable", int)
-  __MAPPER_STATE_ON = __mapper("state.on", int)
-  __MAPPER_VERSION = __mapper("swversion", str)
 
-  __LIGHT_ACTION_MAP = {
-      "is_upgrade_available": __MAPPER_UPDATES_AVAILABLE,
-      "reachable": __MAPPER_LIGHT_REACHABLE,
-      "status": __MAPPER_STATE_ON,
-      "version": __MAPPER_VERSION,
-  }
   __SENSOR_ACTION_MAP = {
       "battery:level": __MAPPER_BATTERY,
       "presence": __MAPPER_PRESENCE,
@@ -333,23 +363,7 @@ class CommandHandler:
     LOG.debug("Finished `sensor` command (arguments=%s)", arguments)
 
   def light(self, arguments):
-    LOG.debug("Running `light` command (arguments=%s)", arguments)
-    if (len(arguments) != 2):
-      LOG.error(
-          "Expected exactly two arguments for `light`, received %s", len(arguments))
-      print(
-          f"Expected exactly two arguments for `light`, received {len(arguments)}")
-      exit(1)
-
-    light_id, action = arguments
-
-    if action not in CommandHandler.__LIGHT_ACTION_MAP:
-      LOG.error("Received unknown action '%s' for `light` command", action)
-      return
-
-    CommandHandler.__process(self.__map_light(
-        light_id, CommandHandler.__LIGHT_ACTION_MAP[action]))
-    LOG.debug("Finished `light` command (arguments=%s)", arguments)
+    return LightCommand(self.api, arguments).exec()
 
   def system(self, arguments):
     return SystemCommand(self.api, arguments).exec()
