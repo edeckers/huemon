@@ -1,5 +1,5 @@
-from api_interface import ApiInterface
-from discovery_interface import Discovery
+from hue_mon.api_interface import ApiInterface
+from hue_mon.discovery_interface import Discovery
 
 
 class LightsDiscovery(Discovery):

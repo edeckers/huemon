@@ -1,7 +1,7 @@
 from functools import reduce
-from api_interface import ApiInterface
-from hue_command_interface import HueCommand
-from logger_factory import create_logger
+from hue_mon.api_interface import ApiInterface
+from hue_mon.hue_command_interface import HueCommand
+from hue_mon.logger_factory import create_logger
 
 LOG = create_logger()
 

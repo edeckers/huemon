@@ -1,6 +1,6 @@
 from urllib.request import urlopen
-from api_interface import ApiInterface
-from logger_factory import create_logger
+from hue_mon.api_interface import ApiInterface
+from hue_mon.logger_factory import create_logger
 
 import json
 

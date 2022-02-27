@@ -5,17 +5,17 @@ from pathlib import Path
 import sys
 
 from functools import reduce
-from api.api import Api
-from api.cached_api import CachedApi
-from api_interface import ApiInterface
-from config_factory import create_config
+from hue_mon.api.api import Api
+from hue_mon.api.cached_api import CachedApi
+from hue_mon.api_interface import ApiInterface
+from hue_mon.config_factory import create_config
 
-from hue_command_interface import HueCommand
-from logger_factory import create_logger
-from plugin_loader import load_plugins
+from hue_mon.hue_command_interface import HueCommand
+from hue_mon.logger_factory import create_logger
+from hue_mon.plugin_loader import load_plugins
 
 COMMAND_PLUGINS_PATH = str(os.path.join(
-    Path(__file__).parent.absolute(), "commands_enabled"))
+    Path(__file__).parent.parent.absolute(), "commands_enabled"))
 CONFIG = create_config()
 HUE_HUB_URL = f"http://{CONFIG['ip']}/api/{CONFIG['key']}"
 LOG = create_logger()

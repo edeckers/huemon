@@ -1,6 +1,6 @@
-from api_interface import ApiInterface
-from discovery_interface import Discovery
-from logger_factory import create_logger
+from hue_mon.api_interface import ApiInterface
+from hue_mon.discovery_interface import Discovery
+from hue_mon.logger_factory import create_logger
 
 LOG = create_logger()
 
