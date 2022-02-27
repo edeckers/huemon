@@ -4,9 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from functools import reduce
-import sys
 from huemon.api_interface import ApiInterface
-from huemon.const import EXIT_FAIL
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 from huemon.util import exit_fail

@@ -4,9 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from functools import reduce
-import sys
 from huemon.api_interface import ApiInterface
-from huemon.const import EXIT_FAIL
 from huemon.discovery_interface import Discovery
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
@@ -71,7 +69,8 @@ class DiscoverCommand(HueCommand):
   def exec(self, arguments):
     LOG.debug("Running `discover` command (arguments=%s)", arguments)
     if (len(arguments) != 1):
-      exit_fail("Expected exactly one arguments for `discover`, received %s", len(arguments))
+      exit_fail(
+          "Expected exactly one arguments for `discover`, received %s", len(arguments))
 
     discovery_type, *_ = arguments
 
