@@ -7,7 +7,7 @@ setup(
   author_email="noreply@nonono.com",
   description="Monitoring for Philips Hue",
   long_description=open("README").read(),
-  name="HueMon",
+  name="huemon",
   packages=["huemon"],
   url="https://deckers.io",
   version="1.0.0",
