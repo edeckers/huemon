@@ -53,8 +53,7 @@ class SensorCommand(HueCommand):
     device_id, action = arguments
 
     if action not in SensorCommand.__SENSOR_ACTION_MAP:
-      LOG.error("Received unknown action '%s' for `sensor` command", action)
-      return
+      exit_fail("Received unknown action '%s' for `sensor` command", action)
 
     HueCommand._process(self.__map_sensor(
         device_id, SensorCommand.__SENSOR_ACTION_MAP[action]))

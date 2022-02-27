@@ -30,9 +30,7 @@ class DiscoveryHandler:
     target, maybe_sub_target, *_ = discovery_type.split(":") + [None]
 
     if target not in self.handlers:
-      LOG.error(
-          "Received unknown target '%s' for `discover` command", target)
-      return
+      exit_fail("Received unknown target '%s' for `discover` command", target)
 
     self.handlers[target].exec([maybe_sub_target] if maybe_sub_target else [])
 

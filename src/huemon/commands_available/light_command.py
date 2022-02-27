@@ -47,8 +47,7 @@ class LightCommand(HueCommand):
     light_id, action = arguments
 
     if action not in self.__LIGHT_ACTION_MAP:
-      LOG.error("Received unknown action '%s' for `light` command", action)
-      return
+      exit_fail("Received unknown action '%s' for `light` command", action)
 
     HueCommand._process(self.__map_light(
         light_id, self.__LIGHT_ACTION_MAP[action]))

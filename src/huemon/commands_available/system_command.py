@@ -39,8 +39,7 @@ class SystemCommand(HueCommand):
     action, *_ = arguments
 
     if action not in self.__SYSTEM_ACTION_MAP:
-      LOG.error("Received unknown action '%s' for `system` command", action)
-      return
+      exit_fail("Received unknown action '%s' for `system` command", action)
 
     HueCommand._process(self.__map_config(self.__SYSTEM_ACTION_MAP[action]))
     LOG.debug("Finished `system` command (arguments=%s)", arguments)
