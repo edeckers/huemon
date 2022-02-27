@@ -204,6 +204,77 @@ class HueCommand:
   def exec(self):
     pass
 
+class DiscoverCommand(HueCommand):
+  def __init__(self, api: ApiInterface, arguments):
+    self.arguments = arguments
+    self.discovery = Discover(api)
+
+  def exec(self):
+    LOG.debug("Running `discover` command (arguments=%s)", self.arguments)
+    if (len(self.arguments) != 1):
+      LOG.error(
+          "Expected exactly one arguments for `discover`, received %s", len(self.arguments))
+      print(
+          f"Expected exactly one argument for `discover`, received {len(self.arguments)}")
+      exit(1)
+    discovery_type, *_ = self.arguments
+
+    self.discovery.discover(discovery_type)
+    LOG.debug("Finished `discover` command (arguments=%s)", self.arguments)
+
+
+class SensorCommand(HueCommand):
+  def __get_sensor(self, device_id):
+    return CommandHandler.get_by_unique_id(device_id, self.api.get_sensors())
+
+  def __mapper(path, type):
+    return lambda value: type(reduce(lambda p, field: p[field], path.split("."), value))
+
+  def __map_sensor(self, unique_id, mapper):
+    return mapper(self.__get_sensor(unique_id))
+
+  def __MAPPER_TEMPERATURE(device): return float(
+      device["state"]["temperature"]/100)
+
+  __MAPPER_BATTERY = __mapper("config.battery", float)
+  __MAPPER_LIGHT_LEVEL = __mapper("state.lightlevel", float)
+  __MAPPER_PRESENCE = __mapper("state.presence", int)
+  __MAPPER_SENSOR_REACHABLE = __mapper("config.reachable", int)
+
+  __SENSOR_ACTION_MAP = {
+      "battery:level": __MAPPER_BATTERY,
+      "presence": __MAPPER_PRESENCE,
+      "reachable": __MAPPER_SENSOR_REACHABLE,
+      "temperature": __MAPPER_TEMPERATURE,
+      "light:level": __MAPPER_LIGHT_LEVEL
+  }
+
+  def __init__(self, api: ApiInterface, arguments):
+    self.api = api
+    self.arguments = arguments
+
+  def name():
+    return "sensor"
+
+  def exec(self):
+    LOG.debug("Running `sensor` command (arguments=%s)", self.arguments)
+    if (len(self.arguments) != 2):
+      LOG.error(
+          "Expected exactly two arguments for `sensor`, received %s", len(self.arguments))
+      print(
+          f"Expected exactly two arguments for `sensor`, received {len(self.arguments)}")
+      exit(1)
+
+    device_id, action = self.arguments
+
+    if action not in SensorCommand.__SENSOR_ACTION_MAP:
+      LOG.error("Received unknown action '%s' for `sensor` command", action)
+      return
+
+    HueCommand._process(self.__map_sensor(
+        device_id, SensorCommand.__SENSOR_ACTION_MAP[action]))
+    LOG.debug("Finished `sensor` command (arguments=%s)", arguments)
+
 
 class LightCommand(HueCommand):
   def __MAPPER_UPDATES_AVAILABLE(light): return int(
@@ -226,7 +297,7 @@ class LightCommand(HueCommand):
   def __map_light(self, unique_id, mapper):
     return mapper(self.__get_light(unique_id))
 
-  def __init__(self, api, arguments):
+  def __init__(self, api: ApiInterface, arguments):
     self.api = api
     self.arguments = arguments
 
@@ -266,7 +337,7 @@ class SystemCommand(HueCommand):
       "version": __MAPPER_VERSION,
   }
 
-  def __init__(self, api, arguments):
+  def __init__(self, api: ApiInterface, arguments):
     self.arguments = arguments
     self.api = api
 
@@ -295,72 +366,17 @@ class SystemCommand(HueCommand):
 class CommandHandler:
   def __init__(self, api: ApiInterface):
     self.api = api
-    self.discovery = Discover(api)
 
   def get_by_unique_id(unique_id: str, items: list) -> list:
     return list(filter(
         lambda info: "uniqueid" in info and info["uniqueid"] == unique_id,
         items))[0]
 
-  def __get_sensor(self, device_id):
-    return CommandHandler.get_by_unique_id(device_id, self.api.get_sensors())
-
-  def __mapper(path, type):
-    return lambda value: type(reduce(lambda p, field: p[field], path.split("."), value))
-
-  def __map_sensor(self, unique_id, mapper):
-    return mapper(self.__get_sensor(unique_id))
-
-  def __MAPPER_TEMPERATURE(device): return float(
-      device["state"]["temperature"]/100)
-
-  __MAPPER_BATTERY = __mapper("config.battery", float)
-  __MAPPER_LIGHT_LEVEL = __mapper("state.lightlevel", float)
-  __MAPPER_PRESENCE = __mapper("state.presence", int)
-  __MAPPER_SENSOR_REACHABLE = __mapper("config.reachable", int)
-
-  __SENSOR_ACTION_MAP = {
-      "battery:level": __MAPPER_BATTERY,
-      "presence": __MAPPER_PRESENCE,
-      "reachable": __MAPPER_SENSOR_REACHABLE,
-      "temperature": __MAPPER_TEMPERATURE,
-      "light:level": __MAPPER_LIGHT_LEVEL
-  }
-
-  def __process(value):
-    print(value)
-
   def discover(self, arguments):
-    LOG.debug("Running `discover` command (arguments=%s)", arguments)
-    if (len(arguments) != 1):
-      LOG.error(
-          "Expected exactly one arguments for `discover`, received %s", len(arguments))
-      print(
-          f"Expected exactly one argument for `discover`, received {len(arguments)}")
-      exit(1)
-    discovery_type, *_ = arguments
-
-    self.discovery.discover(discovery_type)
-    LOG.debug("Finished `discover` command (arguments=%s)", arguments)
+    return DiscoverCommand(self.api, arguments).exec()
 
   def sensor(self, arguments):
-    LOG.debug("Running `sensor` command (arguments=%s)", arguments)
-    if (len(arguments) != 2):
-      LOG.error(
-          "Expected exactly two arguments for `sensor`, received %s", len(arguments))
-      print(
-          f"Expected exactly two arguments for `sensor`, received {len(arguments)}")
-      exit(1)
-
-    device_id, action = arguments
-
-    if action not in CommandHandler.__SENSOR_ACTION_MAP:
-      LOG.error("Received unknown action '%s' for `sensor` command", action)
-      return
-
-    CommandHandler.__process(self.__map_sensor(
-        device_id, CommandHandler.__SENSOR_ACTION_MAP[action]))
-    LOG.debug("Finished `sensor` command (arguments=%s)", arguments)
+    return SensorCommand(self.api, arguments).exec()
 
   def light(self, arguments):
     return LightCommand(self.api, arguments).exec()
