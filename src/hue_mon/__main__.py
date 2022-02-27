@@ -27,7 +27,7 @@ def create_command_handlers(config: dict, api: ApiInterface, plugins: dict):
       lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
 
 
-class CommandHandler:
+class CommandHandler: # pylint: disable=too-few-public-methods
   def __init__(self, handlers):
     self.handlers = handlers
 
@@ -37,32 +37,39 @@ class CommandHandler:
       LOG.error("Received unknown command `%s`", command)
       print(
           f"Unexpected command `{command}`, expected one of {list(self.handlers)}")
-      exit(1)
+      sys.exit(1)
 
     self.handlers[command].exec(arguments)
 
     LOG.debug("Finished command `%s` (arguments=%s)", command, arguments)
 
 
+class Main: # pylint: disable=too-few-public-methods
+  @staticmethod
+  def main(argv):
+    LOG.debug("Running script (parameters=%s)", argv[1:])
+    if len(argv) <= 1:
+      print("Did not receive enough arguments, expected at least one command argument")
+      LOG.error(
+          "Did not receive enough arguments (arguments=%s)", argv[1:])
+      sys.exit(1)
+
+    command, *arguments = argv[1:]
+
+    LOG.debug("Loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
+    command_handler_plugins =  \
+        create_command_handlers(
+            CONFIG,
+            CachedApi(Api(HUE_HUB_URL), MAX_CACHE_AGE_SECONDS),
+            load_plugins("command", COMMAND_PLUGINS_PATH, HueCommand))
+    LOG.debug("Finished loading command plugins (path=%s)",
+              COMMAND_PLUGINS_PATH)
+
+    CommandHandler(command_handler_plugins).exec(command, arguments)
+
+    LOG.debug("Finished script (parameters=%s)", argv[1:])
+    sys.exit(0)
+
+
 if __name__ == "__main__":
-  LOG.debug("Running script (parameters=%s)", sys.argv[1:])
-  if len(sys.argv) <= 1:
-    print("Did not receive enough arguments, expected at least one command argument")
-    LOG.error(
-        "Did not receive enough arguments (arguments=%s)", sys.argv[1:])
-    exit(1)
-
-  command, *arguments = sys.argv[1:]
-
-  LOG.debug("Loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
-  command_handler_plugins =  \
-      create_command_handlers(
-          CONFIG,
-          CachedApi(Api(HUE_HUB_URL), MAX_CACHE_AGE_SECONDS),
-          load_plugins("command", COMMAND_PLUGINS_PATH, HueCommand))
-  LOG.debug("Finished loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
-
-  CommandHandler(command_handler_plugins).exec(command, arguments)
-
-  LOG.debug("Finished script (parameters=%s)", sys.argv[1:])
-  exit(0)
+  Main.main(sys.argv)

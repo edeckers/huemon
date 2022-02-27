@@ -14,7 +14,7 @@ def __get_plugin_type(module_name: str, path: str, sub_class):
           m[1], sub_class) and m[1] is not sub_class,
       inspect.getmembers(module)))
 
-  if (len(plugin_types) == 0):
+  if len(plugin_types) == 0:
     return None
 
   _, hue_command_class = plugin_types[0]

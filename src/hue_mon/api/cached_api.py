@@ -17,11 +17,12 @@ class CachedApi(ApiInterface):
     self.api = api
     self.max_cache_age_seconds = max_cache_age_seconds
 
+  @staticmethod
   def __tf(filename):
     return "/".join([tempfile.gettempdir(), filename])
 
-  def __cache(self, type: str, fn_call):
-    temp_filename = f"zabbix-hue.{type}"
+  def __cache(self, resource_type: str, fn_call):
+    temp_filename = f"zabbix-hue.{resource_type}"
     cache_file_path = CachedApi.__tf(f"{temp_filename}.json")
     lock_file = CachedApi.__tf(f"{temp_filename}.lock")
 
@@ -34,7 +35,7 @@ class CachedApi(ApiInterface):
     if is_cache_hit:
       with open(cache_file_path, "r") as f_json:
         LOG.debug("Cache hit (type=%s,age_seconds=%s,max_cache_age_seconds=%s)",
-                  type, round(cache_age_seconds, 1), self.max_cache_age_seconds)
+                  resource_type, round(cache_age_seconds, 1), self.max_cache_age_seconds)
         return json.loads(f_json.read())
 
     with open(lock_file, "w") as f_lock:
@@ -42,17 +43,17 @@ class CachedApi(ApiInterface):
         flock(f_lock.fileno(), LOCK_EX | LOCK_NB)
         LOG.debug("Acquired lock successfully (file=%s)", lock_file)
 
-        fd, tmp_file_path = tempfile.mkstemp()
+        tmp_fd, tmp_file_path = tempfile.mkstemp()
         with open(tmp_file_path, "w") as f_tmp:
           f_tmp.write(json.dumps(fn_call()))
 
-        os.close(fd)
+        os.close(tmp_fd)
 
         os.rename(tmp_file_path, cache_file_path)
 
         with open(cache_file_path) as f_json:
           return json.loads(f_json.read())
-      except:
+      except: # pylint: disable=bare-except
         LOG.debug("Failed to acquire lock, cache hit (file=%s)", lock_file)
 
     if not does_cache_file_exist:
