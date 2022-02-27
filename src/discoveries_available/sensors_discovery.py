@@ -1,6 +1,11 @@
-from api_interface import ApiInterface
-from discovery_interface import Discovery
-from logger_factory import create_logger
+# Copyright (c) Ely Deckers.
+#
+# This source code is licensed under the MPL-2.0 license found in the
+# LICENSE file in the root directory of this source tree.
+
+from hue_mon.api_interface import ApiInterface
+from hue_mon.discovery_interface import Discovery
+from hue_mon.logger_factory import create_logger
 
 LOG = create_logger()
 

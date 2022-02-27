@@ -1,7 +1,12 @@
+# Copyright (c) Ely Deckers.
+#
+# This source code is licensed under the MPL-2.0 license found in the
+# LICENSE file in the root directory of this source tree.
+
 from functools import reduce
-from api_interface import ApiInterface
-from hue_command_interface import HueCommand
-from logger_factory import create_logger
+from hue_mon.api_interface import ApiInterface
+from hue_mon.hue_command_interface import HueCommand
+from hue_mon.logger_factory import create_logger
 
 LOG = create_logger()
 

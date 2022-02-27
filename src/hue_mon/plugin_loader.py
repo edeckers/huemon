@@ -1,3 +1,8 @@
+# Copyright (c) Ely Deckers.
+#
+# This source code is licensed under the MPL-2.0 license found in the
+# LICENSE file in the root directory of this source tree.
+
 import importlib
 import inspect
 from pathlib import Path
@@ -14,7 +19,7 @@ def __get_plugin_type(module_name: str, path: str, sub_class):
           m[1], sub_class) and m[1] is not sub_class,
       inspect.getmembers(module)))
 
-  if (len(plugin_types) == 0):
+  if len(plugin_types) == 0:
     return None
 
   _, hue_command_class = plugin_types[0]
