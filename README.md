@@ -20,6 +20,7 @@ make init
 ```
 
 ### Archive
+
 ```bash
 make build
 ```
@@ -29,6 +30,18 @@ make build
 ```bash
 ln -s /path/to/commands_available/command_name.py /path/to/commands_enabled/command_name.py
 ln -s /path/to/discoveries_available/command_name.py /path/to/discoveries_enabled/command_name.py
+```
+
+### Configuration
+
+1. Copy `config.example.yml` from `src/huemon` to `/some/path/config.yml`
+2. Make necessary changes
+3. Provide the path through environment variable `HUEMON_CONFIG_PATH`
+
+For example:
+
+```bash
+HUEMON_CONFIG_PATH=/some/path/config.yml python3 -m huemon discover lights
 ```
 
 ### Zabbix agent configuration
