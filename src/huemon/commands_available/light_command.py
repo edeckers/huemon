@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from huemon.api_interface import ApiInterface
+from huemon.commands_available.sensor_command import SensorCommand
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 from huemon.util import exit_fail
@@ -32,16 +33,27 @@ class LightCommand(HueCommand):
     return "light"
 
   def exec(self, arguments):
-    LOG.debug("Running `light` command (arguments=%s)", arguments)
+    LOG.debug(
+        "Running `%s` command (arguments=%s)",
+        LightCommand.name(),
+        arguments)
     if (len(arguments) != 2):
       exit_fail(
-          "Expected exactly two arguments for `light`, received %s", len(arguments))
+          "Expected exactly two arguments for `%s`, received %s",
+          SensorCommand.name(),
+          len(arguments))
 
     light_id, action = arguments
 
     if action not in self.__LIGHT_ACTION_MAP:
-      exit_fail("Received unknown action '%s' for `light` command", action)
+      exit_fail(
+          "Received unknown action `%s` for `%s` command",
+          action,
+          SensorCommand.name())
 
     HueCommand._process(self.__map_light(
         light_id, self.__LIGHT_ACTION_MAP[action]))
-    LOG.debug("Finished `light` command (arguments=%s)", arguments)
+    LOG.debug(
+        "Finished `%s` command (arguments=%s)",
+        LightCommand.name(),
+        arguments)

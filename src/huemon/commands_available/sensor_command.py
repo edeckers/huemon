@@ -37,7 +37,10 @@ class SensorCommand(HueCommand):
     return "sensor"
 
   def exec(self, arguments):
-    LOG.debug("Running `sensor` command (arguments=%s)", arguments)
+    LOG.debug(
+        "Running `%s` command (arguments=%s)",
+        SensorCommand.name(),
+        arguments)
     if (len(arguments) != 2):
       exit_fail(
           "Expected exactly two arguments for `sensor`, received %s", len(arguments))
@@ -45,8 +48,14 @@ class SensorCommand(HueCommand):
     device_id, action = arguments
 
     if action not in SensorCommand.__SENSOR_ACTION_MAP:
-      exit_fail("Received unknown action '%s' for `sensor` command", action)
+      exit_fail(
+          "Received unknown action `%s` for `%s` command",
+          action,
+          SensorCommand.name())
 
     HueCommand._process(self.__map_sensor(
         device_id, SensorCommand.__SENSOR_ACTION_MAP[action]))
-    LOG.debug("Finished `sensor` command (arguments=%s)", arguments)
+    LOG.debug(
+        "Finished `%s` command (arguments=%s)",
+        SensorCommand.name(),
+        arguments)

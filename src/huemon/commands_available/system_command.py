@@ -27,15 +27,26 @@ class SystemCommand(HueCommand):
     return "system"
 
   def exec(self, arguments):
-    LOG.debug("Running `system` command (arguments=%s)", arguments)
+    LOG.debug(
+        "Running `%s` command (arguments=%s)",
+        SystemCommand.name(),
+        arguments)
     if (len(arguments) != 1):
       exit_fail(
-          "Expected exactly one argument for `system`, received %s", len(arguments))
+          "Expected exactly one argument for `%s` command, received %s",
+          SystemCommand.name(),
+          len(arguments))
 
     action, *_ = arguments
 
     if action not in self.__SYSTEM_ACTION_MAP:
-      exit_fail("Received unknown action '%s' for `system` command", action)
+      exit_fail(
+          "Received unknown action `%s` for `%s` command",
+          action,
+          SystemCommand.name())
 
     HueCommand._process(self.__map_config(self.__SYSTEM_ACTION_MAP[action]))
-    LOG.debug("Finished `system` command (arguments=%s)", arguments)
+    LOG.debug(
+        "Finished `%s` command (arguments=%s)",
+        SystemCommand.name(),
+        arguments)

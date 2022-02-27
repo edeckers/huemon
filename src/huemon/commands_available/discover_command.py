@@ -26,16 +26,23 @@ class DiscoveryHandler:
 
   def exec(self, discovery_type):
     LOG.debug(
-        "Running `discover` command (discovery_type=%s)", discovery_type)
+        "Running `%s` command (discovery_type=%s)",
+        DiscoverCommand.name(),
+        discovery_type)
     target, maybe_sub_target, *_ = discovery_type.split(":") + [None]
 
     if target not in self.handlers:
-      exit_fail("Received unknown target '%s' for `discover` command", target)
+      exit_fail(
+          "Received unknown target `%s` for `%s` command",
+          target,
+          DiscoverCommand.name())
 
     self.handlers[target].exec([maybe_sub_target] if maybe_sub_target else [])
 
     LOG.debug(
-        "Finished `discover` command (discovery_type=%s)", discovery_type)
+        "Finished `%s` command (discovery_type=%s)",
+        DiscoverCommand.name(),
+        discovery_type)
 
 
 class Discover:
