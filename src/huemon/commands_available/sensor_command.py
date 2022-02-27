@@ -7,6 +7,7 @@ from functools import reduce
 from huemon.api_interface import ApiInterface
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
+from huemon.util import assert_exists, assert_num_args
 
 LOG = create_logger()
 
@@ -24,40 +25,31 @@ class SensorCommand(HueCommand):
   def __map_sensor(self, unique_id, mapper):
     return mapper(self.__get_sensor(unique_id))
 
-  def __MAPPER_TEMPERATURE(device): return float(
-      device["state"]["temperature"]/100)
-
-  __MAPPER_BATTERY = __mapper("config.battery", float)
-  __MAPPER_LIGHT_LEVEL = __mapper("state.lightlevel", float)
-  __MAPPER_PRESENCE = __mapper("state.presence", int)
-  __MAPPER_SENSOR_REACHABLE = __mapper("config.reachable", int)
-
   __SENSOR_ACTION_MAP = {
-      "battery:level": __MAPPER_BATTERY,
-      "presence": __MAPPER_PRESENCE,
-      "reachable": __MAPPER_SENSOR_REACHABLE,
-      "temperature": __MAPPER_TEMPERATURE,
-      "light:level": __MAPPER_LIGHT_LEVEL
+      "battery:level": __mapper("config.battery", float),
+      "light:level": __mapper("state.lightlevel", float),
+      "presence": __mapper("state.presence", int),
+      "reachable": __mapper("config.reachable", int),
+      "temperature": lambda device: float(device["state"]["temperature"]/100),
   }
 
   def name():
     return "sensor"
 
   def exec(self, arguments):
-    LOG.debug("Running `sensor` command (arguments=%s)", arguments)
-    if (len(arguments) != 2):
-      LOG.error(
-          "Expected exactly two arguments for `sensor`, received %s", len(arguments))
-      print(
-          f"Expected exactly two arguments for `sensor`, received {len(arguments)}")
-      exit(1)
+    LOG.debug(
+        "Running `%s` command (arguments=%s)",
+        SensorCommand.name(),
+        arguments)
+    assert_num_args(2, arguments, SensorCommand.name())
 
     device_id, action = arguments
 
-    if action not in SensorCommand.__SENSOR_ACTION_MAP:
-      LOG.error("Received unknown action '%s' for `sensor` command", action)
-      return
+    assert_exists(list(SensorCommand.__SENSOR_ACTION_MAP), action)
 
     HueCommand._process(self.__map_sensor(
         device_id, SensorCommand.__SENSOR_ACTION_MAP[action]))
-    LOG.debug("Finished `sensor` command (arguments=%s)", arguments)
+    LOG.debug(
+        "Finished `%s` command (arguments=%s)",
+        SensorCommand.name(),
+        arguments)

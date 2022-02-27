@@ -6,8 +6,19 @@
 from huemon.api_interface import ApiInterface
 from huemon.discovery_interface import Discovery
 from huemon.logger_factory import create_logger
+from huemon.util import exit_fail
 
 LOG = create_logger()
+
+TYPE_LIGHT = "light"
+TYPE_PRESENCE = "presence"
+TYPE_TEMPERATURE = "temperature"
+
+SENSOR_TYPES = [
+    TYPE_LIGHT,
+    TYPE_PRESENCE,
+    TYPE_TEMPERATURE
+]
 
 
 class SensorsDiscovery(Discovery):
@@ -19,19 +30,18 @@ class SensorsDiscovery(Discovery):
 
   def exec(self, arguments=None):
     if not arguments or len(arguments) == 0:
-      LOG.error(
+      exit_fail(
           "Did not receive enough arguments for `discover sensor:*`, expected 1 received 0")
-      print ("Did not receive enough arguments for `discover sensor:*`, expected 1 received 0")
-      exit (1)
 
     sensor_type, *_ = arguments
 
     LOG.debug(
         "Running `discover sensor:*` command (sensor_type=%s)", sensor_type)
-    if sensor_type not in ["presence", "light", "temperature"]:
-      LOG.error(
-          "Received unknown sensor type '%s' for `discover sensor:*` command", sensor_type)
-      return
+    if sensor_type not in SENSOR_TYPES:
+      exit_fail(
+          "Received unknown sensor type '%s' for `discover sensor:*` command (expected=%s)",
+          sensor_type,
+          SENSOR_TYPES)
 
     Discovery._print_array_as_discovery(filter(
         Discovery._has_state_field(

@@ -9,7 +9,7 @@ from huemon.discovery_interface import Discovery
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
-from huemon.util import get_discoveries_path
+from huemon.util import assert_exists, assert_num_args, get_discoveries_path
 
 
 LOG = create_logger()
@@ -26,18 +26,19 @@ class DiscoveryHandler:
 
   def exec(self, discovery_type):
     LOG.debug(
-        "Running `discover` command (discovery_type=%s)", discovery_type)
+        "Running `%s` command (discovery_type=%s)",
+        DiscoverCommand.name(),
+        discovery_type)
     target, maybe_sub_target, *_ = discovery_type.split(":") + [None]
 
-    if target not in self.handlers:
-      LOG.error(
-          "Received unknown target '%s' for `discover` command", target)
-      return
+    assert_exists(list(self.handlers), target)
 
     self.handlers[target].exec([maybe_sub_target] if maybe_sub_target else [])
 
     LOG.debug(
-        "Finished `discover` command (discovery_type=%s)", discovery_type)
+        "Finished `%s` command (discovery_type=%s)",
+        DiscoverCommand.name(),
+        discovery_type)
 
 
 class Discover:
@@ -67,13 +68,12 @@ class DiscoverCommand(HueCommand):
     return "discover"
 
   def exec(self, arguments):
-    LOG.debug("Running `discover` command (arguments=%s)", arguments)
-    if (len(arguments) != 1):
-      LOG.error(
-          "Expected exactly one arguments for `discover`, received %s", len(arguments))
-      print(
-          f"Expected exactly one argument for `discover`, received {len(arguments)}")
-      exit(1)
+    LOG.debug(
+        "Running `%s` command (arguments=%s)",
+        DiscoverCommand.name(),
+        arguments)
+    assert_num_args(1, arguments, DiscoverCommand.name())
+
     discovery_type, *_ = arguments
 
     self.discovery.discover(discovery_type)

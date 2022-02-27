@@ -4,14 +4,12 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
-import sys
-
 from pathlib import Path
 from genericpath import isdir, isfile
 
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
-from huemon.util import get_commands_path, get_discoveries_path
+from huemon.util import assert_num_args, exit_fail, get_commands_path, get_discoveries_path
 
 LOG = create_logger()
 
@@ -19,8 +17,7 @@ LOG = create_logger()
 def symlink_plugins(plugins_available_path, plugins_enabled_path):
   for plugins_path in [plugins_available_path, plugins_enabled_path]:
     if not isdir(plugins_path):
-      print(f"Provided path `{plugins_path}` does not exist")
-      sys.exit(1)
+      exit_fail("Provided path `%s` does not exist", plugins_path)
 
   available_plugins = list(Path(plugins_available_path).glob("*.py"))
 
@@ -49,22 +46,15 @@ class InstallAvailableCommand(HueCommand):
   def exec(self, arguments):
     LOG.debug("Running `%s` command (arguments=%s)",
               InstallAvailableCommand.name(), arguments)
-    if len(arguments) != 1:
-      LOG.error(
-          "Expected exactly 1 argument for `%s`, received %s", InstallAvailableCommand.name(), len(arguments))
-      print(
-          f"Expected exactly 1 argument for `{InstallAvailableCommand.name()}`, received {len(arguments)}")
-      sys.exit(1)
+    assert_num_args(1, arguments, InstallAvailableCommand.name())
 
     target, *_ = arguments
 
     if target not in ["commands", "discoveries"]:
-      LOG.error(
+      exit_fail(
           "Received unknown action `%s` for `%s` command",
-          target, InstallAvailableCommand.name())
-      print(
-          f"received unknown action `{target}` for `{InstallAvailableCommand.name()}` command")
-      sys.exit(1)
+          target,
+          InstallAvailableCommand.name())
 
     if target == "commands":
       commands_enabled_path = get_commands_path(
