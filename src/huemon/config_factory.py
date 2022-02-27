@@ -3,15 +3,13 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
-import sys
-
 from os import environ, path
 from pathlib import Path
 from genericpath import isfile
 
 import yaml
 
-from huemon.const import EXIT_FAIL
+from huemon.util import exit_fail
 
 CONFIG_PATH_LOCAL = path.join(str(Path(__file__).parent), "config.yml")
 CONFIG_PATH_ENV_VARIABLE = environ.get("HUEMON_CONFIG_PATH")
@@ -33,9 +31,8 @@ def __first_existing_config_file():
 def create_config():
   maybe_config_path = __first_existing_config_file()
   if not maybe_config_path:
-    print(
-        f"No configuration file found in: {','.join(CONFIG_PATHS_ORDERED_PREFERENCE)}")
-    sys.exit(EXIT_FAIL)
+    exit_fail("No configuration file found in %s",
+              ','.join(CONFIG_PATHS_ORDERED_PREFERENCE))
 
   with open(maybe_config_path, "r") as file:
     return yaml.safe_load(file.read())

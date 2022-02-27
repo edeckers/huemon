@@ -8,6 +8,7 @@ from huemon.api_interface import ApiInterface
 from huemon.const import EXIT_FAIL
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
+from huemon.util import exit_fail
 
 LOG = create_logger()
 
@@ -34,11 +35,8 @@ class SystemCommand(HueCommand):
   def exec(self, arguments):
     LOG.debug("Running `system` command (arguments=%s)", arguments)
     if (len(arguments) != 1):
-      LOG.error(
+      exit_fail(
           "Expected exactly one argument for `system`, received %s", len(arguments))
-      print(
-          f"Expected exactly one argument for `system`, received {len(arguments)}")
-      sys.exit(EXIT_FAIL)
 
     action, *_ = arguments
 

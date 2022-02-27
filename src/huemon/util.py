@@ -1,11 +1,17 @@
 import os
 from pathlib import Path
+import sys
+
+from huemon.const import EXIT_FAIL
+from huemon.logger_factory import create_logger
 
 
 def create_local_path(relative_path: str):
   return str(os.path.join(
       Path(__file__).parent.absolute(), relative_path))
 
+
+LOG = create_logger()
 
 DEFAULT_COMMANDS_AVAILABLE_PATH = create_local_path("commands_available")
 DEFAULT_COMMANDS_ENABLED_PATH = create_local_path("commands_enabled")
@@ -36,3 +42,10 @@ def get_commands_path(config: dict, path_type: str, fallback_path: str = None):
 
 def get_discoveries_path(config: dict, path_type: str, fallback_path: str = None):
   return __create_plugins_path("discoveries", config, path_type, fallback_path)
+
+
+def exit_fail(message, *arguments):
+  LOG.error(message, *arguments)
+  print (message % tuple(arguments))
+
+  sys.exit(EXIT_FAIL)

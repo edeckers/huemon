@@ -11,7 +11,7 @@ from huemon.discovery_interface import Discovery
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
-from huemon.util import get_discoveries_path
+from huemon.util import exit_fail, get_discoveries_path
 
 
 LOG = create_logger()
@@ -71,11 +71,8 @@ class DiscoverCommand(HueCommand):
   def exec(self, arguments):
     LOG.debug("Running `discover` command (arguments=%s)", arguments)
     if (len(arguments) != 1):
-      LOG.error(
-          "Expected exactly one arguments for `discover`, received %s", len(arguments))
-      print(
-          f"Expected exactly one argument for `discover`, received {len(arguments)}")
-      sys.exit(EXIT_FAIL)
+      exit_fail("Expected exactly one arguments for `discover`, received %s", len(arguments))
+
     discovery_type, *_ = arguments
 
     self.discovery.discover(discovery_type)

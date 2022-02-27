@@ -11,12 +11,12 @@ from huemon.api.cached_api import CachedApi
 from huemon.api_interface import ApiInterface
 from huemon.commands_internal.install_available_command import InstallAvailableCommand
 from huemon.config_factory import create_config
-from huemon.const import EXIT_FAIL, EXIT_OK
+from huemon.const import EXIT_OK
 
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import bootstrap_logger
 from huemon.plugin_loader import load_plugins
-from huemon.util import get_commands_path
+from huemon.util import exit_fail, get_commands_path
 
 CONFIG = create_config()
 COMMAND_PLUGINS_PATH = get_commands_path(CONFIG, "enabled")
@@ -60,10 +60,10 @@ class CommandHandler:  # pylint: disable=too-few-public-methods
   def exec(self, command: str, arguments):
     LOG.debug("Running command `%s` (arguments=%s)", command, arguments)
     if not command in self.handlers:
-      LOG.error("Received unknown command `%s`", command)
-      print(
-          f"Unexpected command `{command}`, expected one of {self.available_commands()}")
-      sys.exit(EXIT_FAIL)
+      exit_fail(
+          "Received unknown command `%s`, expected one of %s",
+          command,
+          self.available_commands())
 
     self.handlers[command].exec(arguments)
 
@@ -90,11 +90,10 @@ class Main:  # pylint: disable=too-few-public-methods
     })
 
     if len(argv) <= 1:
-      print(
-          f"Did not receive enough arguments. Expected at least a command argument {command_handler.available_commands()}")
-      LOG.error(
-          "Did not receive enough arguments, expected one of %s (arguments=%s)", command_handler.available_commands(), argv[1:])
-      sys.exit(EXIT_FAIL)
+      exit_fail(
+          "Did not receive enough arguments, expected one of %s (arguments=%s)",
+          command_handler.available_commands(),
+          argv[1:])
 
     command, *arguments = argv[1:]
 

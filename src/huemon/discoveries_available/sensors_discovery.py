@@ -8,6 +8,7 @@ from huemon.api_interface import ApiInterface
 from huemon.const import EXIT_FAIL
 from huemon.discovery_interface import Discovery
 from huemon.logger_factory import create_logger
+from huemon.util import exit_fail
 
 LOG = create_logger()
 
@@ -21,10 +22,8 @@ class SensorsDiscovery(Discovery):
 
   def exec(self, arguments=None):
     if not arguments or len(arguments) == 0:
-      LOG.error(
+      exit_fail(
           "Did not receive enough arguments for `discover sensor:*`, expected 1 received 0")
-      print("Did not receive enough arguments for `discover sensor:*`, expected 1 received 0")
-      sys.exit(EXIT_FAIL)
 
     sensor_type, *_ = arguments
 
