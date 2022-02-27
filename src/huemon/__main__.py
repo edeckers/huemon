@@ -13,14 +13,14 @@ from huemon.commands_internal.install_available_command import InstallAvailableC
 from huemon.config_factory import create_config
 
 from huemon.hue_command_interface import HueCommand
-from huemon.logger_factory import create_logger
+from huemon.logger_factory import bootstrap_logger
 from huemon.plugin_loader import load_plugins
 from huemon.util import get_commands_path
 
 CONFIG = create_config()
 COMMAND_PLUGINS_PATH = get_commands_path(CONFIG, "enabled")
 HUE_HUB_URL = f"http://{CONFIG['ip']}/api/{CONFIG['key']}"
-LOG = create_logger()
+LOG = bootstrap_logger(CONFIG)
 DEFAULT_MAX_CACHE_AGE_SECONDS = 10
 
 
