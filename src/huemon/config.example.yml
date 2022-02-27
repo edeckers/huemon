@@ -3,6 +3,12 @@ ip: YOUR_HUB_IP
 key: YOUR_HUB_API_KEY
 cache:
   max_age_seconds: 10
+# commands:
+#  available: /path/to/commands_available
+#  enabled: /path/to/commands_enabled
+# discoveries:
+#  available: /path/to/discoveries_available
+#  enabled: /path/to/discoveries_enabled
 formatters:
   standard:
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
