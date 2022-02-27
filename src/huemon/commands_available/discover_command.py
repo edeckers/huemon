@@ -12,8 +12,6 @@ from huemon.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
 from huemon.util import DEFAULT_COMMANDS_ENABLED_PATH, get_discoveries_path
 
-DISCOVERY_PLUGINS_PATH = get_discoveries_path(
-    create_config(), "enabled", DEFAULT_COMMANDS_ENABLED_PATH)
 
 LOG = create_logger()
 
@@ -44,24 +42,28 @@ class DiscoveryHandler:
 
 
 class Discover:
-  def __init__(self, api: ApiInterface):
+  def __init__(self, config: dict, api: ApiInterface):
     self.api = api
 
+    self.discovery_plugins_path = get_discoveries_path(
+        config, "enabled", DEFAULT_COMMANDS_ENABLED_PATH)
+
   def discover(self, discovery_type):
-    LOG.debug("Loading command plugins (path=%s)", DISCOVERY_PLUGINS_PATH)
+    LOG.debug("Loading command plugins (path=%s)", self.discovery_plugins_path)
     discovery_handler_plugins =  \
         create_discovery_handlers(
             self.api,
-            load_plugins("command", DISCOVERY_PLUGINS_PATH, Discovery))
-    LOG.debug("Finished loading command plugins (path=%s)",
-              DISCOVERY_PLUGINS_PATH)
+            load_plugins("command", self.discovery_plugins_path, Discovery))
+    LOG.debug(
+        "Finished loading command plugins (path=%s)",
+        self.discovery_plugins_path)
 
     DiscoveryHandler(discovery_handler_plugins).exec(discovery_type)
 
 
 class DiscoverCommand(HueCommand):
   def __init__(self, config: dict, api: ApiInterface):
-    self.discovery = Discover(api)
+    self.discovery = Discover(config, api)
 
   def name():
     return "discover"
