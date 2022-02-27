@@ -51,7 +51,7 @@ class Discover:
     discovery_handler_plugins =  \
         create_discovery_handlers(
             self.api,
-            load_plugins("command", self.discovery_plugins_path, Discovery))
+            load_plugins("discovery", self.discovery_plugins_path, Discovery))
     LOG.debug(
         "Finished loading command plugins (path=%s)",
         self.discovery_plugins_path)
