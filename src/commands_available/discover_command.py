@@ -1,83 +1,11 @@
-from functools import reduce
-import json
 from api_interface import ApiInterface
+from discoveries_available.batteries_discovery import BatteriesDiscovery
+from discoveries_available.lights_discovery import LightsDiscovery
+from discoveries_available.sensors_discovery import SensorsDiscovery
 from hue_command_interface import HueCommand
 from logger_factory import create_logger
 
 LOG = create_logger()
-
-
-class Discovery:
-  def _item_to_discovery(item):
-    return {
-        "{#NAME}": item["name"],
-        "{#UNIQUE_ID}": item["uniqueid"],
-    }
-
-  def _has_state_field(field: str):
-    return lambda item: \
-        "state" in item and \
-        field in item["state"] and \
-        "recycle" not in item
-
-  def _print_array_as_discovery(items):
-    print(json.dumps({"data": reduce(
-        lambda p, item: [*p, Discovery._item_to_discovery(item)],
-        items,
-        [])}))
-
-  def name():
-    pass
-
-  def exec(self, arguments=None):
-    pass
-
-
-class BatteriesDiscovery(Discovery):
-  def __init__(self, api: ApiInterface):
-    self.api = api
-
-  def name():
-    return "batteries"
-
-  def exec(self, arguments=None):
-    Discovery._print_array_as_discovery(self.api.get_batteries()),
-
-
-class LightsDiscovery(Discovery):
-  def __init__(self, api: ApiInterface):
-    self.api = api
-
-  def name():
-    return "lights"
-
-  def exec(self, arguments=None):
-    Discovery._print_array_as_discovery(self.api.get_lights()),
-
-
-class SensorsDiscovery(Discovery):
-  def __init__(self, api: ApiInterface):
-    self.api = api
-
-  def name():
-    return "sensors"
-
-  def exec(self, arguments=None):
-    sensor_type, *_ = arguments
-
-    LOG.debug(
-        "Running `discover sensor:*` command (sensor_type=%s)", sensor_type)
-    if sensor_type not in ["presence", "light", "temperature"]:
-      LOG.error(
-          "Received unknown sensor type '%s' for `discover sensor:*` command", sensor_type)
-      return
-
-    Discovery._print_array_as_discovery(filter(
-        Discovery._has_state_field(
-            "lightlevel" if sensor_type == "light" else sensor_type),
-        self.api.get_sensors()))
-    LOG.debug(
-        "Finished `discover sensor:*` command (sensor_type=%s)", sensor_type)
 
 
 class Discover:
