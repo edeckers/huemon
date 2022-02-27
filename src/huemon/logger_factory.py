@@ -6,12 +6,14 @@
 import logging
 import logging.config
 
+DEFAULT_LOGGER_NAME = "hue"
 
-def bootstrap_logger(config: dict):
+
+def bootstrap_logger(config: dict, name=DEFAULT_LOGGER_NAME):
   logging.config.dictConfig(config)
 
-  return create_logger()
+  return create_logger(name)
 
 
-def create_logger(name="hue"):
+def create_logger(name=DEFAULT_LOGGER_NAME):
   return logging.getLogger(name)
