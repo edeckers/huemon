@@ -3,12 +3,14 @@
 from distutils.core import setup
 
 setup(
-  author="Ely Deckers",
-  author_email="noreply@nonono.com",
-  description="Monitoring for Philips Hue",
-  long_description=open("README").read(),
-  name="HueMon",
-  packages=["huemon"],
-  url="https://deckers.io",
-  version="1.0.0",
+    author="Ely Deckers",
+    author_email="noreply@nonono.com",
+    description="Monitoring for Philips Hue",
+    license="MPL-2.0",
+    long_description=open("README").read(),
+    name="huemon",
+    packages=["huemon", "huemon.api", "huemon.commands_available",
+              "huemon.commands_internal", "huemon.discoveries_available"],
+    url="https://github.com/edeckers/huemon",
+    version="0.0.1",
 )

@@ -4,16 +4,17 @@
 # LICENSE file in the root directory of this source tree.
 
 from functools import reduce
-import os
-from pathlib import Path
 from huemon.api_interface import ApiInterface
+from huemon.config_factory import create_config
 from huemon.discovery_interface import Discovery
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
+from huemon.util import DEFAULT_COMMANDS_ENABLED_PATH, get_discoveries_path
 
-DISCOVERY_PLUGINS_PATH = str(os.path.join(
-    Path(__file__).parent.parent.absolute(), "discoveries_enabled"))
+DISCOVERY_PLUGINS_PATH = get_discoveries_path(
+    create_config(), "enabled", DEFAULT_COMMANDS_ENABLED_PATH)
+
 LOG = create_logger()
 
 
