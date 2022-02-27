@@ -1,8 +1,10 @@
-.PHONY: build init
+.PHONY: build init lint
 
 build:
 	src/bin/build.sh
 
 init:
-	cd src && pip3 install -r requirements.txt
+	src/bin/init.sh
 
+lint:
+	src/bin/lint.sh
