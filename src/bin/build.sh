@@ -13,7 +13,6 @@ function clean_meta_files() {
 }
 
 function create_dist() {
-  pwd
   ./setup.py sdist
 }
 
