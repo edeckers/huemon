@@ -15,18 +15,11 @@ class LightCommand(HueCommand):
   def __init__(self, config: dict, api: ApiInterface):
     self.api = api
 
-  def __MAPPER_UPDATES_AVAILABLE(light): return int(
-      light["swupdate"]["state"] != "noupdates")
-
-  __MAPPER_LIGHT_REACHABLE = HueCommand._mapper("state.reachable", int)
-  __MAPPER_STATE_ON = HueCommand._mapper("state.on", int)
-  __MAPPER_VERSION = HueCommand._mapper("swversion", str)
-
   __LIGHT_ACTION_MAP = {
-      "is_upgrade_available": __MAPPER_UPDATES_AVAILABLE,
-      "reachable": __MAPPER_LIGHT_REACHABLE,
-      "status": __MAPPER_STATE_ON,
-      "version": __MAPPER_VERSION,
+      "is_upgrade_available": lambda light: int(light["swupdate"]["state"] != "noupdates"),
+      "reachable": HueCommand._mapper("state.reachable", int),
+      "status": HueCommand._mapper("state.on", int),
+      "version": HueCommand._mapper("swversion", str),
   }
 
   def __get_light(self, unique_id):

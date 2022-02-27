@@ -25,20 +25,12 @@ class SensorCommand(HueCommand):
   def __map_sensor(self, unique_id, mapper):
     return mapper(self.__get_sensor(unique_id))
 
-  def __MAPPER_TEMPERATURE(device): return float(
-      device["state"]["temperature"]/100)
-
-  __MAPPER_BATTERY = __mapper("config.battery", float)
-  __MAPPER_LIGHT_LEVEL = __mapper("state.lightlevel", float)
-  __MAPPER_PRESENCE = __mapper("state.presence", int)
-  __MAPPER_SENSOR_REACHABLE = __mapper("config.reachable", int)
-
   __SENSOR_ACTION_MAP = {
-      "battery:level": __MAPPER_BATTERY,
-      "presence": __MAPPER_PRESENCE,
-      "reachable": __MAPPER_SENSOR_REACHABLE,
-      "temperature": __MAPPER_TEMPERATURE,
-      "light:level": __MAPPER_LIGHT_LEVEL
+      "battery:level": __mapper("config.battery", float),
+      "light:level": __mapper("state.lightlevel", float),
+      "presence": __mapper("state.presence", int),
+      "reachable": __mapper("config.reachable", int),
+      "temperature": lambda device: float(device["state"]["temperature"]/100),
   }
 
   def name():

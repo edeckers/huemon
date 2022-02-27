@@ -18,13 +18,9 @@ class SystemCommand(HueCommand):
   def __map_config(self, mapper):
     return mapper(self.api.get_system_config())
 
-  def __MAPPER_SYSTEM_UPGRADE_AVAILABLE(config): return int(
-      config["swupdate2"]["state"] != "noupdates")
-  __MAPPER_VERSION = HueCommand._mapper("swversion", str)
-
   __SYSTEM_ACTION_MAP = {
-      "is_upgrade_available": __MAPPER_SYSTEM_UPGRADE_AVAILABLE,
-      "version": __MAPPER_VERSION,
+      "is_upgrade_available": lambda config: int(config["swupdate2"]["state"] != "noupdates"),
+      "version": HueCommand._mapper("swversion", str),
   }
 
   def name():
