@@ -9,7 +9,7 @@ from genericpath import isdir, isfile
 
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
-from huemon.util import exit_fail, get_commands_path, get_discoveries_path
+from huemon.util import assert_num_args, exit_fail, get_commands_path, get_discoveries_path
 
 LOG = create_logger()
 
@@ -46,11 +46,7 @@ class InstallAvailableCommand(HueCommand):
   def exec(self, arguments):
     LOG.debug("Running `%s` command (arguments=%s)",
               InstallAvailableCommand.name(), arguments)
-    if len(arguments) != 1:
-      exit_fail(
-          "Expected exactly 1 argument for `%s`, received %s",
-          InstallAvailableCommand.name(),
-          len(arguments))
+    assert_num_args(1, arguments, InstallAvailableCommand.name())
 
     target, *_ = arguments
 

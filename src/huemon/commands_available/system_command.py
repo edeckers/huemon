@@ -6,7 +6,7 @@
 from huemon.api_interface import ApiInterface
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
-from huemon.util import exit_fail
+from huemon.util import assert_num_args, exit_fail
 
 LOG = create_logger()
 
@@ -31,11 +31,7 @@ class SystemCommand(HueCommand):
         "Running `%s` command (arguments=%s)",
         SystemCommand.name(),
         arguments)
-    if (len(arguments) != 1):
-      exit_fail(
-          "Expected exactly one argument for `%s` command, received %s",
-          SystemCommand.name(),
-          len(arguments))
+    assert_num_args(1, arguments, SystemCommand.name())
 
     action, *_ = arguments
 

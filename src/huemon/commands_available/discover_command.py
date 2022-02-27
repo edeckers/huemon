@@ -9,7 +9,7 @@ from huemon.discovery_interface import Discovery
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
-from huemon.util import exit_fail, get_discoveries_path
+from huemon.util import assert_num_args, exit_fail, get_discoveries_path
 
 
 LOG = create_logger()
@@ -72,10 +72,11 @@ class DiscoverCommand(HueCommand):
     return "discover"
 
   def exec(self, arguments):
-    LOG.debug("Running `discover` command (arguments=%s)", arguments)
-    if (len(arguments) != 1):
-      exit_fail(
-          "Expected exactly one arguments for `discover`, received %s", len(arguments))
+    LOG.debug(
+        "Running `%s` command (arguments=%s)",
+        DiscoverCommand.name(),
+        arguments)
+    assert_num_args(1, arguments, DiscoverCommand.name())
 
     discovery_type, *_ = arguments
 

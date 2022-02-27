@@ -46,6 +46,18 @@ def get_discoveries_path(config: dict, path_type: str, fallback_path: str = None
 
 def exit_fail(message, *arguments):
   LOG.error(message, *arguments)
-  print (message % tuple(arguments))
+  print(message % tuple(arguments))
 
   sys.exit(EXIT_FAIL)
+
+
+def assert_num_args(expected_number_of_arguments: int, arguments: list, context: str):
+  if len(arguments) != expected_number_of_arguments:
+    argument_text = "argument" if expected_number_of_arguments == 1 else "arguments"
+
+    exit_fail(
+        "Expected exactly %s %s for `%s`, received %s",
+        expected_number_of_arguments,
+        argument_text,
+        context,
+        len(arguments))

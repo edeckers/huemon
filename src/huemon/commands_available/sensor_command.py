@@ -7,7 +7,7 @@ from functools import reduce
 from huemon.api_interface import ApiInterface
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
-from huemon.util import exit_fail
+from huemon.util import assert_num_args, exit_fail
 
 LOG = create_logger()
 
@@ -41,9 +41,7 @@ class SensorCommand(HueCommand):
         "Running `%s` command (arguments=%s)",
         SensorCommand.name(),
         arguments)
-    if (len(arguments) != 2):
-      exit_fail(
-          "Expected exactly two arguments for `sensor`, received %s", len(arguments))
+    assert_num_args(2, arguments, SensorCommand.name())
 
     device_id, action = arguments
 
