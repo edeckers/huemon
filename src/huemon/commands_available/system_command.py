@@ -3,7 +3,9 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
+import sys
 from huemon.api_interface import ApiInterface
+from huemon.const import EXIT_FAIL
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 
@@ -36,7 +38,7 @@ class SystemCommand(HueCommand):
           "Expected exactly one argument for `system`, received %s", len(arguments))
       print(
           f"Expected exactly one argument for `system`, received {len(arguments)}")
-      exit(1)
+      sys.exit(EXIT_FAIL)
 
     action, *_ = arguments
 

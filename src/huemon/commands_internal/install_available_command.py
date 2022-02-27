@@ -8,6 +8,7 @@ import sys
 
 from pathlib import Path
 from genericpath import isdir, isfile
+from huemon.const import EXIT_FAIL
 
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
@@ -20,7 +21,7 @@ def symlink_plugins(plugins_available_path, plugins_enabled_path):
   for plugins_path in [plugins_available_path, plugins_enabled_path]:
     if not isdir(plugins_path):
       print(f"Provided path `{plugins_path}` does not exist")
-      sys.exit(1)
+      sys.exit(EXIT_FAIL)
 
   available_plugins = list(Path(plugins_available_path).glob("*.py"))
 
@@ -54,7 +55,7 @@ class InstallAvailableCommand(HueCommand):
           "Expected exactly 1 argument for `%s`, received %s", InstallAvailableCommand.name(), len(arguments))
       print(
           f"Expected exactly 1 argument for `{InstallAvailableCommand.name()}`, received {len(arguments)}")
-      sys.exit(1)
+      sys.exit(EXIT_FAIL)
 
     target, *_ = arguments
 
@@ -64,7 +65,7 @@ class InstallAvailableCommand(HueCommand):
           target, InstallAvailableCommand.name())
       print(
           f"received unknown action `{target}` for `{InstallAvailableCommand.name()}` command")
-      sys.exit(1)
+      sys.exit(EXIT_FAIL)
 
     if target == "commands":
       commands_enabled_path = get_commands_path(

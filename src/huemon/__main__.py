@@ -11,6 +11,7 @@ from huemon.api.cached_api import CachedApi
 from huemon.api_interface import ApiInterface
 from huemon.commands_internal.install_available_command import InstallAvailableCommand
 from huemon.config_factory import create_config
+from huemon.const import EXIT_FAIL, EXIT_OK
 
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import bootstrap_logger
@@ -62,7 +63,7 @@ class CommandHandler:  # pylint: disable=too-few-public-methods
       LOG.error("Received unknown command `%s`", command)
       print(
           f"Unexpected command `{command}`, expected one of {self.available_commands()}")
-      sys.exit(1)
+      sys.exit(EXIT_FAIL)
 
     self.handlers[command].exec(arguments)
 
@@ -93,14 +94,14 @@ class Main:  # pylint: disable=too-few-public-methods
           f"Did not receive enough arguments. Expected at least a command argument {command_handler.available_commands()}")
       LOG.error(
           "Did not receive enough arguments, expected one of %s (arguments=%s)", command_handler.available_commands(), argv[1:])
-      sys.exit(1)
+      sys.exit(EXIT_FAIL)
 
     command, *arguments = argv[1:]
 
     command_handler.exec(command, arguments)
 
     LOG.debug("Finished script (parameters=%s)", argv[1:])
-    sys.exit(0)
+    sys.exit(EXIT_OK)
 
 
 if __name__ == "__main__":

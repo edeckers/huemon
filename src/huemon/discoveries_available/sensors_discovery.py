@@ -3,7 +3,9 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
+import sys
 from huemon.api_interface import ApiInterface
+from huemon.const import EXIT_FAIL
 from huemon.discovery_interface import Discovery
 from huemon.logger_factory import create_logger
 
@@ -21,8 +23,8 @@ class SensorsDiscovery(Discovery):
     if not arguments or len(arguments) == 0:
       LOG.error(
           "Did not receive enough arguments for `discover sensor:*`, expected 1 received 0")
-      print ("Did not receive enough arguments for `discover sensor:*`, expected 1 received 0")
-      exit (1)
+      print("Did not receive enough arguments for `discover sensor:*`, expected 1 received 0")
+      sys.exit(EXIT_FAIL)
 
     sensor_type, *_ = arguments
 

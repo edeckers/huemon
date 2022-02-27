@@ -11,6 +11,8 @@ from genericpath import isfile
 
 import yaml
 
+from huemon.const import EXIT_FAIL
+
 CONFIG_PATH_LOCAL = path.join(str(Path(__file__).parent), "config.yml")
 CONFIG_PATH_ENV_VARIABLE = environ.get("HUEMON_CONFIG_PATH")
 
@@ -33,7 +35,7 @@ def create_config():
   if not maybe_config_path:
     print(
         f"No configuration file found in: {','.join(CONFIG_PATHS_ORDERED_PREFERENCE)}")
-    sys.exit(1)
+    sys.exit(EXIT_FAIL)
 
   with open(maybe_config_path, "r") as file:
     return yaml.safe_load(file.read())

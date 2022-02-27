@@ -4,7 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 
 from functools import reduce
+import sys
 from huemon.api_interface import ApiInterface
+from huemon.const import EXIT_FAIL
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 
@@ -50,7 +52,7 @@ class SensorCommand(HueCommand):
           "Expected exactly two arguments for `sensor`, received %s", len(arguments))
       print(
           f"Expected exactly two arguments for `sensor`, received {len(arguments)}")
-      exit(1)
+      sys.exit(EXIT_FAIL)
 
     device_id, action = arguments
 
