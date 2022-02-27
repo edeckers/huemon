@@ -3,9 +3,11 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
-from genericpath import isfile
+import sys
+
 from os import environ, path
 from pathlib import Path
+from genericpath import isfile
 
 import yaml
 
@@ -23,13 +25,15 @@ def __first_existing_config_file():
     if isfile(config_path):
       return config_path
 
+  return None
+
 
 def create_config():
   maybe_config_path = __first_existing_config_file()
   if not maybe_config_path:
     print(
         f"No configuration file found in: {','.join(CONFIG_PATHS_ORDERED_PREFERENCE)}")
-    exit(1)
+    sys.exit(1)
 
   with open(maybe_config_path, "r") as file:
     return yaml.safe_load(file.read())

@@ -25,5 +25,5 @@ class HueCommand:
   def name():
     pass
 
-  def exec(self):
+  def exec(self, arguments):
     pass

@@ -3,23 +3,22 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
-import os
-from pathlib import Path
 import sys
 
 from functools import reduce
 from huemon.api.api import Api
 from huemon.api.cached_api import CachedApi
 from huemon.api_interface import ApiInterface
+from huemon.commands_internal.install_available_command import InstallAvailableCommand
 from huemon.config_factory import create_config
 
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
+from huemon.util import get_commands_path
 
-COMMAND_PLUGINS_PATH = str(os.path.join(
-    Path(__file__).parent.parent.absolute(), "commands_enabled"))
 CONFIG = create_config()
+COMMAND_PLUGINS_PATH = get_commands_path(CONFIG, "enabled")
 HUE_HUB_URL = f"http://{CONFIG['ip']}/api/{CONFIG['key']}"
 LOG = create_logger()
 MAX_CACHE_AGE_SECONDS = int(CONFIG["cache"]["max_age_seconds"])
@@ -30,16 +29,19 @@ def create_command_handlers(config: dict, api: ApiInterface, plugins: dict):
       lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
 
 
-class CommandHandler: # pylint: disable=too-few-public-methods
+class CommandHandler:  # pylint: disable=too-few-public-methods
   def __init__(self, handlers):
     self.handlers = handlers
+
+  def available_commands(self):
+    return list(self.handlers)
 
   def exec(self, command: str, arguments):
     LOG.debug("Running command `%s` (arguments=%s)", command, arguments)
     if not command in self.handlers:
       LOG.error("Received unknown command `%s`", command)
       print(
-          f"Unexpected command `{command}`, expected one of {list(self.handlers)}")
+          f"Unexpected command `{command}`, expected one of {self.available_commands()}")
       sys.exit(1)
 
     self.handlers[command].exec(arguments)
@@ -47,17 +49,10 @@ class CommandHandler: # pylint: disable=too-few-public-methods
     LOG.debug("Finished command `%s` (arguments=%s)", command, arguments)
 
 
-class Main: # pylint: disable=too-few-public-methods
+class Main:  # pylint: disable=too-few-public-methods
   @staticmethod
   def main(argv):
     LOG.debug("Running script (parameters=%s)", argv[1:])
-    if len(argv) <= 1:
-      print("Did not receive enough arguments, expected at least one command argument")
-      LOG.error(
-          "Did not receive enough arguments (arguments=%s)", argv[1:])
-      sys.exit(1)
-
-    command, *arguments = argv[1:]
 
     LOG.debug("Loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
     command_handler_plugins =  \
@@ -68,7 +63,21 @@ class Main: # pylint: disable=too-few-public-methods
     LOG.debug("Finished loading command plugins (path=%s)",
               COMMAND_PLUGINS_PATH)
 
-    CommandHandler(command_handler_plugins).exec(command, arguments)
+    command_handler = CommandHandler({
+        **command_handler_plugins,
+        InstallAvailableCommand.name(): InstallAvailableCommand(CONFIG)
+    })
+
+    if len(argv) <= 1:
+      print(
+          f"Did not receive enough arguments. Expected at least a command argument {command_handler.available_commands()}")
+      LOG.error(
+          "Did not receive enough arguments, expected one of %s (arguments=%s)", command_handler.available_commands(), argv[1:])
+      sys.exit(1)
+
+    command, *arguments = argv[1:]
+
+    command_handler.exec(command, arguments)
 
     LOG.debug("Finished script (parameters=%s)", argv[1:])
     sys.exit(0)
