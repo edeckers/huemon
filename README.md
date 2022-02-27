@@ -23,18 +23,20 @@ make init
 
 ```bash
 make build
+
+pip3 install /path/to/huemon-<version>.tar.gz
 ```
 
 ### Configuration
 
-1. Copy `config.example.yml` from `src/huemon` to `/some/path/config.yml`
+1. Copy `config.example.yml` from `src/huemon` to `/path/to/config.yml`
 2. Make necessary changes
 3. Provide the path through environment variable `HUEMON_CONFIG_PATH`
 
 For example:
 
 ```bash
-HUEMON_CONFIG_PATH=/some/path/config.yml python3 -m huemon discover lights
+HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon discover lights
 ```
 
 ### Enabling commands and discoveries
@@ -42,8 +44,8 @@ HUEMON_CONFIG_PATH=/some/path/config.yml python3 -m huemon discover lights
 #### Automatically
 
 ```bash
-HUEMON_CONFIG_PATH=/some/path/config.yml python3 -m huemon install_available commands
-HUEMON_CONFIG_PATH=/some/path/config.yml python3 -m huemon install_available discoveries
+HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon install_available commands
+HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon install_available discoveries
 ```
 
 #### Manually
