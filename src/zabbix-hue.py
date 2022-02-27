@@ -1,58 +1,50 @@
 #!/usr/bin/env python3
 
-from genericpath import isfile
-import importlib
-import inspect
-from os import listdir
-from pathlib import Path, PosixPath
+import os
+from pathlib import Path
 import sys
 
 from functools import reduce
 from api.api import Api
 from api.cached_api import CachedApi
 from api_interface import ApiInterface
-from commands_available.discover_command import DiscoverCommand
-from commands_available.light_command import LightCommand
-from commands_available.sensor_command import SensorCommand
-from commands_available.system_command import SystemCommand
 from config_factory import create_config
 
 from hue_command_interface import HueCommand
 from logger_factory import create_logger
+from plugin_loader import load_plugins
 
-config = create_config()
-
+COMMAND_PLUGINS_PATH = str(os.path.join(
+    Path(__file__).parent.absolute(), "commands_enabled"))
+CONFIG = create_config()
+HUE_HUB_URL = f"http://{CONFIG['ip']}/api/{CONFIG['key']}"
 LOG = create_logger()
-
-HUE_HUB_URL = f"http://{config['ip']}/api/{config['key']}"
-
-MAX_CACHE_AGE_SECONDS = int(config["cache"]["max_age_seconds"])
+MAX_CACHE_AGE_SECONDS = int(CONFIG["cache"]["max_age_seconds"])
 
 
-def get_plugin(module_name: str, path: str, sub_class):
-  spec = importlib.util.spec_from_file_location(module_name, path)
-  module = importlib.util.module_from_spec(spec)
+def create_command_handlers(config: dict, api: ApiInterface, plugins: dict):
+  return reduce(
+      lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
 
-  spec.loader.exec_module(module)
 
-  hue_commands = list(filter(
-      lambda m: inspect.isclass(m[1]) and issubclass(
-          m[1], sub_class) and m[1] is not sub_class,
-      inspect.getmembers(module)))
+class CommandHandler:
+  def __init__(self, handlers):
+    self.handlers = handlers
 
-  if (len(hue_commands) == 0):
-    return None
+  def exec(self, command: str, arguments):
+    LOG.debug("Running command `%s` (arguments=%s)", command, arguments)
+    if not command in self.handlers:
+      LOG.error("Received unknown command `%s`", command)
+      print(
+          f"Unexpected command `{command}`, expected one of {list(self.handlers)}")
+      exit(1)
 
-  _, hue_command_class = hue_commands[0]
+    self.handlers[command].exec(arguments)
 
-  return hue_command_class
+    LOG.debug("Finished command `%s` (arguments=%s)", command, arguments)
 
 
 if __name__ == "__main__":
-  plugins = list(map(lambda p: get_plugin(
-      f"commands.{p.stem}", p.absolute(), HueCommand),
-      Path(__file__).parent.glob("commands_enabled/*.py")))
-
   LOG.debug("Running script (parameters=%s)", sys.argv[1:])
   if len(sys.argv) <= 1:
     print("Did not receive enough arguments, expected at least one command argument")
@@ -62,20 +54,15 @@ if __name__ == "__main__":
 
   command, *arguments = sys.argv[1:]
 
-  api = CachedApi(Api(HUE_HUB_URL), MAX_CACHE_AGE_SECONDS)
-  command_handlers = reduce(
-      lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
+  LOG.debug("Loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
+  command_handler_plugins =  \
+      create_command_handlers(
+          CONFIG,
+          CachedApi(Api(HUE_HUB_URL), MAX_CACHE_AGE_SECONDS),
+          load_plugins("command", COMMAND_PLUGINS_PATH, HueCommand))
+  LOG.debug("Finished loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
 
-  LOG.debug("Running command `%s` (arguments=%s)", command, arguments)
-  is_valid_command = command in command_handlers
-  if not is_valid_command:
-    LOG.error("Received unknown command `%s`", command)
-    print(
-        f"Unexpected command `{command}`, expected one of {list(command_handlers)}")
-    exit(1)
+  CommandHandler(command_handler_plugins).exec(command, arguments)
 
-  command_handlers[command].exec(arguments)
-
-  LOG.debug("Finished command `%s` (arguments=%s)", command, arguments)
   LOG.debug("Finished script (parameters=%s)", sys.argv[1:])
   exit(0)
