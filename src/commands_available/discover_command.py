@@ -1,37 +1,56 @@
+from functools import reduce
+import os
+from pathlib import Path
 from api_interface import ApiInterface
-from discoveries_available.batteries_discovery import BatteriesDiscovery
-from discoveries_available.lights_discovery import LightsDiscovery
-from discoveries_available.sensors_discovery import SensorsDiscovery
+from discovery_interface import Discovery
 from hue_command_interface import HueCommand
 from logger_factory import create_logger
+from plugin_loader import load_plugins
 
+DISCOVERY_PLUGINS_PATH = str(os.path.join(
+    Path(__file__).parent.parent.absolute(), "discoveries_enabled"))
 LOG = create_logger()
+
+
+def create_discovery_handlers(api: ApiInterface, plugins: dict):
+  return reduce(
+      lambda p, c: {**p, c.name(): c(api)}, plugins, {})
+
+
+class DiscoveryHandler:
+  def __init__(self, handlers):
+    self.handlers = handlers
+
+  def exec(self, discovery_type):
+    LOG.debug(
+        "Running `discover` command (discovery_type=%s)", discovery_type)
+    target, maybe_sub_target, *_ = discovery_type.split(":") + [None]
+
+    if target not in self.handlers:
+      LOG.error(
+          "Received unknown target '%s' for `discover` command", target)
+      return
+
+    self.handlers[target].exec([maybe_sub_target] if maybe_sub_target else [])
+
+    LOG.debug(
+        "Finished `discover` command (discovery_type=%s)", discovery_type)
 
 
 class Discover:
   def __init__(self, api: ApiInterface):
     self.api = api
 
-  __DISCOVERY_HANDLERS = {
-      "batteries": lambda api, _: BatteriesDiscovery(api).exec(),
-      "lights": lambda api, _: LightsDiscovery(api).exec(),
-      "sensors": lambda api, arguments: SensorsDiscovery(api).exec(arguments)
-  }
-
   def discover(self, discovery_type):
-    LOG.debug(
-        "Running `discover` command (discovery_type=%s)", discovery_type)
-    target, maybe_sub_target, *_ = discovery_type.split(":") + [None]
+    LOG.debug("Loading command plugins (path=%s)", DISCOVERY_PLUGINS_PATH)
+    discovery_handler_plugins =  \
+        create_discovery_handlers(
+            self.api,
+            load_plugins("command", DISCOVERY_PLUGINS_PATH, Discovery))
+    LOG.debug("Finished loading command plugins (path=%s)",
+              DISCOVERY_PLUGINS_PATH)
 
-    if target not in Discover.__DISCOVERY_HANDLERS:
-      LOG.error(
-          "Received unknown target '%s' for `discover` command", target)
-      return
-
-    Discover.__DISCOVERY_HANDLERS[target](
-        self.api, [maybe_sub_target] if maybe_sub_target else [])
-    LOG.debug(
-        "Finished `discover` command (discovery_type=%s)", discovery_type)
+    DiscoveryHandler(discovery_handler_plugins).exec(discovery_type)
 
 
 class DiscoverCommand(HueCommand):
