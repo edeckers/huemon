@@ -5,12 +5,11 @@
 
 from functools import reduce
 from huemon.api_interface import ApiInterface
-from huemon.config_factory import create_config
 from huemon.discovery_interface import Discovery
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
-from huemon.util import DEFAULT_COMMANDS_ENABLED_PATH, get_discoveries_path
+from huemon.util import get_discoveries_path
 
 
 LOG = create_logger()
@@ -45,8 +44,7 @@ class Discover:
   def __init__(self, config: dict, api: ApiInterface):
     self.api = api
 
-    self.discovery_plugins_path = get_discoveries_path(
-        config, "enabled", DEFAULT_COMMANDS_ENABLED_PATH)
+    self.discovery_plugins_path = get_discoveries_path(config, "enabled")
 
   def discover(self, discovery_type):
     LOG.debug("Loading command plugins (path=%s)", self.discovery_plugins_path)

@@ -6,10 +6,12 @@
 import logging
 import logging.config
 
-from huemon.config_factory import create_config
+
+def bootstrap_logger(config: dict):
+  logging.config.dictConfig(config)
+
+  return create_logger()
 
 
-def create_logger():
-  logging.config.dictConfig(create_config())
-
-  return logging.getLogger("hue")
+def create_logger(name="hue"):
+  return logging.getLogger(name)
