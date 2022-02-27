@@ -9,8 +9,8 @@ import os
 from os.path import exists
 import tempfile
 import time
-from hue_mon.api_interface import ApiInterface
-from hue_mon.logger_factory import create_logger
+from huemon.api_interface import ApiInterface
+from huemon.logger_factory import create_logger
 
 LOG = create_logger()
 

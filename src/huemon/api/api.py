@@ -6,8 +6,8 @@
 import json
 
 from urllib.request import urlopen
-from hue_mon.api_interface import ApiInterface
-from hue_mon.logger_factory import create_logger
+from huemon.api_interface import ApiInterface
+from huemon.logger_factory import create_logger
 
 
 LOG = create_logger()
