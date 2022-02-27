@@ -36,8 +36,8 @@ ln -s /path/to/discoveries_available/command_name.py /path/to/discoveries_enable
 ```
 # file:/path/to/zabbix/agent/conf.d/hue.conf
 
-UserParameter=hue.discovery[*],/usr/bin/python3 -m hue_mon discover $1
-UserParameter=hue.value[*],/usr/bin/python3 -m hue_mon $1 $2 $3
+UserParameter=hue.discovery[*],/usr/bin/python3 -m huemon discover $1
+UserParameter=hue.value[*],/usr/bin/python3 -m huemon $1 $2 $3
 ```
 
 ## License

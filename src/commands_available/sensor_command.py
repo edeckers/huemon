@@ -4,9 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 
 from functools import reduce
-from hue_mon.api_interface import ApiInterface
-from hue_mon.hue_command_interface import HueCommand
-from hue_mon.logger_factory import create_logger
+from huemon.api_interface import ApiInterface
+from huemon.hue_command_interface import HueCommand
+from huemon.logger_factory import create_logger
 
 LOG = create_logger()
 

@@ -6,11 +6,11 @@
 from functools import reduce
 import os
 from pathlib import Path
-from hue_mon.api_interface import ApiInterface
-from hue_mon.discovery_interface import Discovery
-from hue_mon.hue_command_interface import HueCommand
-from hue_mon.logger_factory import create_logger
-from hue_mon.plugin_loader import load_plugins
+from huemon.api_interface import ApiInterface
+from huemon.discovery_interface import Discovery
+from huemon.hue_command_interface import HueCommand
+from huemon.logger_factory import create_logger
+from huemon.plugin_loader import load_plugins
 
 DISCOVERY_PLUGINS_PATH = str(os.path.join(
     Path(__file__).parent.parent.absolute(), "discoveries_enabled"))

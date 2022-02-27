@@ -8,14 +8,14 @@ from pathlib import Path
 import sys
 
 from functools import reduce
-from hue_mon.api.api import Api
-from hue_mon.api.cached_api import CachedApi
-from hue_mon.api_interface import ApiInterface
-from hue_mon.config_factory import create_config
+from huemon.api.api import Api
+from huemon.api.cached_api import CachedApi
+from huemon.api_interface import ApiInterface
+from huemon.config_factory import create_config
 
-from hue_mon.hue_command_interface import HueCommand
-from hue_mon.logger_factory import create_logger
-from hue_mon.plugin_loader import load_plugins
+from huemon.hue_command_interface import HueCommand
+from huemon.logger_factory import create_logger
+from huemon.plugin_loader import load_plugins
 
 COMMAND_PLUGINS_PATH = str(os.path.join(
     Path(__file__).parent.parent.absolute(), "commands_enabled"))
