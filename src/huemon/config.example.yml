@@ -2,6 +2,7 @@ version: 1
 ip: YOUR_HUB_IP
 key: YOUR_HUB_API_KEY
 cache:
+  enable: false
   max_age_seconds: 10
 # commands:
 #  available: /path/to/commands_available
