@@ -21,12 +21,32 @@ CONFIG = create_config()
 COMMAND_PLUGINS_PATH = get_commands_path(CONFIG, "enabled")
 HUE_HUB_URL = f"http://{CONFIG['ip']}/api/{CONFIG['key']}"
 LOG = create_logger()
-MAX_CACHE_AGE_SECONDS = int(CONFIG["cache"]["max_age_seconds"])
+DEFAULT_MAX_CACHE_AGE_SECONDS = 10
 
 
 def create_command_handlers(config: dict, api: ApiInterface, plugins: dict):
   return reduce(
       lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
+
+
+def create_api(config: dict):
+  enable_cache = \
+      "cache" in config and \
+      "enable" in config["cache"] and \
+      bool(config["cache"]["enable"])
+
+  is_cache_age_configured = \
+      "cache" in config and \
+      "max_age_seconds" in config["cache"]
+
+  max_cache_age_seconds = \
+      int(config["cache"]["max_age_seconds"]) if \
+      is_cache_age_configured else \
+      DEFAULT_MAX_CACHE_AGE_SECONDS
+
+  api = Api(HUE_HUB_URL)
+
+  return CachedApi(api, max_cache_age_seconds) if enable_cache else api
 
 
 class CommandHandler:  # pylint: disable=too-few-public-methods
@@ -58,7 +78,7 @@ class Main:  # pylint: disable=too-few-public-methods
     command_handler_plugins =  \
         create_command_handlers(
             CONFIG,
-            CachedApi(Api(HUE_HUB_URL), MAX_CACHE_AGE_SECONDS),
+            create_api(CONFIG),
             load_plugins("command", COMMAND_PLUGINS_PATH, HueCommand))
     LOG.debug("Finished loading command plugins (path=%s)",
               COMMAND_PLUGINS_PATH)
