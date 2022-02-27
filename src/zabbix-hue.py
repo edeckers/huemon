@@ -15,6 +15,9 @@ from functools import reduce
 from os.path import exists
 from pathlib import Path
 from urllib.request import urlopen
+from api import ApiInterface
+
+from hue_command import HueCommand
 
 with open("/".join([str(Path(__file__).parent), "config.yml"]), "r") as f:
   config = yaml.safe_load(f.read())
@@ -26,17 +29,6 @@ LOG = logging.getLogger("hue")
 HUE_HUB_URL = f"http://{config['ip']}/api/{config['key']}"
 
 MAX_CACHE_AGE_SECONDS = int(config["cache"]["max_age_seconds"])
-
-
-class ApiInterface:
-  def get_system_config():
-    pass
-
-  def get_lights():
-    pass
-
-  def get_sensors():
-    pass
 
 
 class Api(ApiInterface):
@@ -190,19 +182,6 @@ class Discover:
     LOG.debug(
         "Finished `discover` command (discovery_type=%s)", discovery_type)
 
-
-class HueCommand:
-  def _process(value):
-    print(value)
-
-  def _mapper(path, type):
-    return lambda value: type(reduce(lambda p, field: p[field], path.split("."), value))
-
-  def name(self):
-    pass
-
-  def exec(self):
-    pass
 
 class DiscoverCommand(HueCommand):
   def __init__(self, api: ApiInterface, arguments):
