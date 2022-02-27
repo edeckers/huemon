@@ -25,13 +25,6 @@ make init
 make build
 ```
 
-### Enabling commands and discoveries
-
-```bash
-ln -s /path/to/commands_available/command_name.py /path/to/commands_enabled/command_name.py
-ln -s /path/to/discoveries_available/command_name.py /path/to/discoveries_enabled/command_name.py
-```
-
 ### Configuration
 
 1. Copy `config.example.yml` from `src/huemon` to `/some/path/config.yml`
@@ -42,6 +35,21 @@ For example:
 
 ```bash
 HUEMON_CONFIG_PATH=/some/path/config.yml python3 -m huemon discover lights
+```
+
+### Enabling commands and discoveries
+
+#### Automatically
+
+```bash
+HUEMON_CONFIG_PATH=/some/path/config.yml python3 -m huemon install_available commands
+HUEMON_CONFIG_PATH=/some/path/config.yml python3 -m huemon install_available discoveries
+```
+
+#### Manually
+```bash
+ln -s /path/to/commands_available/command_name.py /path/to/commands_enabled/command_name.py
+ln -s /path/to/discoveries_available/command_name.py /path/to/discoveries_enabled/command_name.py
 ```
 
 ### Zabbix agent configuration
