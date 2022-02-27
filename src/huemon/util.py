@@ -61,3 +61,11 @@ def assert_num_args(expected_number_of_arguments: int, arguments: list, context:
         argument_text,
         context,
         len(arguments))
+
+
+def assert_exists(expected_values: list, value: str):
+  if value not in expected_values:
+    exit_fail(
+        "Received unknown value `%s` (expected=%s)",
+        value,
+        expected_values)

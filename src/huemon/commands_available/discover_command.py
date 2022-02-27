@@ -9,7 +9,7 @@ from huemon.discovery_interface import Discovery
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
-from huemon.util import assert_num_args, exit_fail, get_discoveries_path
+from huemon.util import assert_exists, assert_num_args, get_discoveries_path
 
 
 LOG = create_logger()
@@ -31,11 +31,7 @@ class DiscoveryHandler:
         discovery_type)
     target, maybe_sub_target, *_ = discovery_type.split(":") + [None]
 
-    if target not in self.handlers:
-      exit_fail(
-          "Received unknown target `%s` for `%s` command",
-          target,
-          DiscoverCommand.name())
+    assert_exists(list(self.handlers), target)
 
     self.handlers[target].exec([maybe_sub_target] if maybe_sub_target else [])
 

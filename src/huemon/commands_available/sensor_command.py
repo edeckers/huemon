@@ -7,7 +7,7 @@ from functools import reduce
 from huemon.api_interface import ApiInterface
 from huemon.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
-from huemon.util import assert_num_args, exit_fail
+from huemon.util import assert_exists, assert_num_args
 
 LOG = create_logger()
 
@@ -45,11 +45,7 @@ class SensorCommand(HueCommand):
 
     device_id, action = arguments
 
-    if action not in SensorCommand.__SENSOR_ACTION_MAP:
-      exit_fail(
-          "Received unknown action `%s` for `%s` command",
-          action,
-          SensorCommand.name())
+    assert_exists(list(SensorCommand.__SENSOR_ACTION_MAP), action)
 
     HueCommand._process(self.__map_sensor(
         device_id, SensorCommand.__SENSOR_ACTION_MAP[action]))
