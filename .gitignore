@@ -1,5 +1,6 @@
 config.yml
 commands_enabled
+discoveries_enabled
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
