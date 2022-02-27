@@ -1,0 +1,3 @@
+include hue_mon/config.example.yml
+include requirements.txt
+recursive-include hue_mon *.py
