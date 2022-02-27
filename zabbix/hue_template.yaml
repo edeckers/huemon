@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2022-02-25T13:57:06Z'
+  date: '2022-02-27T20:47:51Z'
   groups:
     -
       uuid: 4918b88734c54bd094cff7585b5d71fc
@@ -259,6 +259,17 @@ zabbix_export:
                     -
                       tag: Application
                       value: Hue
+          graph_prototypes:
+            -
+              uuid: 3eb088bdaf864047a1a944534733e9be
+              name: 'Presence detection on {#NAME}'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: 199C0D
+                  item:
+                    host: 'Template Philips Hue'
+                    key: 'hue.value[sensor,{#UNIQUE_ID},presence]'
         -
           uuid: 0c872b19769b46a5b4dbab4650508033
           name: 'Sensors: temperature'
@@ -269,6 +280,7 @@ zabbix_export:
               name: 'Temperature on {#NAME}'
               type: ZABBIX_ACTIVE
               key: 'hue.value[sensor,{#UNIQUE_ID},temperature]'
+              value_type: FLOAT
               units: C
               tags:
                 -
@@ -289,6 +301,97 @@ zabbix_export:
         -
           tag: Application
           value: Hue
+      dashboards:
+        -
+          uuid: 7202274c66384c3990b9e6a1dd93fa74
+          name: Devices
+          display_period: '10'
+          auto_start: 'NO'
+          pages:
+            -
+              name: Sensors
+              widgets:
+                -
+                  type: GRAPH_PROTOTYPE
+                  width: '8'
+                  height: '14'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Light level for {#NAME}'
+                        host: 'Template Philips Hue'
+                -
+                  type: GRAPH_PROTOTYPE
+                  x: '8'
+                  width: '8'
+                  height: '14'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Temperature development on {#NAME}'
+                        host: 'Template Philips Hue'
+                -
+                  type: GRAPH_PROTOTYPE
+                  x: '16'
+                  width: '8'
+                  height: '14'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Presence detection on {#NAME}'
+                        host: 'Template Philips Hue'
+            -
+              name: Batteries
+              widgets:
+                -
+                  type: GRAPH_PROTOTYPE
+                  width: '24'
+                  height: '14'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '3'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Battery level for {#NAME}'
+                        host: 'Template Philips Hue'
       valuemaps:
         -
           uuid: 264cff25c74842a589ed7f6a7ec0006f
