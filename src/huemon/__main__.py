@@ -5,9 +5,8 @@
 
 import sys
 
-from huemon.api.api import Api
-from huemon.api.cached_api import CachedApi
-from huemon.commands.command_handler import CommandHandler, create_command_handlers
+from huemon.api.api_factory import create_api
+from huemon.commands.command_handler import CommandHandler, create_name_to_command_mapping
 from huemon.commands_internal.install_available_command import InstallAvailableCommand
 from huemon.config_factory import create_config
 from huemon.const import EXIT_OK
@@ -19,29 +18,30 @@ from huemon.util import exit_fail, get_commands_path
 
 CONFIG = create_config()
 COMMAND_PLUGINS_PATH = get_commands_path(CONFIG, "enabled")
-HUE_HUB_URL = f"http://{CONFIG['ip']}/api/{CONFIG['key']}"
 LOG = bootstrap_logger(CONFIG)
-DEFAULT_MAX_CACHE_AGE_SECONDS = 10
 
 
-def create_api(config: dict):
-  enable_cache = \
-      "cache" in config and \
-      "enable" in config["cache"] and \
-      bool(config["cache"]["enable"])
+def load_command_plugins():
+  LOG.debug("Loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
+  command_handler_plugins =  \
+      create_name_to_command_mapping(
+          CONFIG,
+          create_api(CONFIG),
+          load_plugins("command", COMMAND_PLUGINS_PATH, HueCommand))
+  LOG.debug("Finished loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
 
-  is_cache_age_configured = \
-      "cache" in config and \
-      "max_age_seconds" in config["cache"]
+  return command_handler_plugins
 
-  max_cache_age_seconds = \
-      int(config["cache"]["max_age_seconds"]) if \
-      is_cache_age_configured else \
-      DEFAULT_MAX_CACHE_AGE_SECONDS
 
-  api = Api(HUE_HUB_URL)
+def load_plugins_and_hardwired_handlers():
+  return {
+      **load_command_plugins(),
+      InstallAvailableCommand.name(): InstallAvailableCommand(CONFIG)
+  }
 
-  return CachedApi(api, max_cache_age_seconds) if enable_cache else api
+
+def create_default_command_handler():
+  return CommandHandler(load_plugins_and_hardwired_handlers())
 
 
 class Main:  # pylint: disable=too-few-public-methods
@@ -49,19 +49,7 @@ class Main:  # pylint: disable=too-few-public-methods
   def main(argv):
     LOG.debug("Running script (parameters=%s)", argv[1:])
 
-    LOG.debug("Loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
-    command_handler_plugins =  \
-        create_command_handlers(
-            CONFIG,
-            create_api(CONFIG),
-            load_plugins("command", COMMAND_PLUGINS_PATH, HueCommand))
-    LOG.debug("Finished loading command plugins (path=%s)",
-              COMMAND_PLUGINS_PATH)
-
-    command_handler = CommandHandler({
-        **command_handler_plugins,
-        InstallAvailableCommand.name(): InstallAvailableCommand(CONFIG)
-    })
+    command_handler = create_default_command_handler()
 
     if len(argv) <= 1:
       exit_fail(

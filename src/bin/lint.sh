@@ -6,6 +6,7 @@ function cd_to_source_directory() {
 
 function run_linter() {
   pylint huemon
+  pylint tests
 }
 
 cd_to_source_directory

@@ -24,6 +24,11 @@ def create_system_config(version: str = None, is_update_available: bool = False)
 
 
 class MutableApi(ApiInterface):
+  def __init__(self):
+    self.lights = []
+    self.sensors = []
+    self.system_config = {}
+
   def set_system_config(self, json_data: dict):
     self.system_config = json_data
 

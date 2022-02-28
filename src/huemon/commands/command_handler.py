@@ -7,7 +7,7 @@ from huemon.util import exit_fail
 LOG = create_logger()
 
 
-def create_command_handlers(config: dict, api: ApiInterface, plugins: list):
+def create_name_to_command_mapping(config: dict, api: ApiInterface, plugins: list):
   return reduce(
       lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
 

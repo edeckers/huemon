@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from huemon.commands.command_handler import CommandHandler, create_command_handlers
+from huemon.commands.command_handler import CommandHandler, create_name_to_command_mapping
 from huemon.commands_available.system_command import SystemCommand
 from huemon.const import EXIT_FAIL
 from tests.fixtures import MutableApi,  create_system_config
@@ -16,7 +16,7 @@ class TestCachedApi(unittest.TestCase):
     vanilla_command_handler = CommandHandler([])
 
     command_handler = CommandHandler(
-        create_command_handlers({}, MutableApi(), [SystemCommand]))
+        create_name_to_command_mapping({}, MutableApi(), [SystemCommand]))
 
     expected_command = SystemCommand.name()
 
@@ -40,7 +40,7 @@ class TestCachedApi(unittest.TestCase):
     mutable_api.set_system_config(system_config_pre)
 
     command_handler = CommandHandler(
-        create_command_handlers({}, mutable_api, [SystemCommand]))
+        create_name_to_command_mapping({}, mutable_api, [SystemCommand]))
 
     command_handler.exec("system", ["version"])
 
@@ -49,10 +49,10 @@ class TestCachedApi(unittest.TestCase):
   def test_when_unknown_command_received_system_exit_is_called(self):
     command_handler = CommandHandler([])
 
-    with self.assertRaises(SystemExit) as cm:
+    with self.assertRaises(SystemExit) as failed_call_context:
       command_handler.exec("system", ["version"])
 
     self.assertEqual(
         EXIT_FAIL,
-        cm.exception.code,
+        failed_call_context.exception.code,
         f"Exit code should equal {EXIT_FAIL}")

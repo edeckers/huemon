@@ -1,9 +1,7 @@
 import tempfile
-from typing import List
 import unittest
 
 from huemon.api.cached_api import CachedApi
-from huemon.api_interface import ApiInterface
 from tests.fixtures import FIELD_SYSTEM_SWVERSION, MutableApi, create_system_config
 
 
