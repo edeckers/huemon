@@ -19,5 +19,5 @@ setup(
         "huemon.discoveries_available",
         "huemon.infrastructure"],
     url="https://github.com/edeckers/huemon",
-    version="0.0.1",
+    version="0.0.2",
 )
