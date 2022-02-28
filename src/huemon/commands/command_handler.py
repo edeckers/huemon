@@ -1,7 +1,7 @@
 from functools import reduce
 
-from huemon.api_interface import ApiInterface
-from huemon.logger_factory import create_logger
+from huemon.api.api_interface import ApiInterface
+from huemon.infrastructure.logger_factory import create_logger
 from huemon.util import exit_fail
 
 LOG = create_logger()

@@ -1,7 +1,7 @@
 import time
 from typing import List
 
-from huemon.api_interface import ApiInterface
+from huemon.api.api_interface import ApiInterface
 
 
 FIELD_STATE = "state"

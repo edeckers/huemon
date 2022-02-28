@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 
 from huemon.const import EXIT_FAIL
-from huemon.logger_factory import create_logger
+from huemon.infrastructure.logger_factory import create_logger
 
 
 def create_local_path(relative_path: str):

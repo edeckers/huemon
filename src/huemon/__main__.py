@@ -8,11 +8,11 @@ import sys
 from huemon.api.api_factory import create_api
 from huemon.commands.command_handler import CommandHandler, create_name_to_command_mapping
 from huemon.commands_internal.install_available_command import InstallAvailableCommand
-from huemon.config_factory import create_config
+from huemon.infrastructure.config_factory import create_config
 from huemon.const import EXIT_OK
 
 from huemon.commands.hue_command_interface import HueCommand
-from huemon.logger_factory import bootstrap_logger
+from huemon.infrastructure.logger_factory import bootstrap_logger
 from huemon.plugin_loader import load_plugins
 from huemon.util import exit_fail, get_commands_path
 
