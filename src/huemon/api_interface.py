@@ -4,11 +4,11 @@
 # LICENSE file in the root directory of this source tree.
 
 class ApiInterface:
-  def get_system_config(): # pylint: disable=no-method-argument
+  def get_system_config(self):
     pass
 
-  def get_lights(): # pylint: disable=no-method-argument
+  def get_lights(self):
     pass
 
-  def get_sensors(): # pylint: disable=no-method-argument
+  def get_sensors(self):
     pass
