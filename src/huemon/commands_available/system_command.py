@@ -35,7 +35,7 @@ class SystemCommand(HueCommand):
 
     action, *_ = arguments
 
-    assert_exists(list(SystemCommand.__SENSOR_ACTION_MAP), action)
+    assert_exists(list(SystemCommand.__SYSTEM_ACTION_MAP), action)
 
     HueCommand._process(self.__map_config(self.__SYSTEM_ACTION_MAP[action]))
     LOG.debug(
