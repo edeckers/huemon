@@ -5,7 +5,7 @@ function cd_to_source_directory() {
 }
 
 function run_tests() {
-  python3 -m unittest discover tests
+  python3 -m unittest discover tests -b
 }
 
 cd_to_source_directory

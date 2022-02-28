@@ -5,7 +5,7 @@
 
 from functools import reduce
 from huemon.api_interface import ApiInterface
-from huemon.hue_command_interface import HueCommand
+from huemon.commands.hue_command_interface import HueCommand
 from huemon.logger_factory import create_logger
 from huemon.util import assert_exists, assert_num_args
 

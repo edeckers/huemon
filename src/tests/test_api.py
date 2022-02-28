@@ -1,35 +1,14 @@
 import tempfile
-import time
 from typing import List
 import unittest
 
 from huemon.api.cached_api import CachedApi
 from huemon.api_interface import ApiInterface
-from tests.fixtures import FIELD_SYSTEM_VERSION, create_system_config
+from tests.fixtures import FIELD_SYSTEM_SWVERSION, MutableApi, create_system_config
 
 
 CACHE_VALIDITY_INFINITE_SECONDS = 1_000_000
 CACHE_VALIDITY_ZERO_SECONDS = 0
-
-
-class MutableApi(ApiInterface):
-  def set_system_config(self, json_data: dict):
-    self.system_config = json_data
-
-  def set_lights(self, json_data: List[dict]):
-    self.lights = json_data
-
-  def set_sensors(self, json_data: List[dict]):
-    self.sensors = json_data
-
-  def get_system_config(self):
-    return self.system_config
-
-  def get_lights(self):
-    return self.lights
-
-  def get_sensors(self):
-    return self.sensors
 
 
 class TestCachedApi(unittest.TestCase):
@@ -37,7 +16,7 @@ class TestCachedApi(unittest.TestCase):
     mutable_api = MutableApi()
 
     system_config_pre = create_system_config()
-    version_pre = system_config_pre[FIELD_SYSTEM_VERSION]
+    version_pre = system_config_pre[FIELD_SYSTEM_SWVERSION]
 
     mutable_api.set_system_config(system_config_pre)
 
@@ -47,14 +26,14 @@ class TestCachedApi(unittest.TestCase):
         tempfile.mkdtemp())
 
     system_config_pre_recv = api.get_system_config()
-    version_pre_recv = system_config_pre_recv[FIELD_SYSTEM_VERSION]
+    version_pre_recv = system_config_pre_recv[FIELD_SYSTEM_SWVERSION]
 
     system_config_post = create_system_config()
-    version_post = system_config_post[FIELD_SYSTEM_VERSION]
+    version_post = system_config_post[FIELD_SYSTEM_SWVERSION]
     mutable_api.set_system_config(system_config_post)
 
     system_config_post_recv = api.get_system_config()
-    version_post_recv = system_config_post_recv[FIELD_SYSTEM_VERSION]
+    version_post_recv = system_config_post_recv[FIELD_SYSTEM_SWVERSION]
 
     self.assertEqual(
         version_pre,
@@ -73,7 +52,7 @@ class TestCachedApi(unittest.TestCase):
     mutable_api = MutableApi()
 
     system_config_pre = create_system_config()
-    version_pre = system_config_pre[FIELD_SYSTEM_VERSION]
+    version_pre = system_config_pre[FIELD_SYSTEM_SWVERSION]
 
     mutable_api.set_system_config(system_config_pre)
 
@@ -83,14 +62,14 @@ class TestCachedApi(unittest.TestCase):
         tempfile.mkdtemp())
 
     system_config_pre_recv = api.get_system_config()
-    version_pre_recv = system_config_pre_recv[FIELD_SYSTEM_VERSION]
+    version_pre_recv = system_config_pre_recv[FIELD_SYSTEM_SWVERSION]
 
     system_config_post = create_system_config()
-    version_post = system_config_post[FIELD_SYSTEM_VERSION]
+    version_post = system_config_post[FIELD_SYSTEM_SWVERSION]
     mutable_api.set_system_config(system_config_post)
 
     system_config_post_recv = api.get_system_config()
-    version_post_recv = system_config_post_recv[FIELD_SYSTEM_VERSION]
+    version_post_recv = system_config_post_recv[FIELD_SYSTEM_SWVERSION]
 
     self.assertEqual(
         version_pre,
