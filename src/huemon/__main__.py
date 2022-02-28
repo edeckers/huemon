@@ -5,69 +5,43 @@
 
 import sys
 
-from functools import reduce
-from huemon.api.api import Api
-from huemon.api.cached_api import CachedApi
-from huemon.api_interface import ApiInterface
+from huemon.api.api_factory import create_api
+from huemon.commands.command_handler import CommandHandler, create_name_to_command_mapping
 from huemon.commands_internal.install_available_command import InstallAvailableCommand
-from huemon.config_factory import create_config
+from huemon.infrastructure.config_factory import create_config
 from huemon.const import EXIT_OK
 
-from huemon.hue_command_interface import HueCommand
-from huemon.logger_factory import bootstrap_logger
+from huemon.commands.hue_command_interface import HueCommand
+from huemon.infrastructure.logger_factory import bootstrap_logger
 from huemon.plugin_loader import load_plugins
 from huemon.util import exit_fail, get_commands_path
 
 CONFIG = create_config()
 COMMAND_PLUGINS_PATH = get_commands_path(CONFIG, "enabled")
-HUE_HUB_URL = f"http://{CONFIG['ip']}/api/{CONFIG['key']}"
 LOG = bootstrap_logger(CONFIG)
-DEFAULT_MAX_CACHE_AGE_SECONDS = 10
 
 
-def create_command_handlers(config: dict, api: ApiInterface, plugins: dict):
-  return reduce(
-      lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
+def load_command_plugins():
+  LOG.debug("Loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
+  command_handler_plugins =  \
+      create_name_to_command_mapping(
+          CONFIG,
+          create_api(CONFIG),
+          load_plugins("command", COMMAND_PLUGINS_PATH, HueCommand))
+  LOG.debug("Finished loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
+
+  return command_handler_plugins
 
 
-def create_api(config: dict):
-  enable_cache = \
-      "cache" in config and \
-      "enable" in config["cache"] and \
-      bool(config["cache"]["enable"])
-
-  is_cache_age_configured = \
-      "cache" in config and \
-      "max_age_seconds" in config["cache"]
-
-  max_cache_age_seconds = \
-      int(config["cache"]["max_age_seconds"]) if \
-      is_cache_age_configured else \
-      DEFAULT_MAX_CACHE_AGE_SECONDS
-
-  api = Api(HUE_HUB_URL)
-
-  return CachedApi(api, max_cache_age_seconds) if enable_cache else api
+def load_plugins_and_hardwired_handlers():
+  return {
+      **load_command_plugins(),
+      InstallAvailableCommand.name(): InstallAvailableCommand(CONFIG)
+  }
 
 
-class CommandHandler:  # pylint: disable=too-few-public-methods
-  def __init__(self, handlers):
-    self.handlers = handlers
-
-  def available_commands(self):
-    return list(self.handlers)
-
-  def exec(self, command: str, arguments):
-    LOG.debug("Running command `%s` (arguments=%s)", command, arguments)
-    if not command in self.handlers:
-      exit_fail(
-          "Received unknown command `%s`, expected one of %s",
-          command,
-          self.available_commands())
-
-    self.handlers[command].exec(arguments)
-
-    LOG.debug("Finished command `%s` (arguments=%s)", command, arguments)
+def create_default_command_handler():
+  return CommandHandler(load_plugins_and_hardwired_handlers())
 
 
 class Main:  # pylint: disable=too-few-public-methods
@@ -75,19 +49,7 @@ class Main:  # pylint: disable=too-few-public-methods
   def main(argv):
     LOG.debug("Running script (parameters=%s)", argv[1:])
 
-    LOG.debug("Loading command plugins (path=%s)", COMMAND_PLUGINS_PATH)
-    command_handler_plugins =  \
-        create_command_handlers(
-            CONFIG,
-            create_api(CONFIG),
-            load_plugins("command", COMMAND_PLUGINS_PATH, HueCommand))
-    LOG.debug("Finished loading command plugins (path=%s)",
-              COMMAND_PLUGINS_PATH)
-
-    command_handler = CommandHandler({
-        **command_handler_plugins,
-        InstallAvailableCommand.name(): InstallAvailableCommand(CONFIG)
-    })
+    command_handler = create_default_command_handler()
 
     if len(argv) <= 1:
       exit_fail(

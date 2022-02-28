@@ -4,10 +4,10 @@
 # LICENSE file in the root directory of this source tree.
 
 from functools import reduce
-from huemon.api_interface import ApiInterface
-from huemon.discovery_interface import Discovery
-from huemon.hue_command_interface import HueCommand
-from huemon.logger_factory import create_logger
+from huemon.api.api_interface import ApiInterface
+from huemon.discoveries.discovery_interface import Discovery
+from huemon.commands.hue_command_interface import HueCommand
+from huemon.infrastructure.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
 from huemon.util import assert_exists, assert_num_args, get_discoveries_path
 

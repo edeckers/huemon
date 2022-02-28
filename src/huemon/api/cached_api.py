@@ -9,27 +9,28 @@ import os
 from os.path import exists
 import tempfile
 import time
-from huemon.api_interface import ApiInterface
-from huemon.logger_factory import create_logger
+from huemon.api.api_interface import ApiInterface
+from huemon.infrastructure.logger_factory import create_logger
 
 LOG = create_logger()
 
 DEFAULT_MAX_CACHE_AGE_SECONDS = 10
+DEFAULT_CACHE_PATH = tempfile.gettempdir()
 
 
 class CachedApi(ApiInterface):
-  def __init__(self, api: ApiInterface, max_cache_age_seconds=DEFAULT_MAX_CACHE_AGE_SECONDS):
+  def __init__(self, api: ApiInterface, max_cache_age_seconds=DEFAULT_MAX_CACHE_AGE_SECONDS, cache_path=DEFAULT_CACHE_PATH):
     self.api = api
+    self.cache_path = cache_path
     self.max_cache_age_seconds = max_cache_age_seconds
 
-  @staticmethod
-  def __tf(filename):
-    return "/".join([tempfile.gettempdir(), filename])
+  def __tf(self, filename):
+    return "/".join([self.cache_path, filename])
 
   def __cache(self, resource_type: str, fn_call):
     temp_filename = f"zabbix-hue.{resource_type}"
-    cache_file_path = CachedApi.__tf(f"{temp_filename}.json")
-    lock_file = CachedApi.__tf(f"{temp_filename}.lock")
+    cache_file_path = self.__tf(f"{temp_filename}.json")
+    lock_file = self.__tf(f"{temp_filename}.lock")
 
     does_cache_file_exist = exists(cache_file_path)
     cache_age_seconds = time.time(
@@ -58,7 +59,7 @@ class CachedApi(ApiInterface):
 
         with open(cache_file_path) as f_json:
           return json.loads(f_json.read())
-      except: # pylint: disable=bare-except
+      except:  # pylint: disable=bare-except
         LOG.debug("Failed to acquire lock, cache hit (file=%s)", lock_file)
 
     if not does_cache_file_exist:

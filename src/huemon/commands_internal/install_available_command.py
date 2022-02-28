@@ -7,8 +7,8 @@ import os
 from pathlib import Path
 from genericpath import isdir, isfile
 
-from huemon.hue_command_interface import HueCommand
-from huemon.logger_factory import create_logger
+from huemon.commands.hue_command_interface import HueCommand
+from huemon.infrastructure.logger_factory import create_logger
 from huemon.util import assert_num_args, exit_fail, get_commands_path, get_discoveries_path
 
 LOG = create_logger()

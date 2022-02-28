@@ -9,8 +9,15 @@ setup(
     license="MPL-2.0",
     long_description=open("README").read(),
     name="huemon",
-    packages=["huemon", "huemon.api", "huemon.commands_available",
-              "huemon.commands_internal", "huemon.discoveries_available"],
+    packages=[
+        "huemon",
+        "huemon.api",
+        "huemon.commands",
+        "huemon.commands_available",
+        "huemon.commands_internal",
+        "huemon.discoveries",
+        "huemon.discoveries_available",
+        "huemon.infrastructure"],
     url="https://github.com/edeckers/huemon",
     version="0.0.1",
 )

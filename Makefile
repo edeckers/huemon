@@ -1,4 +1,4 @@
-.PHONY: build init lint
+.PHONY: build init lint test
 
 build:
 	src/bin/build.sh
@@ -8,3 +8,6 @@ init:
 
 lint:
 	src/bin/lint.sh
+
+test:
+	src/bin/test.sh

@@ -11,7 +11,7 @@ import yaml
 
 from huemon.util import exit_fail
 
-CONFIG_PATH_LOCAL = path.join(str(Path(__file__).parent), "config.yml")
+CONFIG_PATH_LOCAL = path.join(str(Path(__file__).parent.parent), "config.yml")
 CONFIG_PATH_ENV_VARIABLE = environ.get("HUEMON_CONFIG_PATH")
 
 CONFIG_PATHS_ORDERED_PREFERENCE = list(filter(lambda p: p, [
