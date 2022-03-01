@@ -1,5 +1,6 @@
 [general]
-contrib=contrib-title-conventional-commits,CC1
+contrib=contrib-title-conventional-commits,CT1
+ignore=body-is-missing,B1
 
 
 [contrib-title-conventional-commits]

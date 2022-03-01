@@ -4,9 +4,15 @@ function cd_to_source_directory() {
   cd `dirname ${0}`/..
 }
 
-function run_initializer() {
+function install_git_hooks() {
+  pre-commit install
+  pre-commit install --hook-type commit-msg
+}
+
+function install_required_packages() {
   pip3 install -r requirements.txt
 }
 
 cd_to_source_directory
-run_initializer
+install_required_packages
+install_git_hooks
