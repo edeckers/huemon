@@ -10,4 +10,8 @@ repos:
     -   id: gitlint
         args: [--staged, --msg-filename]
         stages: [commit-msg]
+  - repo: https://github.com/ambv/black
+    rev: 22.1.0
+    hooks:
+    - id: black
 
