@@ -3,3 +3,8 @@ repos:
     rev: pylint-2.6.0
     hooks:
     -   id: pylint
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.17.0
+    hooks:
+    -   id: gitlint
+
