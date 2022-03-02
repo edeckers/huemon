@@ -14,38 +14,39 @@ TYPE_LIGHT = "light"
 TYPE_PRESENCE = "presence"
 TYPE_TEMPERATURE = "temperature"
 
-SENSOR_TYPES = [
-    TYPE_LIGHT,
-    TYPE_PRESENCE,
-    TYPE_TEMPERATURE
-]
+SENSOR_TYPES = [TYPE_LIGHT, TYPE_PRESENCE, TYPE_TEMPERATURE]
 
 
 class SensorsDiscovery(Discovery):
-  def __init__(self, api: ApiInterface):
-    self.api = api
+    def __init__(self, api: ApiInterface):
+        self.api = api
 
-  def name():
-    return "sensors"
+    @staticmethod
+    def name():
+        return "sensors"
 
-  def exec(self, arguments=None):
-    if not arguments or len(arguments) == 0:
-      exit_fail(
-          "Did not receive enough arguments for `discover sensor:*`, expected 1 received 0")
+    def exec(self, arguments=None):
+        if not arguments or len(arguments) == 0:
+            exit_fail(
+                "Did not receive enough arguments for `discover sensor:*`, expected 1 received 0"
+            )
 
-    sensor_type, *_ = arguments
+        sensor_type, *_ = arguments
 
-    LOG.debug(
-        "Running `discover sensor:*` command (sensor_type=%s)", sensor_type)
-    if sensor_type not in SENSOR_TYPES:
-      exit_fail(
-          "Received unknown sensor type '%s' for `discover sensor:*` command (expected=%s)",
-          sensor_type,
-          SENSOR_TYPES)
+        LOG.debug("Running `discover sensor:*` command (sensor_type=%s)", sensor_type)
+        if sensor_type not in SENSOR_TYPES:
+            exit_fail(
+                "Received unknown sensor type '%s' for `discover sensor:*` command (expected=%s)",
+                sensor_type,
+                SENSOR_TYPES,
+            )
 
-    Discovery._print_array_as_discovery(filter(
-        Discovery._has_state_field(
-            "lightlevel" if sensor_type == "light" else sensor_type),
-        self.api.get_sensors()))
-    LOG.debug(
-        "Finished `discover sensor:*` command (sensor_type=%s)", sensor_type)
+        Discovery._print_array_as_discovery(
+            filter(
+                Discovery._has_state_field(
+                    "lightlevel" if sensor_type == "light" else sensor_type
+                ),
+                self.api.get_sensors(),
+            )
+        )
+        LOG.debug("Finished `discover sensor:*` command (sensor_type=%s)", sensor_type)

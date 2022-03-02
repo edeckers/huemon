@@ -8,11 +8,12 @@ from huemon.discoveries.discovery_interface import Discovery
 
 
 class LightsDiscovery(Discovery):
-  def __init__(self, api: ApiInterface):
-    self.api = api
+    def __init__(self, api: ApiInterface):
+        self.api = api
 
-  def name():
-    return "lights"
+    @staticmethod
+    def name():
+        return "lights"
 
-  def exec(self, arguments=None):
-    Discovery._print_array_as_discovery(self.api.get_lights()),
+    def exec(self, arguments=None):
+        Discovery._print_array_as_discovery(self.api.get_lights())

@@ -10,10 +10,10 @@ DEFAULT_LOGGER_NAME = "hue"
 
 
 def bootstrap_logger(config: dict, name=DEFAULT_LOGGER_NAME):
-  logging.config.dictConfig(config)
+    logging.config.dictConfig(config)
 
-  return create_logger(name)
+    return create_logger(name)
 
 
 def create_logger(name=DEFAULT_LOGGER_NAME):
-  return logging.getLogger(name)
+    return logging.getLogger(name)
