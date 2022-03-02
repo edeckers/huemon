@@ -17,7 +17,8 @@ setup(
         "huemon.commands_internal",
         "huemon.discoveries",
         "huemon.discoveries_available",
-        "huemon.infrastructure"],
+        "huemon.infrastructure",
+    ],
     url="https://github.com/edeckers/huemon",
     version="0.0.2",
 )

@@ -8,11 +8,12 @@ from huemon.discoveries.discovery_interface import Discovery
 
 
 class BatteriesDiscovery(Discovery):
-  def __init__(self, api: ApiInterface):
-    self.api = api
+    def __init__(self, api: ApiInterface):
+        self.api = api
 
-  def name():
-    return "batteries"
+    @staticmethod
+    def name():
+        return "batteries"
 
-  def exec(self, arguments=None):
-    Discovery._print_array_as_discovery(self.api.get_batteries()),
+    def exec(self, arguments=None):
+        Discovery._print_array_as_discovery(self.api.get_batteries())

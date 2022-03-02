@@ -1,6 +1,6 @@
 .PHONY: build init lint test
 
-build:
+build: init
 	src/bin/build.sh
 
 init:

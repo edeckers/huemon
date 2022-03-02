@@ -12,33 +12,36 @@ LOG = create_logger()
 
 
 class SystemCommand(HueCommand):
-  def __init__(self, config: dict, api: ApiInterface):
-    self.api = api
+    def __init__(
+        self, config: dict, api: ApiInterface
+    ):  # pylint: disable=unused-argument
+        self.api = api
 
-  def __map_config(self, mapper):
-    return mapper(self.api.get_system_config())
+    def __map_config(self, mapper):
+        return mapper(self.api.get_system_config())
 
-  __SYSTEM_ACTION_MAP = {
-      "is_upgrade_available": lambda config: int(config["swupdate2"]["state"] != "noupdates"),
-      "version": HueCommand._mapper("swversion", str),
-  }
+    __SYSTEM_ACTION_MAP = {
+        "is_upgrade_available": lambda config: int(
+            config["swupdate2"]["state"] != "noupdates"
+        ),
+        "version": HueCommand._mapper("swversion", str),
+    }
 
-  def name():
-    return "system"
+    @staticmethod
+    def name():
+        return "system"
 
-  def exec(self, arguments):
-    LOG.debug(
-        "Running `%s` command (arguments=%s)",
-        SystemCommand.name(),
-        arguments)
-    assert_num_args(1, arguments, SystemCommand.name())
+    def exec(self, arguments):
+        LOG.debug(
+            "Running `%s` command (arguments=%s)", SystemCommand.name(), arguments
+        )
+        assert_num_args(1, arguments, SystemCommand.name())
 
-    action, *_ = arguments
+        action, *_ = arguments
 
-    assert_exists(list(SystemCommand.__SYSTEM_ACTION_MAP), action)
+        assert_exists(list(SystemCommand.__SYSTEM_ACTION_MAP), action)
 
-    HueCommand._process(self.__map_config(self.__SYSTEM_ACTION_MAP[action]))
-    LOG.debug(
-        "Finished `%s` command (arguments=%s)",
-        SystemCommand.name(),
-        arguments)
+        HueCommand._process(self.__map_config(self.__SYSTEM_ACTION_MAP[action]))
+        LOG.debug(
+            "Finished `%s` command (arguments=%s)", SystemCommand.name(), arguments
+        )
