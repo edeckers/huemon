@@ -2,14 +2,18 @@ repos:
   - repo: https://github.com/pycqa/pylint
     rev: pylint-2.6.0
     hooks:
-    -   id: pylint
-        args: [--rcfile=src/pylintrc]
+    - id: pylint
+      args: [--rcfile=src/pylintrc]
   - repo: https://github.com/jorisroovers/gitlint
     rev: v0.17.0
     hooks:
-    -   id: gitlint
-        args: [--staged, --msg-filename]
-        stages: [commit-msg]
+    - id: gitlint
+      args: [--staged, --msg-filename]
+      stages: [commit-msg]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
   - repo: https://github.com/ambv/black
     rev: 22.1.0
     hooks:
