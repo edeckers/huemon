@@ -11,7 +11,8 @@ function run_linter() {
   p run isort --profile=black --check-only ${1}
   echo "formatting: ${1}"
   p run black --check  ${1} --diff
-  # p run mypy huemon --ignore-missing-imports
+  echo "check types: ${1}"
+  p run mypy ${1} --ignore-missing-imports
   echo "scanning vulnerabilities: ${1}"
   p run bandit -r ${1} -s B608
 }

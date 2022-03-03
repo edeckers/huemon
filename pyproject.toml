@@ -12,6 +12,8 @@ license = "MPL-2.0"
 [tool.poetry.dependencies]
 python = "^3.8"
 PyYAML = "^6.0"
+mypy = "^0.931"
+types-PyYAML = "^6.0.4"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7"
@@ -34,16 +36,11 @@ log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 # Style checking
 #########################################################################################
 
+[tool.bandit]
+
 [tool.black]
-line-length = 100
 target-version = ["py38", "py39"]
 
 [tool.isort]
-line_length = 100
 profile = "black"
 
-[mypy]
-check_untyped_defs = true
-strict_optional = true
-
-[tool.bandit]
