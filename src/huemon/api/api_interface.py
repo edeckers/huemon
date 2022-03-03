@@ -13,3 +13,6 @@ class ApiInterface:
 
     def get_sensors(self):
         pass
+
+    def get_batteries(self):
+        pass

@@ -3,16 +3,22 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
-import importlib
+import importlib.util
 import inspect
 from pathlib import Path
 
 
 def __get_plugin_type(module_name: str, path: str, sub_class):
-    spec = importlib.util.spec_from_file_location(module_name, path)
-    module = importlib.util.module_from_spec(spec)
+    maybe_spec = importlib.util.spec_from_file_location(module_name, path)
+    if not maybe_spec:
+        return None
 
-    spec.loader.exec_module(module)
+    module = importlib.util.module_from_spec(maybe_spec)
+
+    if not maybe_spec.loader:
+        return None
+
+    maybe_spec.loader.exec_module(module)
 
     plugin_types = list(
         filter(
@@ -35,7 +41,7 @@ def load_plugins(module_name: str, path: str, plugin_type):
     return list(
         map(
             lambda p: __get_plugin_type(
-                f"{module_name}.{p.stem}", p.absolute(), plugin_type
+                f"{module_name}.{p.stem}", str(p.absolute()), plugin_type
             ),
             Path(path).glob("*.py"),
         )

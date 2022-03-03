@@ -14,18 +14,10 @@ A library that enables Zabbix monitoring for Philips Hue networks.
 
 ## Installation
 
-### In place
+### Dependencies and environment
 
 ```bash
-make init
-```
-
-### Archive
-
-```bash
-make build
-
-pip3 install /path/to/huemon-<version>.tar.gz
+make install
 ```
 
 ### Configuration

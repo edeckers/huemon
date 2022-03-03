@@ -16,7 +16,7 @@ CONFIG_PATH_ENV_VARIABLE = environ.get("HUEMON_CONFIG_PATH")
 
 CONFIG_PATHS_ORDERED_PREFERENCE = list(
     filter(
-        lambda p: p,
+        None,
         [
             CONFIG_PATH_ENV_VARIABLE,
             CONFIG_PATH_LOCAL,

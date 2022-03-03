@@ -1,0 +1,46 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "huemon"
+version = "0.0.3"
+description = "Monitor your Philips Hue network"
+authors = ["Ely Deckers"]
+license = "MPL-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+PyYAML = "^6.0"
+mypy = "^0.931"
+types-PyYAML = "^6.0.4"
+
+[tool.poetry.dev-dependencies]
+bandit = "^1.7"
+pre-commit = "^2.17"
+pre-commit-hooks = "^4.1"
+pytest = "^7"
+pytest-cov = "^3"
+
+#########################################################################################
+# Testing
+#########################################################################################
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(name)s: %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+#########################################################################################
+# Style checking
+#########################################################################################
+
+[tool.bandit]
+
+[tool.black]
+target-version = ["py38", "py39"]
+
+[tool.isort]
+profile = "black"
+
