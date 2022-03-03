@@ -1,3 +1,5 @@
+.install.stamp
+
 bin
 config.yml
 commands_enabled
