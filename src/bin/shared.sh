@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 POETRY=`command -v poetry 2> /dev/null`
 INSTALL_STAMP_PATH='.install.stamp'
 
