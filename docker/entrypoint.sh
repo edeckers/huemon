@@ -21,11 +21,11 @@ case ${1} in
     ;;
   help)
     echo "Available options:"
-    echo " discover - Discover resources"
-    echo " value    - Read resource value"
-    echo " install  - Read resource value"
-    echo " help     - Displays the help"
-    echo " [command]    - Execute the specified command, eg. bash."
+    echo " discover  - Discover resources"
+    echo " value     - Read resource value"
+    echo " install   - Read resource value"
+    echo " help      - Displays the help"
+    echo " [command] - Execute the specified command, eg. bash."
     ;;
   *)
     exec "$@"

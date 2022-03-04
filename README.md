@@ -17,7 +17,7 @@ A library that enables Zabbix monitoring for Philips Hue networks.
 ### Shell
 
 ```bash
-docker run -v /path/to/huemon/config:/etc/huemon huemon:0.0.3 app:discover lights
+docker run -v /path/to/huemon/config:/etc/huemon huemon:0.0.3 discover lights
 ```
 
 ### Docker
