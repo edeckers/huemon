@@ -4,6 +4,7 @@ bin
 config.yml
 commands_enabled
 discoveries_enabled
+src/reports
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
