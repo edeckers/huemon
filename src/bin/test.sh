@@ -5,8 +5,11 @@ function cd_to_source_directory() {
 }
 
 function run_tests() {
-  python3 -m unittest discover tests -b
+  p run nox
 }
 
 cd_to_source_directory
+
+source bin/shared.sh
+
 run_tests
