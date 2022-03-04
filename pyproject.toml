@@ -3,11 +3,22 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "huemon"
-version = "0.0.3"
-description = "Monitor your Philips Hue network"
 authors = ["Ely Deckers"]
+description = "Monitor your Philips Hue network"
+documentation = "https://github.com/edeckers/huemon"
+homepage = ""
+keywords = [
+    "Hue",
+    "Monitoring",
+    "Zabbix",
+    "Zigbee",
+]
 license = "MPL-2.0"
+maintainers = ["Ely Deckers"]
+name = "huemon"
+readme = "README.md"
+repository = "https://github.com/edeckers/huemon.git"
+version = "0.0.3"
 
 [tool.poetry.dependencies]
 python = "^3.8"
