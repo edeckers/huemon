@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 
-# set -e, -u, -x, -o pipefail
+set -e -u -x -o pipefail
 
 case ${1} in
-  app:discover|app:install|app:value)
+  discover|install|value)
     case ${1} in
-      app:discover)
+      discover)
         python3 -m huemon discover ${2}
         ;;
-      app:install)
+      install)
         python3 -m huemon install_available commands
         python3 -m huemon install_available discoveries
         ;;
-      app:value)
+      value)
         python3 -m huemon ${2} ${3} ${4}
         ;;
     esac
     ;;
-  app:help)
+  help)
     echo "Available options:"
-    echo " app:discover - Discover resources"
-    echo " app:value    - Read resource value"
-    echo " app:install  - Read resource value"
-    echo " app:help     - Displays the help"
+    echo " discover - Discover resources"
+    echo " value    - Read resource value"
+    echo " install  - Read resource value"
+    echo " help     - Displays the help"
     echo " [command]    - Execute the specified command, eg. bash."
     ;;
   *)

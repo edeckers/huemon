@@ -19,7 +19,7 @@ RUN pip3 install /tmp/huemon.tar.gz
 
 COPY src/huemon/config.example.yml ${HUEMON_CONFIG_PATH}
 
-RUN /sbin/entrypoint.sh app:install
+RUN /sbin/entrypoint.sh install
 
 LABEL \
     maintainer="noreply@nonono.com" \
