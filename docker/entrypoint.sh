@@ -2,7 +2,7 @@
 
 # inspired by https://github.com/sameersbn/docker-gitlab/blob/master/entrypoint.sh
 
-set -e -u -x -o pipefail
+set -e -u -o pipefail
 
 case ${1} in
   discover|install|value)
