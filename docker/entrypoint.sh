@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# inspired by https://github.com/sameersbn/docker-gitlab/blob/master/entrypoint.sh
+
 set -e -u -x -o pipefail
 
 case ${1} in
