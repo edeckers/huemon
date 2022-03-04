@@ -1,5 +1,0 @@
-include huemon/config.example.yml
-include requirements.txt
-recursive-include commands_available *.py
-recursive-include discoveries_available *.py
-recursive-include huemon *.py
