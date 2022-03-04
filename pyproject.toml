@@ -29,7 +29,7 @@ maintainers = ["Ely Deckers"]
 name = "huemon"
 readme = "README.md"
 repository = "https://github.com/edeckers/huemon.git"
-version = "0.0.4"
+version = "0.0.3"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -49,6 +49,7 @@ pytest-cov = "^3"
 # Testing
 #########################################################################################
 nox = "^2022.1.7"
+python-semantic-release = "^7.25.2"
 
 [tool.pytest.ini_options]
 log_cli = true
@@ -67,3 +68,13 @@ target-version = ["py38", "py39"]
 
 [tool.isort]
 profile = "black"
+
+#########################################################################################
+# Publishing
+#########################################################################################
+
+[tool.semantic_release]
+branch = "develop"
+build_command = "poetry build"
+version_toml = "pyproject.toml:tool.poetry.version"
+upload_to_repository = false
