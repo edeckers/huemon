@@ -1,10 +1,11 @@
 FROM python:3.8-alpine3.15
 
+ARG HUEMON_VERSION=0.0.3  
+
 ENV HUEMON_CONFIG_DIR="/etc/huemon" \
     HUEMON_COMMANDS_ENABLED_DIR="/opt/huemon/commands_enabled" \
     HUEMON_DISCOVERIES_ENABLED_DIR="/opt/huemon/discoveries_enabled" \
-    HUEMON_LOG_DIR="/var/log/huemon" \
-    HUEMON_VERSION=0.0.3  
+    HUEMON_LOG_DIR="/var/log/huemon"
 
 ENV HUEMON_CONFIG_PATH="${HUEMON_CONFIG_DIR}/config.yml"
 
