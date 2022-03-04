@@ -4,9 +4,20 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 authors = ["Ely Deckers"]
+classifiers = [
+    "Environment :: Console",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: System :: Logging",
+    "Topic :: System :: Monitoring",
+]
 description = "Monitor your Philips Hue network"
 documentation = "https://github.com/edeckers/huemon"
 homepage = ""
+include = [
+    "LICENSE",
+]
 keywords = [
     "Hue",
     "Monitoring",
@@ -38,6 +49,7 @@ pytest-cov = "^3"
 # Testing
 #########################################################################################
 nox = "^2022.1.7"
+python-semantic-release = "^7.25.2"
 
 [tool.pytest.ini_options]
 log_cli = true
@@ -57,3 +69,12 @@ target-version = ["py38", "py39"]
 [tool.isort]
 profile = "black"
 
+#########################################################################################
+# Publishing
+#########################################################################################
+
+[tool.semantic_release]
+branch = "develop"
+build_command = "poetry build"
+version_toml = "pyproject.toml:tool.poetry.version"
+upload_to_repository = false

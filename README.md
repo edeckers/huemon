@@ -1,10 +1,10 @@
 # Huemon
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
+[![Build](https://github.com/edeckers/huemon/actions/workflows/test.yml/badge.svg)](https://github.com/edeckers/huemon/actions/workflows/test.yml)
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 
-
-A library that enables Zabbix monitoring for Philips Hue networks.
+Zabbix monitoring for Philips Hue networks.
 
 ## Requirements
 
