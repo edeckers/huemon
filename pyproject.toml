@@ -4,9 +4,20 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 authors = ["Ely Deckers"]
+classifiers = [
+    "Environment :: Console",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: System :: Logging",
+    "Topic :: System :: Monitoring",
+]
 description = "Monitor your Philips Hue network"
 documentation = "https://github.com/edeckers/huemon"
 homepage = ""
+include = [
+    "LICENSE",
+]
 keywords = [
     "Hue",
     "Monitoring",
@@ -18,7 +29,7 @@ maintainers = ["Ely Deckers"]
 name = "huemon"
 readme = "README.md"
 repository = "https://github.com/edeckers/huemon.git"
-version = "0.0.3"
+version = "0.0.4"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -56,4 +67,3 @@ target-version = ["py38", "py39"]
 
 [tool.isort]
 profile = "black"
-
