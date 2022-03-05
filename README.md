@@ -6,7 +6,7 @@
 
 Zabbix monitoring for Philips Hue networks.
 
-![Dashboard: sensors](docs/assets/dashboard-sensors.png?raw=true "Dashboard: sensors")
+![Dashboard: sensors](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/dashboard-sensors.png?raw=true "Dashboard: sensors")
 
 ## Requirements
 
@@ -68,19 +68,19 @@ UserParameter=hue.value[*],HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon $1 $2 $
 ## Screenshots
 
 ### Dashboards
-![Dashboard: sensors](docs/assets/dashboard-sensors.png?raw=true "Dashboard: sensors")
+![Dashboard: sensors](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/dashboard-sensors.png?raw=true "Dashboard: sensors")
 
 ### Discoveries
 
-![Discoveries: batteries](docs/assets/discoveries-batteries.png?raw=true "Discoveries: batteries")
+![Discoveries: batteries](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/discoveries-batteries.png?raw=true "Discoveries: batteries")
 
-![Discoveries: lights](docs/assets/discoveries-lights.png?raw=true "Discoveries: lights")
+![Discoveries: lights](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/discoveries-lights.png?raw=true "Discoveries: lights")
 
-![Discoveries: sensors](docs/assets/discoveries-sensors.png?raw=true "Discoveries: sensors")
+![Discoveries: sensors](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/discoveries-sensors.png?raw=true "Discoveries: sensors")
 
 ### Template
 
-![Template](docs/assets/template-discoveries.png?raw=true "Template")
+![Template](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/template-discoveries.png?raw=true "Template")
 
 
 ## License
