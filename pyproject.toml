@@ -29,7 +29,7 @@ maintainers = ["Ely Deckers"]
 name = "huemon"
 readme = "README.md"
 repository = "https://github.com/edeckers/huemon.git"
-version = "0.0.3"
+version = "0.0.0"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -76,5 +76,6 @@ profile = "black"
 [tool.semantic_release]
 branch = "develop"
 build_command = "poetry build"
+major_on_zero = false
 version_toml = "pyproject.toml:tool.poetry.version"
 upload_to_repository = false
