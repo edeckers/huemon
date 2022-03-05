@@ -6,45 +6,25 @@
 
 Zabbix monitoring for Philips Hue networks.
 
+![Dashboard: sensors](docs/assets/dashboard-sensors.png?raw=true "Dashboard: sensors")
+
 ## Requirements
 
 - Zabbix server 5.0+
 - Zabbix agent 5.0+
 - Python 3.0+ on Zabbix agent machine
 
-## Running
-
-### Shell
-
-```bash
-docker run -v /path/to/huemon/config:/etc/huemon huemon:0.0.3 discover lights
-```
-
-### Docker
-
-```bash
-HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon discover lights
-```
-
 ## Installation
 
-### Dependencies and environment
-
 ```bash
-make install
+pip3 install huemon
 ```
 
-### Configuration
+## Configuration
 
 1. Copy `config.example.yml` from `src/huemon` to `/path/to/config.yml`
 2. Make necessary changes
 3. Provide the path through environment variable `HUEMON_CONFIG_PATH`
-
-For example:
-
-```bash
-HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon discover lights
-```
 
 ### Enabling commands and discoveries
 
@@ -56,9 +36,24 @@ HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon install_available disco
 ```
 
 #### Manually
+
 ```bash
 ln -s /path/to/commands_available/command_name.py /path/to/commands_enabled/command_name.py
 ln -s /path/to/discoveries_available/command_name.py /path/to/discoveries_enabled/command_name.py
+```
+
+## Usage
+
+### Shell
+
+```bash
+HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon discover lights
+```
+
+### Docker
+
+```bash
+docker run -v /path/to/huemon/config:/etc/huemon huemon:0.1.0 discover lights
 ```
 
 ### Zabbix agent configuration
@@ -69,6 +64,24 @@ ln -s /path/to/discoveries_available/command_name.py /path/to/discoveries_enable
 UserParameter=hue.discovery[*],HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon discover $1
 UserParameter=hue.value[*],HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon $1 $2 $3
 ```
+
+## Screenshots
+
+### Dashboards
+![Dashboard: sensors](docs/assets/dashboard-sensors.png?raw=true "Dashboard: sensors")
+
+### Discoveries
+
+![Discoveries: batteries](docs/assets/discoveries-batteries.png?raw=true "Discoveries: batteries")
+
+![Discoveries: lights](docs/assets/discoveries-lights.png?raw=true "Discoveries: lights")
+
+![Discoveries: sensors](docs/assets/discoveries-sensors.png?raw=true "Discoveries: sensors")
+
+### Template
+
+![Template](docs/assets/template-discoveries.png?raw=true "Template")
+
 
 ## License
 
