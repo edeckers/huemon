@@ -2,9 +2,10 @@
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 [![Build](https://github.com/edeckers/huemon/actions/workflows/test.yml/badge.svg)](https://github.com/edeckers/huemon/actions/workflows/test.yml)
+[![PyPI](https://img.shields.io/pypi/v/huemon.svg?maxAge=3600)](https://pypi.org/project/huemon)
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 
-Zabbix monitoring for Philips Hue networks.
+Zabbix monitoring with low-level discovery for Philips Hue networks.
 
 ![Dashboard: sensors](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/dashboard-sensors.png?raw=true "Dashboard: sensors")
 
@@ -12,7 +13,7 @@ Zabbix monitoring for Philips Hue networks.
 
 - Zabbix server 5.0+
 - Zabbix agent 5.0+
-- Python 3.0+ on Zabbix agent machine
+- Python 3.8+ on Zabbix agent machine
 
 ## Installation
 
@@ -61,8 +62,8 @@ docker run -v /path/to/huemon/config:/etc/huemon huemon:0.1.0 discover lights
 ```
 # file:/path/to/zabbix/agent/conf.d/hue.conf
 
-UserParameter=hue.discovery[*],HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon discover $1
-UserParameter=hue.value[*],HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon $1 $2 $3
+UserParameter=hue.discovery[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/python3 -m huemon discover $1
+UserParameter=hue.value[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/python3 -m huemon $1 $2 $3
 ```
 
 ## Screenshots
