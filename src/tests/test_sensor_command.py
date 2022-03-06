@@ -20,8 +20,6 @@ CACHE_VALIDITY_ZERO_SECONDS = 0
 SOME_SENSOR_MAC_0 = "SO:ME:SE:NS:OR:MA:C0"
 SOME_SENSOR_MAC_1 = "SO:ME:SE:NS:OR:MA:C1"
 
-#        "battery:level": HueCommand._mapper("config.battery", float),
-#        "light:level": HueCommand._mapper("state.lightlevel", float),
 #        "presence": HueCommand._mapper("state.presence", int),
 #        "reachable": HueCommand._mapper("config.reachable", int),
 #        "temperature": lambda device: float(device["state"]["temperature"] / 100),
@@ -69,6 +67,41 @@ class TestSensorCommand(unittest.TestCase):
         command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "battery:level"])
         state_sensor_0 = read_result(mock_print)
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "battery:level"])
+        state_sensor_1 = read_result(mock_print)
+
+        self.assertEqual(some_level_0, state_sensor_0)
+        self.assertEqual(some_level_1, state_sensor_1)
+
+    @patch("builtins.print")
+    def test_when_sensor_exists_return_light_level(self, mock_print: MagicMock):
+        some_level_0 = 80
+        some_level_1 = 1
+
+        mutable_api = MutableApi()
+        mutable_api.set_sensors(
+            [
+                {
+                    "uniqueid": SOME_SENSOR_MAC_0,
+                    "state": {
+                        "lightlevel": some_level_0,
+                    },
+                },
+                {
+                    "uniqueid": SOME_SENSOR_MAC_1,
+                    "state": {
+                        "lightlevel": some_level_1,
+                    },
+                },
+            ]
+        )
+
+        command_handler = CommandHandler(
+            create_name_to_command_mapping({}, mutable_api, [SensorCommand])
+        )
+
+        command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "light:level"])
+        state_sensor_0 = read_result(mock_print)
+        command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "light:level"])
         state_sensor_1 = read_result(mock_print)
 
         self.assertEqual(some_level_0, state_sensor_0)
