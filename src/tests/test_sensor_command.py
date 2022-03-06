@@ -106,3 +106,38 @@ class TestSensorCommand(unittest.TestCase):
 
         self.assertEqual(some_level_0, state_sensor_0)
         self.assertEqual(some_level_1, state_sensor_1)
+
+    @patch("builtins.print")
+    def test_when_sensor_exists_return_presence(self, mock_print: MagicMock):
+        some_presence_0 = 80
+        some_presence_1 = 1
+
+        mutable_api = MutableApi()
+        mutable_api.set_sensors(
+            [
+                {
+                    "uniqueid": SOME_SENSOR_MAC_0,
+                    "state": {
+                        "presence": some_presence_0,
+                    },
+                },
+                {
+                    "uniqueid": SOME_SENSOR_MAC_1,
+                    "state": {
+                        "presence": some_presence_1,
+                    },
+                },
+            ]
+        )
+
+        command_handler = CommandHandler(
+            create_name_to_command_mapping({}, mutable_api, [SensorCommand])
+        )
+
+        command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "presence"])
+        state_sensor_0 = read_result(mock_print)
+        command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "presence"])
+        state_sensor_1 = read_result(mock_print)
+
+        self.assertEqual(some_presence_0, state_sensor_0)
+        self.assertEqual(some_presence_1, state_sensor_1)
