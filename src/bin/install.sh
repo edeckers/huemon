@@ -11,7 +11,9 @@ function install_git_hooks () {
 
 function install_poetry () {
   if [ -z ${POETRY} ]; then
-    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+
+    try_source_env
   fi
 }
 
