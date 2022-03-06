@@ -20,6 +20,12 @@ def __generate_version():
     return str(time.process_time())
 
 
+def read_result(mock_print):
+    (printed_result, *_) = mock_print.call_args.args
+
+    return printed_result
+
+
 def create_system_config(version: str = None, is_update_available: bool = False):
     return {
         FIELD_SYSTEM_SWUPDATE2: {
