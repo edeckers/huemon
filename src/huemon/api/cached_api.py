@@ -7,16 +7,29 @@ import json
 import os
 import tempfile
 import time
-from fcntl import LOCK_EX, LOCK_NB, flock
 from os.path import exists
 
 from huemon.api.api_interface import ApiInterface
 from huemon.infrastructure.logger_factory import create_logger
+from huemon.util import run_locked
 
 LOG = create_logger()
 
 DEFAULT_MAX_CACHE_AGE_SECONDS = 10
 DEFAULT_CACHE_PATH = tempfile.gettempdir()
+
+
+def cache_output_to_temp(cache_file_path, fn_call):
+    tmp_fd, tmp_file_path = tempfile.mkstemp()
+    with open(tmp_file_path, "w") as f_tmp:
+        f_tmp.write(json.dumps(fn_call()))
+
+    os.close(tmp_fd)
+
+    os.rename(tmp_file_path, cache_file_path)
+
+    with open(cache_file_path) as f_json:
+        return json.loads(f_json.read())
 
 
 class CachedApi(ApiInterface):
@@ -59,23 +72,12 @@ class CachedApi(ApiInterface):
                 )
                 return json.loads(f_json.read())
 
-        with open(lock_file, "w") as f_lock:
-            try:
-                flock(f_lock.fileno(), LOCK_EX | LOCK_NB)
-                LOG.debug("Acquired lock successfully (file=%s)", lock_file)
+        cached_result = run_locked(
+            lock_file, lambda: cache_output_to_temp(cache_file_path, fn_call)
+        )
 
-                tmp_fd, tmp_file_path = tempfile.mkstemp()
-                with open(tmp_file_path, "w") as f_tmp:
-                    f_tmp.write(json.dumps(fn_call()))
-
-                os.close(tmp_fd)
-
-                os.rename(tmp_file_path, cache_file_path)
-
-                with open(cache_file_path) as f_json:
-                    return json.loads(f_json.read())
-            except:  # pylint: disable=bare-except
-                LOG.debug("Failed to acquire lock, cache hit (file=%s)", lock_file)
+        if cached_result:
+            return cached_result
 
         if not does_cache_file_exist:
             return []
