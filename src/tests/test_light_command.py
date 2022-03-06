@@ -22,6 +22,17 @@ SOME_LIGHT_MAC_1 = "SO:ME:LI:GH:TM:AC:01"
 
 
 class TestLightCommand(unittest.TestCase):
+    def test_when_light_doesnt_exist(self):
+        mutable_api = MutableApi()
+        mutable_api.set_lights([])
+
+        command_handler = CommandHandler(
+            create_name_to_command_mapping({}, mutable_api, [LightCommand])
+        )
+
+        with self.assertRaises(Exception):
+            command_handler.exec("light", [SOME_LIGHT_MAC_0, "status"])
+
     @patch("builtins.print")
     def test_when_light_exists_return_status(self, mock_print: MagicMock):
         mutable_api = MutableApi()
