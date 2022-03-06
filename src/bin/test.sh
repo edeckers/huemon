@@ -13,3 +13,4 @@ cd_to_source_directory
 source bin/shared.sh
 
 run_tests
+

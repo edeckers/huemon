@@ -37,6 +37,8 @@ PyYAML = "^6.0"
 mypy = "^0.931"
 types-PyYAML = "^6.0.4"
 nox = "^2022.1.7"
+coverage = {extras = ["toml"], version = "^6.3.2"}
+pytest-cov = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7"
@@ -56,6 +58,16 @@ log_cli = true
 log_cli_level = "INFO"
 log_cli_format = "%(asctime)s [%(levelname)8s] %(name)s: %(message)s (%(filename)s:%(lineno)s)"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 60
+
+[tool.coverage.html]
+directory = "reports/coverage/html"
+
+[tool.coverage.xml]
+output = "reports/coverage/coverage.xml"
 
 #########################################################################################
 # Style checking
