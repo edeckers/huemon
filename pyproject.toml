@@ -61,7 +61,7 @@ log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 
 [tool.coverage.report]
 show_missing = true
-fail_under = 60
+fail_under = 85
 
 [tool.coverage.html]
 directory = "reports/coverage/html"

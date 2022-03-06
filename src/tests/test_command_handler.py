@@ -12,7 +12,7 @@ from huemon.commands.command_handler import (
 )
 from huemon.commands_available.system_command import SystemCommand
 from huemon.const import EXIT_FAIL
-from tests.fixtures import MutableApi, create_system_config
+from tests.fixtures import MutableApi, create_system_config, read_result
 
 CACHE_VALIDITY_INFINITE_SECONDS = 1_000_000
 CACHE_VALIDITY_ZERO_SECONDS = 0
@@ -55,7 +55,9 @@ class TestCachedApi(unittest.TestCase):
 
         command_handler.exec("system", ["version"])
 
-        self.assertTrue(mock_print.call_args.__eq__(some_version))
+        system_version = read_result(mock_print)
+
+        self.assertEqual(some_version, system_version)
 
     def test_when_unknown_command_received_system_exit_is_called(self):
         command_handler = CommandHandler([])

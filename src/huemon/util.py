@@ -3,8 +3,11 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
+import json
 import os
 import sys
+import tempfile
+from fcntl import LOCK_EX, LOCK_NB, flock
 from pathlib import Path
 
 from huemon.const import EXIT_FAIL
@@ -75,3 +78,29 @@ def assert_num_args(expected_number_of_arguments: int, arguments: list, context:
 def assert_exists(expected_values: list, value: str):
     if value not in expected_values:
         exit_fail("Received unknown value `%s` (expected=%s)", value, expected_values)
+
+
+def cache_output_to_temp(cache_file_path, fn_call):
+    tmp_fd, tmp_file_path = tempfile.mkstemp()
+    with open(tmp_file_path, "w") as f_tmp:
+        f_tmp.write(json.dumps(fn_call()))
+
+    os.close(tmp_fd)
+
+    os.rename(tmp_file_path, cache_file_path)
+
+    with open(cache_file_path) as f_json:
+        return json.loads(f_json.read())
+
+
+def run_locked(lock_file, fn_call):
+    with open(lock_file, "w") as f_lock:
+        try:
+            flock(f_lock.fileno(), LOCK_EX | LOCK_NB)
+            LOG.debug("Acquired lock successfully (file=%s)", lock_file)
+
+            return fn_call()
+        except:  # pylint: disable=bare-except
+            LOG.debug("Failed to acquire lock, cache hit (file=%s)", lock_file)
+
+    return None
