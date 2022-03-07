@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 from huemon.commands.command_handler import (
     CommandHandler,
@@ -12,7 +12,7 @@ from huemon.commands.command_handler import (
 )
 from huemon.commands_available.light_command import LightCommand
 from huemon.const import EXIT_FAIL
-from tests.fixtures import MutableApi, read_result
+from tests.fixtures import MutableApi
 
 SOME_LIGHT_MAC_0 = "SO:ME:LI:GH:TM:AC:00"
 SOME_LIGHT_MAC_1 = "SO:ME:LI:GH:TM:AC:01"
@@ -64,8 +64,9 @@ class TestLightCommand(unittest.TestCase):
             f"Exit code should equal {EXIT_FAIL}",
         )
 
+    @staticmethod
     @patch("builtins.print")
-    def test_when_light_exists_return_status(self, mock_print: MagicMock):
+    def test_when_light_exists_return_status(mock_print: MagicMock):
         mutable_api = MutableApi()
         mutable_api.set_lights(
             [
@@ -89,15 +90,13 @@ class TestLightCommand(unittest.TestCase):
         )
 
         command_handler.exec("light", [SOME_LIGHT_MAC_0, "status"])
-        state_light_0 = read_result(mock_print)
         command_handler.exec("light", [SOME_LIGHT_MAC_1, "status"])
-        state_light_1 = read_result(mock_print)
 
-        self.assertEqual(1, state_light_0)
-        self.assertEqual(0, state_light_1)
+        mock_print.assert_has_calls(map(call, [1, 0]))
 
+    @staticmethod
     @patch("builtins.print")
-    def test_when_light_exists_return_is_upgrade_available(self, mock_print: MagicMock):
+    def test_when_light_exists_return_is_upgrade_available(mock_print: MagicMock):
         mutable_api = MutableApi()
         mutable_api.set_lights(
             [
@@ -121,15 +120,13 @@ class TestLightCommand(unittest.TestCase):
         )
 
         command_handler.exec("light", [SOME_LIGHT_MAC_0, "is_upgrade_available"])
-        state_light_0 = read_result(mock_print)
         command_handler.exec("light", [SOME_LIGHT_MAC_1, "is_upgrade_available"])
-        state_light_1 = read_result(mock_print)
 
-        self.assertEqual(0, state_light_0)
-        self.assertEqual(1, state_light_1)
+        mock_print.assert_has_calls(map(call, [0, 1]))
 
+    @staticmethod
     @patch("builtins.print")
-    def test_when_light_exists_return_is_reachable(self, mock_print: MagicMock):
+    def test_when_light_exists_return_is_reachable(mock_print: MagicMock):
         mutable_api = MutableApi()
         mutable_api.set_lights(
             [
@@ -148,15 +145,13 @@ class TestLightCommand(unittest.TestCase):
         )
 
         command_handler.exec("light", [SOME_LIGHT_MAC_0, "reachable"])
-        state_light_0 = read_result(mock_print)
         command_handler.exec("light", [SOME_LIGHT_MAC_1, "reachable"])
-        state_light_1 = read_result(mock_print)
 
-        self.assertEqual(0, state_light_0)
-        self.assertEqual(1, state_light_1)
+        mock_print.assert_has_calls(map(call, [0, 1]))
 
+    @staticmethod
     @patch("builtins.print")
-    def test_when_light_exists_return_version(self, mock_print: MagicMock):
+    def test_when_light_exists_return_version(mock_print: MagicMock):
         some_version_0 = "some_version_0"
         some_version_1 = "some_version_1"
 
@@ -179,9 +174,6 @@ class TestLightCommand(unittest.TestCase):
         )
 
         command_handler.exec("light", [SOME_LIGHT_MAC_0, "version"])
-        state_light_0 = read_result(mock_print)
         command_handler.exec("light", [SOME_LIGHT_MAC_1, "version"])
-        state_light_1 = read_result(mock_print)
 
-        self.assertEqual(some_version_0, state_light_0)
-        self.assertEqual(some_version_1, state_light_1)
+        mock_print.assert_has_calls(map(call, [some_version_0, some_version_1]))

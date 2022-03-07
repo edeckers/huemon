@@ -12,7 +12,7 @@ from huemon.commands.command_handler import (
 )
 from huemon.commands_available.system_command import SystemCommand
 from huemon.const import EXIT_FAIL
-from tests.fixtures import MutableApi, create_system_config, read_result
+from tests.fixtures import MutableApi, create_system_config
 
 
 class TestCachedApi(unittest.TestCase):
@@ -36,8 +36,9 @@ class TestCachedApi(unittest.TestCase):
             "The command should not be known by the CommandHandler",
         )
 
+    @staticmethod
     @patch("builtins.print")
-    def test_when_cache_not_expired_return_cache(self, mock_print: MagicMock):
+    def test_when_cache_not_expired_return_cache(mock_print: MagicMock):
         some_version = "TEST_VERSION"
 
         mutable_api = MutableApi()
@@ -52,9 +53,7 @@ class TestCachedApi(unittest.TestCase):
 
         command_handler.exec("system", ["version"])
 
-        system_version = read_result(mock_print)
-
-        self.assertEqual(some_version, system_version)
+        mock_print.assert_called_once_with(some_version)
 
     def test_when_unknown_command_received_system_exit_is_called(self):
         command_handler = CommandHandler([])

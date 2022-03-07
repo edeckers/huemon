@@ -4,14 +4,14 @@
 # LICENSE file in the root directory of this source tree.
 
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 from huemon.commands.command_handler import (
     CommandHandler,
     create_name_to_command_mapping,
 )
 from huemon.commands_available.sensor_command import SensorCommand
-from tests.fixtures import MutableApi, read_result
+from tests.fixtures import MutableApi
 
 SOME_SENSOR_MAC_0 = "SO:ME:SE:NS:OR:MA:C0"
 SOME_SENSOR_MAC_1 = "SO:ME:SE:NS:OR:MA:C1"
@@ -29,8 +29,9 @@ class TestSensorCommand(unittest.TestCase):
         with self.assertRaises(Exception):
             command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "battery:level"])
 
+    @staticmethod
     @patch("builtins.print")
-    def test_when_sensor_exists_return_battery_level(self, mock_print: MagicMock):
+    def test_when_sensor_exists_return_battery_level(mock_print: MagicMock):
         some_level_0 = 80
         some_level_1 = 1
 
@@ -57,15 +58,13 @@ class TestSensorCommand(unittest.TestCase):
         )
 
         command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "battery:level"])
-        state_sensor_0 = read_result(mock_print)
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "battery:level"])
-        state_sensor_1 = read_result(mock_print)
 
-        self.assertEqual(some_level_0, state_sensor_0)
-        self.assertEqual(some_level_1, state_sensor_1)
+        mock_print.assert_has_calls(map(call, [some_level_0, some_level_1]))
 
+    @staticmethod
     @patch("builtins.print")
-    def test_when_sensor_exists_return_light_level(self, mock_print: MagicMock):
+    def test_when_sensor_exists_return_light_level(mock_print: MagicMock):
         some_level_0 = 80
         some_level_1 = 1
 
@@ -92,15 +91,13 @@ class TestSensorCommand(unittest.TestCase):
         )
 
         command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "light:level"])
-        state_sensor_0 = read_result(mock_print)
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "light:level"])
-        state_sensor_1 = read_result(mock_print)
 
-        self.assertEqual(some_level_0, state_sensor_0)
-        self.assertEqual(some_level_1, state_sensor_1)
+        mock_print.assert_has_calls(map(call, [some_level_0, some_level_1]))
 
+    @staticmethod
     @patch("builtins.print")
-    def test_when_sensor_exists_return_temperature(self, mock_print: MagicMock):
+    def test_when_sensor_exists_return_temperature(mock_print: MagicMock):
         some_temperature_0 = 80
         some_temperature_1 = 1
 
@@ -127,15 +124,15 @@ class TestSensorCommand(unittest.TestCase):
         )
 
         command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "temperature"])
-        state_sensor_0 = read_result(mock_print)
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "temperature"])
-        state_sensor_1 = read_result(mock_print)
 
-        self.assertEqual(some_temperature_0, state_sensor_0 * 100)
-        self.assertEqual(some_temperature_1, state_sensor_1 * 100)
+        mock_print.assert_has_calls(
+            map(call, [some_temperature_0 * 0.01, some_temperature_1 * 0.01])
+        )
 
+    @staticmethod
     @patch("builtins.print")
-    def test_when_sensor_exists_return_presence(self, mock_print: MagicMock):
+    def test_when_sensor_exists_return_presence(mock_print: MagicMock):
         some_presence_0 = 80
         some_presence_1 = 1
 
@@ -162,17 +159,15 @@ class TestSensorCommand(unittest.TestCase):
         )
 
         command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "presence"])
-        state_sensor_0 = read_result(mock_print)
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "presence"])
-        state_sensor_1 = read_result(mock_print)
 
-        self.assertEqual(some_presence_0, state_sensor_0)
-        self.assertEqual(some_presence_1, state_sensor_1)
+        mock_print.assert_has_calls(map(call, [some_presence_0, some_presence_1]))
 
+    @staticmethod
     @patch("builtins.print")
-    def test_when_sensor_exists_return_reachable(self, mock_print: MagicMock):
-        some_presence_0 = 0
-        some_presence_1 = 1
+    def test_when_sensor_exists_return_reachable(mock_print: MagicMock):
+        some_reachability_0 = 0
+        some_reachability_1 = 1
 
         mutable_api = MutableApi()
         mutable_api.set_sensors(
@@ -180,13 +175,13 @@ class TestSensorCommand(unittest.TestCase):
                 {
                     "uniqueid": SOME_SENSOR_MAC_0,
                     "config": {
-                        "reachable": some_presence_0,
+                        "reachable": some_reachability_0,
                     },
                 },
                 {
                     "uniqueid": SOME_SENSOR_MAC_1,
                     "config": {
-                        "reachable": some_presence_1,
+                        "reachable": some_reachability_1,
                     },
                 },
             ]
@@ -197,9 +192,8 @@ class TestSensorCommand(unittest.TestCase):
         )
 
         command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "reachable"])
-        state_sensor_0 = read_result(mock_print)
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "reachable"])
-        state_sensor_1 = read_result(mock_print)
 
-        self.assertEqual(some_presence_0, state_sensor_0)
-        self.assertEqual(some_presence_1, state_sensor_1)
+        mock_print.assert_has_calls(
+            map(call, [some_reachability_0, some_reachability_1])
+        )
