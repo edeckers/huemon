@@ -8,6 +8,7 @@ from functools import reduce
 from huemon.api.api_factory import create_api
 from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
+from huemon.commands_internal.agent_command import AgentCommand
 from huemon.commands_internal.install_available_command import InstallAvailableCommand
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
@@ -36,6 +37,7 @@ def __load_plugins_and_hardwired_handlers(config: dict, command_plugins_path: st
     return {
         **__load_command_plugins(config, command_plugins_path),
         InstallAvailableCommand.name(): InstallAvailableCommand(config),
+        AgentCommand.name(): AgentCommand(config),
     }
 
 
