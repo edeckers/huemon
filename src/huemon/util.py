@@ -100,7 +100,13 @@ def run_locked(lock_file, fn_call):
             LOG.debug("Acquired lock successfully (file=%s)", lock_file)
 
             return fn_call()
-        except:  # pylint: disable=bare-except
-            LOG.debug("Failed to acquire lock, cache hit (file=%s)", lock_file)
+        except BlockingIOError:
+            LOG.debug("Failed to acquire lock (file=%s)", lock_file)
+        except Exception as error:  # pylint: disable=broad-except
+            LOG.debug(
+                "Something unexpected whent wrong while acquiring lock (file=%s, error=%s)",
+                lock_file,
+                error,
+            )
 
     return None

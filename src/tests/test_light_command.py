@@ -13,10 +13,6 @@ from huemon.commands.command_handler import (
 from huemon.commands_available.light_command import LightCommand
 from tests.fixtures import MutableApi, read_result
 
-CACHE_VALIDITY_INFINITE_SECONDS = 1_000_000
-CACHE_VALIDITY_ZERO_SECONDS = 0
-
-
 SOME_LIGHT_MAC_0 = "SO:ME:LI:GH:TM:AC:00"
 SOME_LIGHT_MAC_1 = "SO:ME:LI:GH:TM:AC:01"
 
