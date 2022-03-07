@@ -46,7 +46,7 @@ class TestApiConfiguration(unittest.TestCase):
 
         thread_result = {"result": False}
         target = lambda: run_locked(
-            lock_file_path, lambda: TestApiConfiguration.__wait(0.1, thread_result)
+            lock_file_path, lambda: TestApiConfiguration.__wait(1, thread_result)
         )
 
         thread0 = threading.Thread(target=target)
