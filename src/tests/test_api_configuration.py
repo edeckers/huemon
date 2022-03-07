@@ -59,3 +59,14 @@ class TestApiConfiguration(unittest.TestCase):
 
         self.assertIsNone(maybe_true)
         self.assertEqual(True, thread_result["result"])
+
+    def test_when_locked_raises_exception_return_none(self):
+        (lfd, lock_file_path) = tempfile.mkstemp()
+
+        raise_exception = lambda: 1 / 0
+
+        maybe_true = run_locked(lock_file_path, raise_exception)
+
+        os.close(lfd)
+
+        self.assertIsNone(maybe_true)
