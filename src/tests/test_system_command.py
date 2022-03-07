@@ -13,9 +13,6 @@ from huemon.commands.command_handler import (
 from huemon.commands_available.system_command import SystemCommand
 from tests.fixtures import MutableApi, read_result
 
-CACHE_VALIDITY_INFINITE_SECONDS = 1_000_000
-CACHE_VALIDITY_ZERO_SECONDS = 0
-
 
 class TestCachedApi(unittest.TestCase):
     @patch("builtins.print")

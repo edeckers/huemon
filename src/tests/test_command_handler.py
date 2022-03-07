@@ -14,9 +14,6 @@ from huemon.commands_available.system_command import SystemCommand
 from huemon.const import EXIT_FAIL
 from tests.fixtures import MutableApi, create_system_config, read_result
 
-CACHE_VALIDITY_INFINITE_SECONDS = 1_000_000
-CACHE_VALIDITY_ZERO_SECONDS = 0
-
 
 class TestCachedApi(unittest.TestCase):
     def test_when_command_is_loaded_it_should_be_listed_as_available(self):
