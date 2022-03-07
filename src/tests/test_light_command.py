@@ -11,6 +11,7 @@ from huemon.commands.command_handler import (
     create_name_to_command_mapping,
 )
 from huemon.commands_available.light_command import LightCommand
+from huemon.const import EXIT_FAIL
 from tests.fixtures import MutableApi, read_result
 
 SOME_LIGHT_MAC_0 = "SO:ME:LI:GH:TM:AC:00"
@@ -18,7 +19,7 @@ SOME_LIGHT_MAC_1 = "SO:ME:LI:GH:TM:AC:01"
 
 
 class TestLightCommand(unittest.TestCase):
-    def test_when_light_doesnt_exist(self):
+    def test_when_light_doesnt_exist_raise(self):
         mutable_api = MutableApi()
         mutable_api.set_lights([])
 
@@ -28,6 +29,40 @@ class TestLightCommand(unittest.TestCase):
 
         with self.assertRaises(Exception):
             command_handler.exec("light", [SOME_LIGHT_MAC_0, "status"])
+
+    def test_when_not_enough_parameters_raise(self):
+        mutable_api = MutableApi()
+        mutable_api.set_lights([])
+
+        command_handler = CommandHandler(
+            create_name_to_command_mapping({}, mutable_api, [LightCommand])
+        )
+
+        with self.assertRaises(SystemExit) as failed_call_context:
+            command_handler.exec("light", [])
+
+        self.assertEqual(
+            EXIT_FAIL,
+            failed_call_context.exception.code,
+            f"Exit code should equal {EXIT_FAIL}",
+        )
+
+    def test_when_unknown_action_raise(self):
+        mutable_api = MutableApi()
+        mutable_api.set_lights([])
+
+        command_handler = CommandHandler(
+            create_name_to_command_mapping({}, mutable_api, [LightCommand])
+        )
+
+        with self.assertRaises(SystemExit) as failed_call_context:
+            command_handler.exec("light", [SOME_LIGHT_MAC_0, "some_unknown_action"])
+
+        self.assertEqual(
+            EXIT_FAIL,
+            failed_call_context.exception.code,
+            f"Exit code should equal {EXIT_FAIL}",
+        )
 
     @patch("builtins.print")
     def test_when_light_exists_return_status(self, mock_print: MagicMock):
