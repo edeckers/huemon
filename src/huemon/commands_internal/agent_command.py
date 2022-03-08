@@ -5,6 +5,8 @@
 
 import uvicorn
 
+from huemon.api.api_interface import ApiInterface
+from huemon.api_server import HuemonServerFactory
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.util import assert_exists, assert_num_args
@@ -18,16 +20,18 @@ class MyServer:  # pylint: disable=too-few-public-methods
         host = config["host"] if "host" in config else "127.0.0.1"
         port = int(config["port"]) if "port" in config else 8000
 
-        uvicorn.run("huemon.server:app", host=host, port=port, reload=True)
+        uvicorn.run(HuemonServerFactory.create(config), host=host, port=port)
 
 
 class AgentCommand(HueCommand):
-    def __init__(self, config: dict):  # pylint: disable=unused-argument
-        self.server_config = config["server"] if "server" in config else {}
-
     __SYSTEM_ACTION_MAP = {
         "start": MyServer.start,
     }
+
+    def __init__(
+        self, config: dict, _: ApiInterface
+    ):  # pylint: disable=unused-argument
+        self.config = config
 
     @staticmethod
     def name():
@@ -41,7 +45,7 @@ class AgentCommand(HueCommand):
 
         assert_exists(list(AgentCommand.__SYSTEM_ACTION_MAP), action)
 
-        HueCommand._process(self.__SYSTEM_ACTION_MAP[action](self.server_config))
+        HueCommand._process(self.__SYSTEM_ACTION_MAP[action](self.config))
         LOG.debug(
             "Finished `%s` command (arguments=%s)", AgentCommand.name(), arguments
         )
