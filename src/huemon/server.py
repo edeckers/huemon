@@ -1,8 +1,9 @@
 import contextlib
 import io
 import json
+from typing import List
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, Query, status
 
 from huemon.commands.command_handler import create_default_command_handler
 from huemon.infrastructure.config_factory import create_config
@@ -21,7 +22,7 @@ async def root():
 
 
 @app.get("/discover")
-async def discover():
+async def discover(q: List[str] = Query(None)):  # pylint: disable=invalid-name
     command_handler = create_default_command_handler(
         CONFIG, get_commands_path(CONFIG, "enabled")
     )
@@ -29,11 +30,11 @@ async def discover():
     context_reader = io.StringIO()
     with contextlib.redirect_stdout(context_reader):
         try:
-            command_handler.exec("discover", ["lights"])
-        except SystemExit:
-            raise HTTPException(  # pylint: disable=raise-missing-from
+            command_handler.exec("discover", q)
+        except SystemExit as system_exit:
+            raise HTTPException(
                 detail=context_reader.getvalue(),
                 status_code=status.HTTP_400_BAD_REQUEST,
-            )
+            ) from system_exit
 
     return json.loads(context_reader.getvalue())
