@@ -43,6 +43,24 @@ ln -s /path/to/commands_available/command_name.py /path/to/commands_enabled/comm
 ln -s /path/to/discoveries_available/command_name.py /path/to/discoveries_enabled/command_name.py
 ```
 
+### Zabbix agent configuration
+
+```
+# file:/path/to/zabbix/agent/conf.d/hue.conf
+
+UserParameter=hue.discovery[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/python3 -m huemon discover $1
+UserParameter=hue.value[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/python3 -m huemon $1 $2 $3
+```
+
+Or _Huemon agent mode_
+
+```
+# file:/path/to/zabbix/agent/conf.d/hue.conf
+
+UserParameter=hue.discovery[*],curl http://127.0.0.1:8000/discover?q=$1
+UserParameter=hue.value[*],curl http://127.0.0.1:8000/$1?q=$2&q=$3
+```
+
 ## Usage
 
 ### Shell
@@ -51,19 +69,22 @@ ln -s /path/to/discoveries_available/command_name.py /path/to/discoveries_enable
 HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon discover lights
 ```
 
+Or _agent mode_
+
+```bash
+HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon agent start
+```
+
 ### Docker
 
 ```bash
-docker run -v /path/to/huemon/config:/etc/huemon huemon:0.1.0 discover lights
+docker run -v /path/to/huemon/config:/etc/huemon huemon:0.6.0 discover lights
 ```
 
-### Zabbix agent configuration
+Or _agent mode_
 
-```
-# file:/path/to/zabbix/agent/conf.d/hue.conf
-
-UserParameter=hue.discovery[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/python3 -m huemon discover $1
-UserParameter=hue.value[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/python3 -m huemon $1 $2 $3
+```bash
+docker run -v /path/to/huemon/config:/etc/huemon huemon:0.6.0 agent start
 ```
 
 ## Screenshots
