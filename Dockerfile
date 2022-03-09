@@ -16,8 +16,8 @@ COPY assets/docker/entrypoint.sh /sbin/entrypoint.sh
 
 RUN chmod +x /sbin/entrypoint.sh
 
-COPY dist/huemon-${HUEMON_VERSION}.tar.gz /tmp/huemon.tar.gz
-RUN pip3 install /tmp/huemon.tar.gz
+COPY dist/huemon-${HUEMON_VERSION}-py3-none-any.whl /tmp
+RUN pip3 install /tmp/huemon-${HUEMON_VERSION}-py3-none-any.whl
 
 RUN /sbin/entrypoint.sh install
 
