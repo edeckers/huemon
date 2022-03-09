@@ -55,7 +55,8 @@ class CommandHandler:  # pylint: disable=too-few-public-methods
         return list(self.handlers)
 
     def exec(self, command: str, arguments):
-        LOG.debug("Running command `%s` (arguments=%s)", command, arguments)
+        filtered_arguments = list(filter(lambda parameter: parameter, arguments))
+        LOG.debug("Running command `%s` (arguments=%s)", command, filtered_arguments)
         if not command in self.handlers:
             exit_fail(
                 "Received unknown command `%s`, expected one of %s",
@@ -63,6 +64,6 @@ class CommandHandler:  # pylint: disable=too-few-public-methods
                 self.available_commands(),
             )
 
-        self.handlers[command].exec(arguments)
+        self.handlers[command].exec(filtered_arguments)
 
-        LOG.debug("Finished command `%s` (arguments=%s)", command, arguments)
+        LOG.debug("Finished command `%s` (arguments=%s)", command, filtered_arguments)
