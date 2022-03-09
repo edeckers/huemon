@@ -1,0 +1,15 @@
+[Unit]
+Description=Huemon
+After=network.target
+
+[Service]
+ExecStart=python3 -m huemon agent start
+Restart=always
+RestartSec=10
+StandardError=file:var/log/huemon/systemd-error.log
+StandardOutput=file:/var/log/huemon/systemd-output.log
+Type=simple
+WorkingDirectory=/opt/huemon
+
+[Install]
+WantedBy=multi-user.target
