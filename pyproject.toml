@@ -99,6 +99,7 @@ changelog_file = "README.md"
 changelog_placeholder = "DISABLE_CHANGELOG_HACK"
 major_on_zero = false
 version_pattern = [
+    "docker-compose.yml:huemon:{version}",
     "Dockerfile:ARG HUEMON_VERSION={version}",
 ]
 version_toml = "pyproject.toml:tool.poetry.version"
