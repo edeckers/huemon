@@ -17,8 +17,18 @@ LOG = create_logger()
 class MyServer:  # pylint: disable=too-few-public-methods
     @staticmethod
     def start(config: dict):
-        host = config["host"] if "host" in config else "127.0.0.1"
-        port = int(config["port"]) if "port" in config else 8000
+        has_server_config = "server" in config
+
+        host = (
+            config["server"]["host"]
+            if has_server_config and "host" in config["server"]
+            else "127.0.0.1"
+        )
+        port = (
+            int(config["server"]["port"])
+            if has_server_config and "port" in config["server"]
+            else 8000
+        )
 
         uvicorn.run(HuemonServerFactory.create(config), host=host, port=port)
 

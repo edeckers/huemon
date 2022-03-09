@@ -77,14 +77,16 @@ HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon agent start
 
 ### Docker
 
+Provide a configuration path for the `huemon-config` volume in `docker-compose.yml` before running the commands below.
+
 ```bash
-docker run -v /path/to/huemon/config:/etc/huemon huemon:0.6.0 discover lights
+docker-compose run discover lights
 ```
 
 Or _agent mode_
 
 ```bash
-docker run -v /path/to/huemon/config:/etc/huemon huemon:0.6.0 agent start
+docker-compose up -d
 ```
 
 ## Screenshots
