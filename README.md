@@ -52,13 +52,22 @@ UserParameter=hue.discovery[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/p
 UserParameter=hue.value[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/python3 -m huemon $1 $2 $3
 ```
 
-Or _Huemon agent mode_
+Or Docker
+
+```
+# file:/path/to/zabbix/agent/conf.d/hue.conf
+
+UserParameter=hue.discovery[*],docker-compose run huemon discover $1
+UserParameter=hue.value[*],docker-compose run huemon $1 $2 $3
+```
+
+Or _agent mode_
 
 ```
 # file:/path/to/zabbix/agent/conf.d/hue.conf
 
 UserParameter=hue.discovery[*],curl http://127.0.0.1:8000/discover?q=$1
-UserParameter=hue.value[*],curl http://127.0.0.1:8000/$1?q=$2&q=$3
+UserParameter=hue.value[*],curl http://127.0.0.1:8000/$1?q=$2\&q=$3
 ```
 
 ## Usage
@@ -80,7 +89,7 @@ HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon agent start
 Provide a configuration path for the `huemon-config` volume in `docker-compose.yml` before running the commands below.
 
 ```bash
-docker-compose run discover lights
+docker-compose run huemon discover lights
 ```
 
 Or _agent mode_
