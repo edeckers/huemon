@@ -1,0 +1,14 @@
+[Unit]
+Description=Huemon
+After=network.target
+
+[Service]
+Environment=HUEMON_CONFIG_PATH=/etc/huemon/config.yml
+ExecStart=python3 -m huemon agent start
+Restart=always
+RestartSec=10
+Type=simple
+
+
+[Install]
+WantedBy=multi-user.target

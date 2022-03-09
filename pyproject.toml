@@ -42,6 +42,9 @@ types-PyYAML = "^6.0.4"
 nox = "^2022.1.7"
 coverage = {extras = ["toml"], version = "^6.3.2"}
 pytest-cov = "^3.0.0"
+fastapi = "^0.75.0"
+uvicorn = "^0.17.5"
+gunicorn = "^20.1.0"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7"
@@ -95,5 +98,10 @@ commit_subject = "chore: release {version}"
 changelog_file = "README.md"
 changelog_placeholder = "DISABLE_CHANGELOG_HACK"
 major_on_zero = false
+version_pattern = [
+    "assets/release/release-docker.sh:huemon:{version}",
+    "docker-compose.yml:huemon:{version}",
+    "Dockerfile:ARG HUEMON_VERSION={version}",
+]
 version_toml = "pyproject.toml:tool.poetry.version"
 upload_to_repository = true

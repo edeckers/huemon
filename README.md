@@ -7,7 +7,7 @@
 
 Zabbix monitoring with low-level discovery for Philips Hue networks.
 
-![Dashboard: sensors](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/dashboard-sensors.png?raw=true "Dashboard: sensors")
+![Dashboard: sensors](https://raw.githubusercontent.com/edeckers/huemon/develop/assets/docs/dashboard-sensors.png?raw=true "Dashboard: sensors")
 
 ## Requirements
 
@@ -43,20 +43,6 @@ ln -s /path/to/commands_available/command_name.py /path/to/commands_enabled/comm
 ln -s /path/to/discoveries_available/command_name.py /path/to/discoveries_enabled/command_name.py
 ```
 
-## Usage
-
-### Shell
-
-```bash
-HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon discover lights
-```
-
-### Docker
-
-```bash
-docker run -v /path/to/huemon/config:/etc/huemon huemon:0.1.0 discover lights
-```
-
 ### Zabbix agent configuration
 
 ```
@@ -66,22 +52,76 @@ UserParameter=hue.discovery[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/p
 UserParameter=hue.value[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/python3 -m huemon $1 $2 $3
 ```
 
+Or Docker
+
+```
+# file:/path/to/zabbix/agent/conf.d/hue.conf
+
+UserParameter=hue.discovery[*],docker-compose run huemon discover $1
+UserParameter=hue.value[*],docker-compose run huemon $1 $2 $3
+```
+
+Or _agent mode_
+
+```
+# file:/path/to/zabbix/agent/conf.d/hue.conf
+
+UserParameter=hue.discovery[*],curl http://127.0.0.1:8000/discover?q=$1
+UserParameter=hue.value[*],curl http://127.0.0.1:8000/$1?q=$2\&q=$3
+```
+
+### Configure Systemd service
+
+An installer that configures Huemon as a Systemd service is included in this repository. It uses `/etc/huemon/config.yml` as the configuration path.
+
+```bash
+assets/service-installer.sh install
+```
+
+## Usage
+
+### Shell
+
+```bash
+HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon discover lights
+```
+
+Or _agent mode_
+
+```bash
+HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon agent start
+```
+
+### Docker
+
+Provide a configuration path for the `huemon-config` volume in `docker-compose.yml` before running the commands below.
+
+```bash
+docker-compose run huemon discover lights
+```
+
+Or _agent mode_
+
+```bash
+docker-compose up -d
+```
+
 ## Screenshots
 
 ### Dashboards
-![Dashboard: sensors](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/dashboard-sensors.png?raw=true "Dashboard: sensors")
+![Dashboard: sensors](https://raw.githubusercontent.com/edeckers/huemon/develop/assets/docs/dashboard-sensors.png?raw=true "Dashboard: sensors")
 
 ### Discoveries
 
-![Discoveries: batteries](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/discoveries-batteries.png?raw=true "Discoveries: batteries")
+![Discoveries: batteries](https://raw.githubusercontent.com/edeckers/huemon/develop/assets/docs/discoveries-batteries.png?raw=true "Discoveries: batteries")
 
-![Discoveries: lights](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/discoveries-lights.png?raw=true "Discoveries: lights")
+![Discoveries: lights](https://raw.githubusercontent.com/edeckers/huemon/develop/assets/docs/discoveries-lights.png?raw=true "Discoveries: lights")
 
-![Discoveries: sensors](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/discoveries-sensors.png?raw=true "Discoveries: sensors")
+![Discoveries: sensors](https://raw.githubusercontent.com/edeckers/huemon/develop/assets/docs/discoveries-sensors.png?raw=true "Discoveries: sensors")
 
 ### Template
 
-![Template](https://raw.githubusercontent.com/edeckers/huemon/develop/docs/assets/template-discoveries.png?raw=true "Template")
+![Template](https://raw.githubusercontent.com/edeckers/huemon/develop/assets/docs/template-discoveries.png?raw=true "Template")
 
 
 ## License

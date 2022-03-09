@@ -8,6 +8,7 @@ from pathlib import Path
 
 from genericpath import isdir, isfile
 
+from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.util import (
@@ -50,7 +51,7 @@ def symlink_plugins(plugins_available_path, plugins_enabled_path):
 
 
 class InstallAvailableCommand(HueCommand):
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, _: ApiInterface):
         self.config = config
 
     @staticmethod

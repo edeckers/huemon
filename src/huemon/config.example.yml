@@ -10,6 +10,9 @@ cache:
 # discoveries:
 #  available: /path/to/discoveries_available
 #  enabled: /path/to/discoveries_enabled
+server:
+  host: "0.0.0.0"
+  port: 8000
 formatters:
   standard:
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

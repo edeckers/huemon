@@ -5,8 +5,11 @@
 set -e -u -o pipefail
 
 case ${1} in
-  discover|install|value)
+  agent|discover|install|value)
     case ${1} in
+      agent)
+        python3 -m huemon agent ${2}
+        ;;
       discover)
         python3 -m huemon discover ${2}
         ;;
@@ -21,9 +24,10 @@ case ${1} in
     ;;
   help)
     echo "Available options:"
+    echo " agent     - Start agent mode"
     echo " discover  - Discover resources"
-    echo " value     - Read resource value"
     echo " install   - Read resource value"
+    echo " value     - Read resource value"
     echo " help      - Displays the help"
     echo " [command] - Execute the specified command, eg. bash."
     ;;
