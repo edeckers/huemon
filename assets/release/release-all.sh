@@ -10,19 +10,15 @@ function publish_semantic_release () {
   echo "Published release"
 }
 
-function create_semantic_release () {
-  echo "Creating semantic release"
-  poetry run semantic-release version
+function build_dist () {
   poetry build
-  echo "Created semantic release"
 }
 
 cd_to_root_directory
 
-create_semantic_release
+publish_semantic_release
 
 source assets/release/release-docker.sh
-build_docker_image
 
-publish_semantic_release
-push_docker_image
+build_dist
+build_and_publish_docker_image
