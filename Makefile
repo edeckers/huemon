@@ -14,6 +14,7 @@ help:
 	@echo "  format      reformat code"
 	@echo "  install     install packages and prepare environment"
 	@echo "  lint        run the code linters"
+	@echo "  release     build a release and publish it"
 	@echo "  test        run all the tests"
 	@echo ""
 	@echo "Check the Makefile to know exactly what each target is doing."
@@ -30,6 +31,9 @@ $(INSTALL_STAMP): pyproject.toml poetry.lock
 
 lint: $(INSTALL_STAMP)
 	src/bin/lint.sh
+
+release: $(INSTALL_STAMP)
+	assets/release/release-all.sh
 
 test: $(INSTALL_STAMP)
 	src/bin/test.sh
