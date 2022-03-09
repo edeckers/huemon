@@ -9,16 +9,15 @@ ARG HUEMON_VERSION=0.6.0
 
 ENV HUEMON_CONFIG_PATH="/etc/huemon/config.yml"
 
-COPY assets/docker/entrypoint.sh /sbin/entrypoint.sh
-RUN chmod 755 /sbin/entrypoint.sh
-
 RUN apk add bash curl
 
-RUN curl -L https://github.com/edeckers/huemon/releases/download/v${HUEMON_VERSION}/huemon-${HUEMON_VERSION}.tar.gz > /tmp/huemon.tar.gz
-
-RUN pip3 install /tmp/huemon.tar.gz
-
 COPY src/huemon/config.example.yml ${HUEMON_CONFIG_PATH}
+COPY assets/docker/entrypoint.sh /sbin/entrypoint.sh
+
+RUN chmod +x /sbin/entrypoint.sh
+
+COPY dist/huemon-${HUEMON_VERSION}.tar.gz /tmp/huemon.tar.gz
+RUN pip3 install /tmp/huemon.tar.gz
 
 RUN /sbin/entrypoint.sh install
 
