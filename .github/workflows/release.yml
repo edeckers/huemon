@@ -1,0 +1,11 @@
+name: Release to GitHub, PyPI and Docker Hub
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build and publish release
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo "This is a dummy workflow for testing pruposes"
