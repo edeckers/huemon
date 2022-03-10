@@ -7,7 +7,7 @@ function cd_to_root_directory () {
 function build_and_publish_docker_image () {
   cd_to_root_directory
 
-  echo "Building and publishing Docker image edeckers/huemon:0.7.2"
-  docker buildx build . --platform linux/amd64,linux/arm64,linux/arm/v7 -t edeckers/huemon:0.7.2 --push
-  echo "Built and published Docker image edeckers/huemon:0.7.2"
+  echo "Building and publishing Docker image edeckers/huemon:0.7.3"
+  docker buildx build . --platform linux/amd64,linux/arm64,linux/arm/v7 -t edeckers/huemon:0.7.3 --push
+  echo "Built and published Docker image edeckers/huemon:0.7.3"
 }
