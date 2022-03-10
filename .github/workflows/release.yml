@@ -2,10 +2,22 @@ name: Release to GitHub, PyPI and Docker Hub
 on:
   workflow_dispatch:
 
+env:
+  python-version: 3.8
+
 jobs:
   build:
     runs-on: ubuntu-latest
     name: Build and publish release
     steps:
       - uses: actions/checkout@v2
-      - run: echo "This is a dummy workflow for testing pruposes"
+      - uses: docker/setup-qemu-action@v1
+      - uses: docker/setup-buildx-action@v1
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.python-version }}
+          architecture: x64
+      - run: make release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN}}
