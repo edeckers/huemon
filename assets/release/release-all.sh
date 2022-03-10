@@ -14,12 +14,12 @@ function publish_semantic_release () {
 
   set_github_actions_git_details
 
-  publish_result=`p run semantic-release publish -D commit_author="github-actions <action@github.com>" 2>&1`
+  publish_result=`p run semantic-release publish 2>&1`
   error_code=`echo $?`
-  is_error_code=`[ -z ${error_code} ] && echo 1 || echo 0`
+  is_error_code=`[ ${error_code} -ne 0 ] && echo 1 || echo 0`
   
   no_release_count=`echo "${publish_result}" | grep -cim1 "no release"`
-  is_release=`[ -z ${no_release_count} ] && echo 1 || echo 0`
+  is_release=`[ ${no_release_count} -eq 0 ] && echo 1 || echo 0`
 
   echo "${publish_result}"
 
