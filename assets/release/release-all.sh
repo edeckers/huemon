@@ -4,9 +4,17 @@ function cd_to_root_directory () {
   cd `dirname ${0}`/../../
 }
 
+function set_github_actions_git_details () {
+  git config --global user.name "github-actions"
+  git config --global user.email "action@github.com"
+}
+
 function publish_semantic_release () {
   echo "Publishing release"
-  publish_result=`p run semantic-release publish 2>&1`
+
+  set_github_actions_git_details
+
+  publish_result=`p run semantic-release publish -D commit_author="github-actions <action@github.com>" 2>&1`
   error_code=`echo $?`
   is_error_code=`[ -z ${error_code} ] && echo 1 || echo 0`
   
