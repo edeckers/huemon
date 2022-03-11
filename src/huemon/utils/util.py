@@ -14,8 +14,12 @@ from huemon.const import EXIT_FAIL
 from huemon.infrastructure.logger_factory import create_logger
 
 
+def get_root_module_path():
+    return Path(sys.modules["__main__"].__file__).parent
+
+
 def create_local_path(relative_path: str):
-    return str(os.path.join(Path(__file__).parent.absolute(), relative_path))
+    return str(os.path.join(get_root_module_path().absolute(), relative_path))
 
 
 LOG = create_logger()
