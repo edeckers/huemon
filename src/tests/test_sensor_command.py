@@ -10,7 +10,7 @@ from huemon.commands.command_handler import (
     CommandHandler,
     create_name_to_command_mapping,
 )
-from huemon.commands_available.sensor_command import SensorCommand
+from huemon.commands.internal.sensor_command import SensorCommand
 from tests.fixtures import MutableApi
 
 SOME_SENSOR_MAC_0 = "SO:ME:SE:NS:OR:MA:C0"

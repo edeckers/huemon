@@ -20,15 +20,12 @@ def create_local_path(relative_path: str):
 
 LOG = create_logger()
 
-DEFAULT_COMMANDS_AVAILABLE_PATH = create_local_path("commands_available")
-DEFAULT_COMMANDS_ENABLED_PATH = create_local_path("commands_enabled")
 DEFAULT_DISCOVERIES_AVAILABLE_PATH = create_local_path("discoveries_available")
 DEFAULT_DISCOVERIES_ENABLED_PATH = create_local_path("discoveries_enabled")
 
 PLUGIN_TYPE_MAPPING = {
     "commands": {
-        "available": DEFAULT_COMMANDS_AVAILABLE_PATH,
-        "enabled": DEFAULT_COMMANDS_ENABLED_PATH,
+        "enabled": None,
     },
     "discoveries": {
         "available": DEFAULT_DISCOVERIES_AVAILABLE_PATH,
