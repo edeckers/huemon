@@ -54,6 +54,20 @@ class Discover:  # pylint: disable=too-few-public-methods
 
         self.discovery_plugins_path = get_discoveries_path(config, "enabled")
 
+        self.handler = self.__create_discovery_handler()
+
+    def __create_discovery_handler(self):
+        LOG.debug("Loading discovery plugins (path=%s)", self.discovery_plugins_path)
+        discovery_handler_plugins = create_discovery_handlers(
+            self.api,
+            Discover.__load_plugins_and_hardwired_handlers(self.discovery_plugins_path),
+        )
+        LOG.debug(
+            "Finished loading discovery plugins (path=%s)", self.discovery_plugins_path
+        )
+
+        return DiscoveryHandler(discovery_handler_plugins)
+
     @staticmethod
     def __load_discovery_plugin(path: str):
         return [] if not path else load_plugins("discovery", path, Discovery)
@@ -71,16 +85,7 @@ class Discover:  # pylint: disable=too-few-public-methods
         ) + Discover.__load_discovery_plugin(hardwired_discoveries_path)
 
     def discover(self, discovery_type):
-        LOG.debug("Loading discovery plugins (path=%s)", self.discovery_plugins_path)
-        discovery_handler_plugins = create_discovery_handlers(
-            self.api,
-            Discover.__load_plugins_and_hardwired_handlers(self.discovery_plugins_path),
-        )
-        LOG.debug(
-            "Finished loading discovery plugins (path=%s)", self.discovery_plugins_path
-        )
-
-        DiscoveryHandler(discovery_handler_plugins).exec(discovery_type)
+        self.handler.exec(discovery_type)
 
 
 class DiscoverCommand(HueCommand):
