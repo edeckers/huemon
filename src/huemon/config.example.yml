@@ -7,7 +7,6 @@ cache:
 # commands:
 #  enabled: /path/to/commands_enabled
 # discoveries:
-#  available: /path/to/discoveries_available
 #  enabled: /path/to/discoveries_enabled
 server:
   host: "0.0.0.0"

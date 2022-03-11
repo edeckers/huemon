@@ -20,19 +20,6 @@ def create_local_path(relative_path: str):
 
 LOG = create_logger()
 
-DEFAULT_DISCOVERIES_AVAILABLE_PATH = create_local_path("discoveries_available")
-DEFAULT_DISCOVERIES_ENABLED_PATH = create_local_path("discoveries_enabled")
-
-PLUGIN_TYPE_MAPPING = {
-    "commands": {
-        "enabled": None,
-    },
-    "discoveries": {
-        "available": DEFAULT_DISCOVERIES_AVAILABLE_PATH,
-        "enabled": DEFAULT_DISCOVERIES_ENABLED_PATH,
-    },
-}
-
 
 def __create_plugins_path(
     plugin_type: str, config: dict, path_type: str, fallback_path: str = None
@@ -40,7 +27,7 @@ def __create_plugins_path(
     return (
         config[plugin_type][path_type]
         if plugin_type in config and path_type in config[plugin_type]
-        else (fallback_path or PLUGIN_TYPE_MAPPING[plugin_type][path_type])
+        else fallback_path
     )
 
 
