@@ -21,22 +21,28 @@ def create_local_path(relative_path: str):
 LOG = create_logger()
 
 
-def __create_plugins_path(
-    plugin_type: str, config: dict, path_type: str, fallback_path: str = None
-):
+def __create_plugins_path(plugin_type: str, config: dict, fallback_path: str = None):
+    plugins_section_exists = "plugins" in config
+    if not plugins_section_exists:
+        return fallback_path
+
+    plugin_type_exists = config["plugins"][plugin_type]
+    if not plugin_type_exists:
+        return fallback_path
+
     return (
-        config[plugin_type][path_type]
-        if plugin_type in config and path_type in config[plugin_type]
+        config["plugins"][plugin_type]["path"]
+        if "path" in config["plugins"][plugin_type]
         else fallback_path
     )
 
 
-def get_commands_path(config: dict, path_type: str, fallback_path: str = None):
-    return __create_plugins_path("commands", config, path_type, fallback_path)
+def get_command_plugins_path(config: dict, fallback_path: str = None):
+    return __create_plugins_path("commands", config, fallback_path)
 
 
-def get_discoveries_path(config: dict, path_type: str, fallback_path: str = None):
-    return __create_plugins_path("discoveries", config, path_type, fallback_path)
+def get_discovery_plugins_path(config: dict, fallback_path: str = None):
+    return __create_plugins_path("discoveries", config, fallback_path)
 
 
 def exit_fail(message, *arguments):

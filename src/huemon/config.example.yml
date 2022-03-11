@@ -4,10 +4,11 @@ key: YOUR_HUB_API_KEY
 cache:
   enable: false
   max_age_seconds: 10
-# commands:
-#  enabled: /path/to/commands_enabled
-# discoveries:
-#  enabled: /path/to/discoveries_enabled
+plugins:
+  commands:
+#   path: /path/to/command_plugins
+  discoveries:
+#   path: /path/to/discovery_plugins
 server:
   host: "0.0.0.0"
   port: 8000

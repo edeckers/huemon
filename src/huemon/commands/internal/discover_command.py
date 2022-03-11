@@ -15,7 +15,7 @@ from huemon.util import (
     assert_exists,
     assert_num_args,
     create_local_path,
-    get_discoveries_path,
+    get_discovery_plugins_path,
 )
 
 LOG = create_logger()
@@ -52,7 +52,7 @@ class Discover:  # pylint: disable=too-few-public-methods
     def __init__(self, config: dict, api: ApiInterface):
         self.api = api
 
-        self.discovery_plugins_path = get_discoveries_path(config, "enabled")
+        self.discovery_plugins_path = get_discovery_plugins_path(config)
 
         self.handler = self.__create_discovery_handler()
 
