@@ -19,8 +19,6 @@ RUN chmod +x /sbin/entrypoint.sh
 COPY dist/huemon-${HUEMON_VERSION}-py3-none-any.whl /tmp
 RUN pip3 install /tmp/huemon-${HUEMON_VERSION}-py3-none-any.whl
 
-RUN /sbin/entrypoint.sh install
-
 LABEL \
     maintainer="noreply@nonono.com" \
     org.label-schema.schema-version="1.0" \
