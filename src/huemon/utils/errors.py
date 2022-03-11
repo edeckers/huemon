@@ -5,8 +5,8 @@
 
 import sys
 
-from huemon.const import EXIT_FAIL
 from huemon.infrastructure.logger_factory import create_logger
+from huemon.utils.const import EXIT_FAIL
 
 LOG = create_logger()
 

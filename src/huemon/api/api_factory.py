@@ -1,6 +1,6 @@
 from huemon.api.api import Api
 from huemon.api.cached_api import CachedApi
-from huemon.const import DEFAULT_MAX_CACHE_AGE_SECONDS
+from huemon.utils.const import DEFAULT_MAX_CACHE_AGE_SECONDS
 
 
 def create_hue_hub_url(config: dict):
