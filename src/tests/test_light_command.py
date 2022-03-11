@@ -10,7 +10,7 @@ from huemon.commands.command_handler import (
     CommandHandler,
     create_name_to_command_mapping,
 )
-from huemon.commands_available.light_command import LightCommand
+from huemon.commands.internal.light_command import LightCommand
 from huemon.const import EXIT_FAIL
 from tests.fixtures import MutableApi
 

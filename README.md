@@ -27,21 +27,9 @@ pip3 install huemon
 2. Make necessary changes
 3. Provide the path through environment variable `HUEMON_CONFIG_PATH`
 
-### Enabling commands and discoveries
+### Plugins
 
-#### Automatically
-
-```bash
-HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon install_available commands
-HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon install_available discoveries
-```
-
-#### Manually
-
-```bash
-ln -s /path/to/commands_available/command_name.py /path/to/commands_enabled/command_name.py
-ln -s /path/to/discoveries_available/command_name.py /path/to/discoveries_enabled/command_name.py
-```
+Create a command or discovery plugin by implementing [HueCommand](src/huemon/commands/hue_command_interface.py) or [Discovery](src/huemon/discoveries/discovery_interface.py) respectively and copy the file to the configured path in `commands.enabled` or `discoveries.enabled` of the configuration file.
 
 ### Zabbix agent configuration
 

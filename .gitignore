@@ -2,7 +2,6 @@
 
 bin
 config.yml
-commands_enabled
 discoveries_enabled
 src/reports
 

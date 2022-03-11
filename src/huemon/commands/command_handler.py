@@ -16,12 +16,17 @@ from huemon.util import create_local_path, exit_fail
 LOG = create_logger()
 
 
-def create_name_to_command_mapping(config: dict, api: ApiInterface, plugins: list):
+def create_name_to_command_mapping(
+    config: dict, api: ApiInterface, plugins: list
+) -> dict:
     return reduce(lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
 
 
-def __load_command_plugins(config: dict, command_plugins_path: str):
+def __load_command_plugins(config: dict, command_plugins_path: str = None) -> dict:
     LOG.debug("Loading command plugins (path=%s)", command_plugins_path)
+    if not command_plugins_path:
+        return {}
+
     command_handler_plugins = create_name_to_command_mapping(
         config,
         create_api(config),
@@ -32,8 +37,10 @@ def __load_command_plugins(config: dict, command_plugins_path: str):
     return command_handler_plugins
 
 
-def __load_plugins_and_hardwired_handlers(config: dict, command_plugins_path: str):
-    hardwired_commands_path = create_local_path(os.path.join("commands_internal"))
+def __load_plugins_and_hardwired_handlers(
+    config: dict, command_plugins_path: str = None
+) -> dict:
+    hardwired_commands_path = create_local_path(os.path.join("commands", "internal"))
 
     return {
         **__load_command_plugins(config, command_plugins_path),

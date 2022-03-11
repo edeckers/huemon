@@ -5,7 +5,6 @@ cache:
   enable: false
   max_age_seconds: 10
 # commands:
-#  available: /path/to/commands_available
 #  enabled: /path/to/commands_enabled
 # discoveries:
 #  available: /path/to/discoveries_available

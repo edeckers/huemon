@@ -10,7 +10,7 @@ from huemon.commands.command_handler import (
     CommandHandler,
     create_name_to_command_mapping,
 )
-from huemon.commands_available.system_command import SystemCommand
+from huemon.commands.internal.system_command import SystemCommand
 from huemon.const import EXIT_FAIL
 from tests.fixtures import MutableApi, create_system_config
 
