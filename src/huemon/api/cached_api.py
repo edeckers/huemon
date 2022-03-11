@@ -11,7 +11,8 @@ from os.path import exists
 
 from huemon.api.api_interface import ApiInterface
 from huemon.infrastructure.logger_factory import create_logger
-from huemon.utils.util import cache_output_to_temp, run_locked
+from huemon.utils.caching import cache_output_to_temp
+from huemon.utils.threading import run_locked
 
 LOG = create_logger()
 

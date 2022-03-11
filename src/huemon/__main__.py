@@ -10,7 +10,8 @@ from huemon.const import EXIT_OK
 from huemon.infrastructure.bootstrapper import bootstrap
 from huemon.infrastructure.config_factory import create_config
 from huemon.infrastructure.logger_factory import bootstrap_logger
-from huemon.utils.util import exit_fail, get_command_plugins_path
+from huemon.utils.errors import exit_fail
+from huemon.utils.plugins import get_command_plugins_path
 
 CONFIG = create_config()
 LOG = bootstrap_logger(CONFIG)
