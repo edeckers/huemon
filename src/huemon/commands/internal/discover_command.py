@@ -11,7 +11,7 @@ from huemon.commands.hue_command_interface import HueCommand
 from huemon.discoveries.discovery_interface import Discovery
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
-from huemon.util import (
+from huemon.utils.util import (
     assert_exists,
     assert_num_args,
     create_local_path,

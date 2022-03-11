@@ -11,7 +11,7 @@ import unittest
 from huemon.api.api import Api
 from huemon.api.api_factory import create_api, create_hue_hub_url
 from huemon.api.cached_api import CachedApi
-from huemon.util import run_locked
+from huemon.utils.util import run_locked
 
 
 class TestApiConfiguration(unittest.TestCase):

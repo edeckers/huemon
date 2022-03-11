@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 from genericpath import isfile
 
-from huemon.util import exit_fail
+from huemon.utils.util import exit_fail
 
 CONFIG_PATH_LOCAL = path.join(str(Path(__file__).parent.parent), "config.yml")
 CONFIG_PATH_ENV_VARIABLE = environ.get("HUEMON_CONFIG_PATH")

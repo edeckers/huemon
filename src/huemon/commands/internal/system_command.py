@@ -6,7 +6,7 @@
 from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
-from huemon.util import assert_exists, assert_num_args
+from huemon.utils.util import assert_exists, assert_num_args
 
 LOG = create_logger()
 
