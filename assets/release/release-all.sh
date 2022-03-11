@@ -5,8 +5,8 @@ function cd_to_root_directory () {
 }
 
 function set_github_actions_git_details () {
-  git config --global user.name "github-actions"
-  git config --global user.email "action@github.com"
+  git config --local user.name ${GITHUB_RELEASE_USER_NAME}
+  git config --local user.email ${GITHUB_RELEASE_USER_EMAIL}
 }
 
 function publish_semantic_release () {
