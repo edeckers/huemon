@@ -29,7 +29,7 @@ pip3 install huemon
 
 ### Plugins
 
-Create a command or discovery plugin by implementing [HueCommand](src/huemon/commands/hue_command_interface.py) or [Discovery](src/huemon/discoveries/discovery_interface.py) respectively and copy the file to the configured path in `commands.enabled` or `discoveries.enabled` of the configuration file.
+Create a command or discovery plugin by implementing [HueCommand](src/huemon/commands/hue_command_interface.py) or [Discovery](src/huemon/discoveries/discovery_interface.py) respectively and copy the file to the configured path in `plugins.commands.path` or `plugins.discoveries.path` of the configuration file.
 
 ### Zabbix agent configuration
 

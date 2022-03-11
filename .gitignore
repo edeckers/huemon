@@ -2,7 +2,6 @@
 
 bin
 config.yml
-discoveries_enabled
 src/reports
 
 # Byte-compiled / optimized / DLL files

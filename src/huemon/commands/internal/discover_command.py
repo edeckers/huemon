@@ -3,6 +3,7 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
+import os
 from functools import reduce
 
 from huemon.api.api_interface import ApiInterface
@@ -10,12 +11,17 @@ from huemon.commands.hue_command_interface import HueCommand
 from huemon.discoveries.discovery_interface import Discovery
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.plugin_loader import load_plugins
-from huemon.util import assert_exists, assert_num_args, get_discoveries_path
+from huemon.util import (
+    assert_exists,
+    assert_num_args,
+    create_local_path,
+    get_discovery_plugins_path,
+)
 
 LOG = create_logger()
 
 
-def create_discovery_handlers(api: ApiInterface, plugins: dict):
+def create_discovery_handlers(api: ApiInterface, plugins: list):
     return reduce(lambda p, c: {**p, c.name(): c(api)}, plugins, {})
 
 
@@ -46,18 +52,40 @@ class Discover:  # pylint: disable=too-few-public-methods
     def __init__(self, config: dict, api: ApiInterface):
         self.api = api
 
-        self.discovery_plugins_path = get_discoveries_path(config, "enabled")
+        self.discovery_plugins_path = get_discovery_plugins_path(config)
 
-    def discover(self, discovery_type):
-        LOG.debug("Loading command plugins (path=%s)", self.discovery_plugins_path)
+        self.handler = self.__create_discovery_handler()
+
+    def __create_discovery_handler(self):
+        LOG.debug("Loading discovery plugins (path=%s)", self.discovery_plugins_path)
         discovery_handler_plugins = create_discovery_handlers(
-            self.api, load_plugins("discovery", self.discovery_plugins_path, Discovery)
+            self.api,
+            Discover.__load_plugins_and_hardwired_handlers(self.discovery_plugins_path),
         )
         LOG.debug(
-            "Finished loading command plugins (path=%s)", self.discovery_plugins_path
+            "Finished loading discovery plugins (path=%s)", self.discovery_plugins_path
         )
 
-        DiscoveryHandler(discovery_handler_plugins).exec(discovery_type)
+        return DiscoveryHandler(discovery_handler_plugins)
+
+    @staticmethod
+    def __load_discovery_plugin(path: str):
+        return [] if not path else load_plugins("discovery", path, Discovery)
+
+    @staticmethod
+    def __load_plugins_and_hardwired_handlers(
+        discovery_plugins_path: str = None,
+    ) -> list:
+        hardwired_discoveries_path = create_local_path(
+            os.path.join("discoveries", "internal")
+        )
+
+        return Discover.__load_discovery_plugin(
+            discovery_plugins_path
+        ) + Discover.__load_discovery_plugin(hardwired_discoveries_path)
+
+    def discover(self, discovery_type):
+        self.handler.exec(discovery_type)
 
 
 class DiscoverCommand(HueCommand):
