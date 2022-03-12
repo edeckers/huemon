@@ -10,11 +10,11 @@ TB = TypeVar("TB")
 
 
 class Maybe(Generic[TA]):  # pylint: disable=too-few-public-methods
-    value = None
+    value: TA
 
 
 class Just(Maybe[TA]):  # pylint: disable=too-few-public-methods
-    def __init__(self, value):
+    def __init__(self, value: TA):
         self.value = value
 
     def __str__(self) -> str:
@@ -22,22 +22,19 @@ class Just(Maybe[TA]):  # pylint: disable=too-few-public-methods
 
 
 class Nothing(Maybe[TA]):  # pylint: disable=too-few-public-methods
-    def __init__(self):
-        self.value = None
-
     def __str__(self) -> str:
         return "Nothing"
 
 
-nothing = Nothing()
+nothing: Maybe = Nothing()
 
 
 def bind(em0: Maybe[TA], map_: Callable[[TA], Maybe[TB]]) -> Maybe[TB]:
     return nothing if is_nothing(em0) else map_(em0.value)
 
 
-def flat_map(em0: Maybe[TA], map_: Callable[[TA], TB]) -> Maybe[TB]:
-    return bind(em0, lambda m0: pure(map_(m0.value)))
+def fmap(em0: Maybe[TA], map_: Callable[[TA], TB]) -> Maybe[TB]:
+    return bind(em0, lambda m0: pure(map_(m0)))
 
 
 def is_nothing(em0: Maybe[TA]) -> bool:

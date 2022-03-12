@@ -8,16 +8,30 @@ import inspect
 from importlib.machinery import ModuleSpec
 from pathlib import Path
 from types import ModuleType
-from typing import Tuple
+from typing import List, Tuple, Type, TypeVar
 
-from huemon.utils.monads.either import Either, Left, Right, bind, chain, flat_map, pure
+from huemon.utils.monads.either import (
+    Either,
+    Left,
+    Right,
+    bind,
+    chain,
+    fmap,
+    left,
+    pure,
+    right,
+)
 from huemon.utils.monads.maybe import maybe, mb_of
 
+TA = TypeVar("TA")
 
-def __get_plugin_type(module_name: str, path: str, sub_class) -> Either[str, object]:
-    error_or_module_spec = maybe(
-        Left[str, ModuleSpec]("ModuleSpec could not be loaded from the provided path"),
-        Right[str, ModuleSpec],
+
+def __get_plugin_type(
+    module_name: str, path: str, sub_class: Type[TA]
+) -> Either[str, Type[TA]]:
+    error_or_module_spec: Either[str, ModuleSpec] = maybe(
+        left("ModuleSpec could not be loaded from the provided path"),
+        right,
         mb_of(importlib.util.spec_from_file_location(module_name, path)),
     )
 
@@ -28,13 +42,11 @@ def __get_plugin_type(module_name: str, path: str, sub_class) -> Either[str, obj
         else Right[str, ModuleSpec](spec),
     )
 
-    error_or_spec_and_module = bind(
+    error_or_spec_and_module: Either[str, Tuple[ModuleSpec, ModuleType]] = bind(
         error_or_spec_loader,
         lambda spec: maybe(
-            Left[str, Tuple[ModuleSpec, ModuleType]](
-                "Module could not be loaded from ModuleSpec"
-            ),
-            lambda module: Right[str, Tuple[ModuleSpec, ModuleType]]((spec, module)),
+            left("Module could not be loaded from ModuleSpec"),
+            lambda module: right((spec, module)),
             mb_of(importlib.util.module_from_spec(spec)),
         ),
     )
@@ -43,10 +55,10 @@ def __get_plugin_type(module_name: str, path: str, sub_class) -> Either[str, obj
         bind(
             error_or_spec_and_module, lambda sm: pure(sm[0].loader.exec_module(sm[1]))
         ),
-        flat_map(error_or_spec_and_module, lambda sm: sm[1]),
+        fmap(error_or_spec_and_module, lambda sm: sm[1]),
     )
 
-    error_or_plugin_types = flat_map(
+    error_or_plugin_types = fmap(
         error_or_module,
         lambda module: list(
             filter(
@@ -66,11 +78,15 @@ def __get_plugin_type(module_name: str, path: str, sub_class) -> Either[str, obj
     )
 
 
-def load_plugins(module_name: str, path: str, plugin_type):
+def load_plugins(
+    module_name: str, path: str, plugin_type: Type[TA]
+) -> List[Either[str, Type[TA]]]:
     return list(
         map(
-            lambda p: __get_plugin_type(
-                f"{module_name}.{p.stem}", str(p.absolute()), plugin_type
+            lambda plugin_path: __get_plugin_type(
+                f"{module_name}.{plugin_path.stem}",
+                str(plugin_path.absolute()),
+                plugin_type,
             ),
             Path(path).glob("*.py"),
         )

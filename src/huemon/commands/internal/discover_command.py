@@ -5,6 +5,7 @@
 
 import os
 from functools import reduce
+from typing import Dict, List, Type
 
 from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
@@ -12,15 +13,18 @@ from huemon.discoveries.discovery_interface import Discovery
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.infrastructure.plugin_loader import load_plugins
 from huemon.utils.assertions import assert_exists, assert_num_args
-from huemon.utils.monads.either import rights
+from huemon.utils.monads.either import Either, rights
+from huemon.utils.monads.maybe import Maybe, fmap, maybe, mb_of
 from huemon.utils.paths import create_local_path
 from huemon.utils.plugins import get_discovery_plugins_path
 
 LOG = create_logger()
 
 
-def create_discovery_handlers(api: ApiInterface, plugins: list):
-    return reduce(lambda p, c: {**p, c.name(): c(api)}, rights(plugins), {})
+def create_discovery_handlers(
+    api: ApiInterface, plugins: List[Type[Discovery]]
+) -> Dict[str, Discovery]:
+    return reduce(lambda p, c: {**p, c.name(): c(api)}, plugins, {})
 
 
 class DiscoveryHandler:  # pylint: disable=too-few-public-methods
@@ -58,7 +62,11 @@ class Discover:  # pylint: disable=too-few-public-methods
         LOG.debug("Loading discovery plugins (path=%s)", self.discovery_plugins_path)
         discovery_handler_plugins = create_discovery_handlers(
             self.api,
-            Discover.__load_plugins_and_hardwired_handlers(self.discovery_plugins_path),
+            rights(
+                Discover.__load_plugins_and_hardwired_handlers(
+                    mb_of(self.discovery_plugins_path)
+                )
+            ),
         )
         LOG.debug(
             "Finished loading discovery plugins (path=%s)", self.discovery_plugins_path
@@ -68,18 +76,18 @@ class Discover:  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def __load_discovery_plugin(path: str):
-        return [] if not path else load_plugins("discovery", path, Discovery)
+        return load_plugins("discovery", path, Discovery)
 
     @staticmethod
     def __load_plugins_and_hardwired_handlers(
-        discovery_plugins_path: str = None,
-    ) -> list:
+        discovery_plugins_path: Maybe[str],
+    ) -> List[Either[str, Type[Discovery]]]:
         hardwired_discoveries_path = create_local_path(
             os.path.join("discoveries", "internal")
         )
 
-        return Discover.__load_discovery_plugin(
-            discovery_plugins_path
+        return maybe(
+            [], Discover.__load_discovery_plugin, discovery_plugins_path
         ) + Discover.__load_discovery_plugin(hardwired_discoveries_path)
 
     def discover(self, discovery_type):
@@ -87,7 +95,7 @@ class Discover:  # pylint: disable=too-few-public-methods
 
 
 class DiscoverCommand(HueCommand):
-    def __init__(self, config: dict, api: ApiInterface):
+    def __init__(self, config: dict, api: ApiInterface): # type: ignore
         self.discovery = Discover(config, api)
 
     @staticmethod

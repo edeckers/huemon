@@ -5,8 +5,13 @@
 
 from functools import reduce
 
+from huemon.api.api_interface import ApiInterface
+
 
 class HueCommand:
+    def __init__(self, config: dict, api: ApiInterface):
+        raise NotImplementedError("Command requires a constructor")
+
     @staticmethod
     def get_by_unique_id(unique_id: str, items: list) -> list:
         return list(

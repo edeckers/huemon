@@ -5,7 +5,7 @@
 
 import os
 from functools import reduce
-from typing import List
+from typing import List, Type
 
 from huemon.api.api_factory import create_api
 from huemon.api.api_interface import ApiInterface
@@ -20,7 +20,7 @@ LOG = create_logger()
 
 
 def create_name_to_command_mapping(
-    config: dict, api: ApiInterface, plugins: List[HueCommand]
+    config: dict, api: ApiInterface, plugins: List[Type[HueCommand]]
 ) -> dict:
     return reduce(lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
 
