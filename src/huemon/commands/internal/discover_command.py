@@ -95,7 +95,7 @@ class Discover:  # pylint: disable=too-few-public-methods
 
 
 class DiscoverCommand(HueCommand):
-    def __init__(self, config: dict, api: ApiInterface): # type: ignore
+    def __init__(self, config: dict, api: ApiInterface):  # type: ignore
         self.discovery = Discover(config, api)
 
     @staticmethod
