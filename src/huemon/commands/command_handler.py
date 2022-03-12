@@ -12,6 +12,7 @@ from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.infrastructure.plugin_loader import load_plugins
 from huemon.utils.errors import exit_fail
+from huemon.utils.monads.either import rights
 from huemon.utils.paths import create_local_path
 
 LOG = create_logger()
@@ -20,7 +21,7 @@ LOG = create_logger()
 def create_name_to_command_mapping(
     config: dict, api: ApiInterface, plugins: list
 ) -> dict:
-    return reduce(lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
+    return reduce(lambda p, c: {**p, c.name(): c(config, api)}, rights(plugins), {})
 
 
 def __load_command_plugins(config: dict, command_plugins_path: str = None) -> dict:

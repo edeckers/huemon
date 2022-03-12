@@ -12,6 +12,7 @@ from huemon.discoveries.discovery_interface import Discovery
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.infrastructure.plugin_loader import load_plugins
 from huemon.utils.assertions import assert_exists, assert_num_args
+from huemon.utils.monads.either import rights
 from huemon.utils.paths import create_local_path
 from huemon.utils.plugins import get_discovery_plugins_path
 
@@ -19,7 +20,7 @@ LOG = create_logger()
 
 
 def create_discovery_handlers(api: ApiInterface, plugins: list):
-    return reduce(lambda p, c: {**p, c.name(): c(api)}, plugins, {})
+    return reduce(lambda p, c: {**p, c.name(): c(api)}, rights(plugins), {})
 
 
 class DiscoveryHandler:  # pylint: disable=too-few-public-methods
