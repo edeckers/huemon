@@ -5,19 +5,22 @@
 
 import os
 from functools import reduce
+from typing import List, Type
 
 from huemon.api.api_factory import create_api
 from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
-from huemon.plugin_loader import load_plugins
-from huemon.util import create_local_path, exit_fail
+from huemon.infrastructure.plugin_loader import load_plugins
+from huemon.utils.errors import exit_fail
+from huemon.utils.monads.either import rights
+from huemon.utils.paths import create_local_path
 
 LOG = create_logger()
 
 
 def create_name_to_command_mapping(
-    config: dict, api: ApiInterface, plugins: list
+    config: dict, api: ApiInterface, plugins: List[Type[HueCommand]]
 ) -> dict:
     return reduce(lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
 
@@ -27,10 +30,12 @@ def __load_command_plugins(config: dict, command_plugins_path: str = None) -> di
     if not command_plugins_path:
         return {}
 
+    command_plugins = rights(load_plugins("command", command_plugins_path, HueCommand))
+
     command_handler_plugins = create_name_to_command_mapping(
         config,
         create_api(config),
-        load_plugins("command", command_plugins_path, HueCommand),
+        command_plugins,
     )
     LOG.debug("Finished loading command plugins (path=%s)", command_plugins_path)
 

@@ -11,7 +11,7 @@ from huemon.commands.command_handler import (
     create_name_to_command_mapping,
 )
 from huemon.commands.internal.light_command import LightCommand
-from huemon.const import EXIT_FAIL
+from huemon.utils.const import EXIT_FAIL
 from tests.fixtures import MutableApi
 
 SOME_LIGHT_MAC_0 = "SO:ME:LI:GH:TM:AC:00"

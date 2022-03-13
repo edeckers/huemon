@@ -12,7 +12,7 @@ from fastapi import FastAPI, HTTPException, Query, Response, status
 
 from huemon.commands.command_handler import create_default_command_handler
 from huemon.infrastructure.logger_factory import create_logger
-from huemon.util import get_command_plugins_path
+from huemon.utils.plugins import get_command_plugins_path
 
 LOG = create_logger()
 

@@ -6,8 +6,13 @@
 import json
 from functools import reduce
 
+from huemon.api.api_interface import ApiInterface
+
 
 class Discovery:
+    def __init__(self, api: ApiInterface):
+        raise NotImplementedError("Discoveries is missing its required constructor")
+
     @staticmethod
     def _item_to_discovery(item: dict):
         return {
