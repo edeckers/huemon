@@ -8,7 +8,7 @@ import inspect
 from pathlib import Path
 from typing import List, Tuple, Type, TypeVar, cast
 
-from huemon.utils.monads.either import Either, Left, left, right
+from huemon.utils.monads.either import Either, left, right
 from huemon.utils.monads.maybe import Maybe
 
 TA = TypeVar("TA")
@@ -56,9 +56,10 @@ def __get_plugin_type(
             ),
         )
         .bind(
-            lambda plugin_types: right(plugin_types[0][1])
-            if len(plugin_types) > 0
-            else Left[str, Type[TA]](f"No plugin of type `{sub_class}` found"),
+            lambda plugin_types: Maybe.of(len(plugin_types) > 0).maybe(
+                left(f"No plugin of type `{sub_class}` found"),
+                lambda _: right(plugin_types[0][1]),
+            )
         )
     )
 
