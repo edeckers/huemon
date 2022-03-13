@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import unittest
+from argparse import ArgumentTypeError
 
 from huemon.utils.monads.maybe import Maybe, nothing, pure
 
@@ -64,4 +65,43 @@ class TestMonadMaybe(unittest.TestCase):
         self.assertEqual(pure(list_val), maybe_list, "List should result in Just")
         self.assertFalse(
             maybe_list.is_nothing(), "Just should return False on is_nothing"
+        )
+
+    def test_when_fmap_on_nothing_return_nothing(self):
+        maybe_nothing = nothing.fmap(lambda _: "")
+
+        self.assertEqual(
+            nothing, maybe_nothing, "Nothing.fmap should result in Nothing"
+        )
+
+    def test_when_fmap_on_just_return_just(self):
+        maybe_int = pure(1).fmap(lambda value: value + 1)
+
+        self.assertEqual(pure(2), maybe_int, "Just.fmap should result in Just")
+
+    def test_when_bind_on_just_return_maybe(self):
+        maybe_nothing = pure(1).bind(lambda _: nothing)
+        maybe_int = pure(1).bind(lambda value: pure(value + 1))
+
+        with self.assertRaises(ArgumentTypeError):
+            pure(1).bind(lambda _: "Some none Maybe-type")
+
+        self.assertEqual(nothing, maybe_nothing, "Just.bind should result in Maybe")
+        self.assertEqual(pure(2), maybe_int, "Just.bind should result in Maybe")
+
+    def test_when_maybe_on_nothing_return_fallback(self):
+        mapper = lambda value: value * 2
+        fallback_value = 42
+        result = nothing.maybe(fallback_value, mapper)
+
+        self.assertEqual(fallback_value, result, "Nothing.maybe should return fallback")
+
+    def test_when_maybe_on_just_return_mapped_value(self):
+        int_value = 1
+
+        mapper = lambda value: value * 2
+        result = pure(int_value).maybe(42, mapper)
+
+        self.assertEqual(
+            mapper(int_value), result, "Just.maybe should return mapped value"
         )

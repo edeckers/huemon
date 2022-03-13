@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from argparse import ArgumentTypeError
 from typing import Callable, Generic, TypeVar
 
 TA = TypeVar("TA")
@@ -61,7 +62,14 @@ pure = Just  # pylint: disable=invalid-name
 
 
 def bind(em0: Maybe[TA], map_: Callable[[TA], Maybe[TB]]) -> Maybe[TB]:
-    return nothing if is_nothing(em0) else map_(em0.value)
+    if is_nothing(em0):
+        return nothing
+
+    result = map_(em0.value)
+    if not isinstance(result, Maybe):
+        raise ArgumentTypeError("Bind should return Maybe")
+
+    return result
 
 
 def fmap(em0: Maybe[TA], map_: Callable[[TA], TB]) -> Maybe[TB]:
