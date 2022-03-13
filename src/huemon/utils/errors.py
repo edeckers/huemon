@@ -12,6 +12,7 @@ from huemon.utils.const import EXIT_FAIL
 LOG = create_logger()
 
 E_CODE_PLUGIN_LOADER = -2
+E_CODE_CONFIG_NOT_FOUND = -3
 
 
 class HueError(NamedTuple):

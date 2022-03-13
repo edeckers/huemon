@@ -9,7 +9,9 @@ from pathlib import Path
 import yaml
 from genericpath import isfile
 
-from huemon.utils.errors import exit_fail
+from huemon.utils.errors import E_CODE_CONFIG_NOT_FOUND, HueError
+from huemon.utils.monads.either import Either, left, right
+from huemon.utils.monads.maybe import Maybe, nothing
 
 CONFIG_PATH_LOCAL = path.join(str(Path(__file__).parent.parent), "config.yml")
 CONFIG_PATH_ENV_VARIABLE = environ.get("HUEMON_CONFIG_PATH")
@@ -25,21 +27,27 @@ CONFIG_PATHS_ORDERED_PREFERENCE = list(
 )
 
 
-def __first_existing_config_file():
+def __first_existing_config_file() -> Maybe[str]:
     for config_path in CONFIG_PATHS_ORDERED_PREFERENCE:
         if isfile(config_path):
-            return config_path
+            return Maybe.of(config_path)
 
-    return None
+    return nothing
 
 
-def create_config():
-    maybe_config_path = __first_existing_config_file()
-    if not maybe_config_path:
-        exit_fail(
-            "No configuration file found in %s",
-            ",".join(CONFIG_PATHS_ORDERED_PREFERENCE),
-        )
-
-    with open(maybe_config_path, "r") as file:
+def __read_yaml_file(yaml_path: str):
+    with open(yaml_path, "r") as file:
         return yaml.safe_load(file.read())
+
+
+def create_config() -> Either[HueError, dict]:
+    return __first_existing_config_file().maybe(
+        left(
+            HueError(
+                code=E_CODE_CONFIG_NOT_FOUND,
+                message="No configuration file found in %s",
+                context={"paths": ",".join(CONFIG_PATHS_ORDERED_PREFERENCE)},
+            )
+        ),
+        lambda path: right(__read_yaml_file(path)),
+    )

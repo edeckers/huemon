@@ -32,8 +32,14 @@ class Either(Generic[TA, TB]):  # pylint: disable=too-few-public-methods
     def fmap(self, map_: Callable[[TB], TC]) -> Either[TA, TC]:
         return fmap(self, map_)
 
+    def if_left(self, fallback: TB) -> TB:
+        return if_left(self, fallback)
+
     def is_left(self) -> bool:
         return is_left(self)
+
+    def if_right(self, fallback: TA) -> TA:
+        return if_right(self, fallback)
 
     def is_right(self) -> bool:
         return is_right(self)
@@ -68,6 +74,10 @@ class Right(Either[TA, TB]):  # pylint: disable=too-few-public-methods
         return f"Right(value={self.value.__str__()})"
 
 
+def __id(value):
+    return value
+
+
 def bind(em0: Either[TC, TA], map_: Callable[[TA], Either[TC, TB]]) -> Either[TC, TB]:
     if is_left(em0):
         return cast(Left[TC, TB], em0)
@@ -95,6 +105,14 @@ def either(
 
 def fmap(em0: Either[TC, TA], map_: Callable[[TA], TB]) -> Either[TC, TB]:
     return bind(em0, lambda m0: pure(map_(m0)))
+
+
+def if_left(em0: Either[TA, TB], lft: TB) -> TB:
+    return either(lambda _: lft, __id, em0)
+
+
+def if_right(em0: Either[TA, TB], rgt: TA) -> TA:
+    return either(__id, lambda _: rgt, em0)
 
 
 def is_left(em0: Either[TA, TB]) -> bool:
