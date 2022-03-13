@@ -3,6 +3,9 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
+from __future__ import annotations
+
+from argparse import ArgumentTypeError
 from typing import Callable, Generic, List, TypeVar, Union, cast
 
 TA = TypeVar("TA")
@@ -12,6 +15,33 @@ TC = TypeVar("TC")
 
 class Either(Generic[TA, TB]):  # pylint: disable=too-few-public-methods
     value: Union[TA, TB]
+
+    def bind(self, map_: Callable[[TB], Either[TA, TB]]) -> Either[TA, TB]:
+        return bind(self, map_)
+
+    def chain(self, em1: Either[TA, TB]) -> Either[TA, TB]:
+        return chain(self, em1)
+
+    def either(self, map_left: Callable[[TA], TC], map_right: Callable[[TB], TC]) -> TC:
+        return either(map_left, map_right, self)
+
+    def fmap(self, map_: Callable[[TB], TC]) -> Either[TA, TC]:
+        return fmap(self, map_)
+
+    def is_left(self) -> bool:
+        return is_left(self)
+
+    def is_right(self) -> bool:
+        return is_right(self)
+
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, Either):
+            return False
+
+        if __o.is_left() or self.is_left():
+            return __o.is_left() and self.is_left() and __o.value == self.value
+
+        return __o.value == self.value
 
 
 class Left(Either[TA, TB]):  # pylint: disable=too-few-public-methods
@@ -31,7 +61,14 @@ class Right(Either[TA, TB]):  # pylint: disable=too-few-public-methods
 
 
 def bind(em0: Either[TC, TA], map_: Callable[[TA], Either[TC, TB]]) -> Either[TC, TB]:
-    return cast(Left[TC, TB], em0) if is_left(em0) else map_(cast(TA, em0.value))
+    if is_left(em0):
+        return cast(Left[TC, TB], em0)
+
+    result = map_(cast(TA, em0.value))
+    if not isinstance(result, Either):
+        raise ArgumentTypeError("Bind should return Either")
+
+    return result
 
 
 def chain(em0: Either[TC, TA], em1: Either[TC, TB]) -> Either[TC, TB]:
