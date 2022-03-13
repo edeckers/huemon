@@ -3,7 +3,7 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import Callable, Generic, List, TypeVar, Union
+from typing import Callable, Generic, List, TypeVar, Union, cast
 
 TA = TypeVar("TA")
 TB = TypeVar("TB")
@@ -31,7 +31,7 @@ class Right(Either[TA, TB]):  # pylint: disable=too-few-public-methods
 
 
 def bind(em0: Either[TC, TA], map_: Callable[[TA], Either[TC, TB]]) -> Either[TC, TB]:
-    return em0 if is_left(em0) else map_(em0.value)
+    return cast(Left[TC, TB], em0) if is_left(em0) else map_(cast(TA, em0.value))
 
 
 def chain(em0: Either[TC, TA], em1: Either[TC, TB]) -> Either[TC, TB]:
@@ -41,7 +41,11 @@ def chain(em0: Either[TC, TA], em1: Either[TC, TB]) -> Either[TC, TB]:
 def either(
     map_left: Callable[[TA], TC], map_right: Callable[[TB], TC], em0: Either[TA, TB]
 ) -> TC:
-    return map_left(em0.value) if is_left(em0) else map_right(em0.value)
+    return (
+        map_left(cast(TA, em0.value))
+        if is_left(em0)
+        else map_right(cast(TB, em0.value))
+    )
 
 
 def fmap(em0: Either[TC, TA], map_: Callable[[TA], TB]) -> Either[TC, TB]:
@@ -61,7 +65,7 @@ def left(value: TA) -> Either[TA, TB]:
 
 
 def lefts(eithers: List[Either[TA, TB]]) -> List[TA]:
-    return list(map(lambda either: either.value, filter(is_left, eithers)))
+    return list(map(lambda either: cast(TA, either.value), filter(is_left, eithers)))
 
 
 def pure(value: TB) -> Either[TA, TB]:
@@ -69,7 +73,7 @@ def pure(value: TB) -> Either[TA, TB]:
 
 
 def rights(eithers: List[Either[TA, TB]]) -> List[TB]:
-    return list(map(lambda either: either.value, filter(is_right, eithers)))
+    return list(map(lambda either: cast(TB, either.value), filter(is_right, eithers)))
 
 
 def right(value: TB) -> Either[TA, TB]:
