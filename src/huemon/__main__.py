@@ -14,7 +14,7 @@ from huemon.utils.const import EXIT_OK
 from huemon.utils.errors import exit_fail
 from huemon.utils.plugins import get_command_plugins_path
 
-CONFIG = create_config().if_left({})
+CONFIG = create_config()
 LOG = bootstrap_logger(CONFIG)
 
 

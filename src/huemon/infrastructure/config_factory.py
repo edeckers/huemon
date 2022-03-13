@@ -9,8 +9,7 @@ from pathlib import Path
 import yaml
 from genericpath import isfile
 
-from huemon.utils.errors import E_CODE_CONFIG_NOT_FOUND, HueError
-from huemon.utils.monads.either import Either, left, right
+from huemon.utils.errors import exit_fail
 from huemon.utils.monads.maybe import Maybe, nothing
 
 CONFIG_PATH_LOCAL = path.join(str(Path(__file__).parent.parent), "config.yml")
@@ -40,14 +39,12 @@ def __read_yaml_file(yaml_path: str):
         return yaml.safe_load(file.read())
 
 
-def create_config() -> Either[HueError, dict]:
-    return __first_existing_config_file().maybe(
-        left(
-            HueError(
-                code=E_CODE_CONFIG_NOT_FOUND,
-                message="No configuration file found in %s",
-                context={"paths": ",".join(CONFIG_PATHS_ORDERED_PREFERENCE)},
-            )
-        ),
-        lambda path: right(__read_yaml_file(path)),
-    )
+def create_config() -> dict:
+    maybe_config_file = __first_existing_config_file()
+    if maybe_config_file.is_nothing():
+        exit_fail(
+            "No configuration file found in %s",
+            ",".join(CONFIG_PATHS_ORDERED_PREFERENCE),
+        )
+
+    return __read_yaml_file(maybe_config_file.from_just())

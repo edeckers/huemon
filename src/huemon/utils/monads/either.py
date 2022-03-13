@@ -11,7 +11,6 @@ from typing import Callable, Generic, List, TypeVar, Union, cast
 TA = TypeVar("TA")
 TB = TypeVar("TB")
 TC = TypeVar("TC")
-TD = TypeVar("TD")
 
 
 class Either(Generic[TA, TB]):  # pylint: disable=too-few-public-methods

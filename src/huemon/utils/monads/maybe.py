@@ -21,6 +21,9 @@ class Maybe(Generic[TA]):  # pylint: disable=too-few-public-methods
     def fmap(self, map_: Callable[[TA], TB]) -> Maybe[TB]:
         return fmap(self, map_)
 
+    def from_just(self) -> TA:
+        return from_just(self)
+
     def is_nothing(self) -> bool:
         return is_nothing(self)
 
@@ -74,6 +77,13 @@ def bind(em0: Maybe[TA], map_: Callable[[TA], Maybe[TB]]) -> Maybe[TB]:
 
 def fmap(em0: Maybe[TA], map_: Callable[[TA], TB]) -> Maybe[TB]:
     return bind(em0, lambda m0: pure(map_(m0)))
+
+
+def from_just(em0: Maybe[TA]):
+    if em0.is_nothing():
+        raise TypeError("fromJust failed, no instance of Just")
+
+    return em0.value
 
 
 def is_nothing(em0: Maybe[TA]) -> bool:
