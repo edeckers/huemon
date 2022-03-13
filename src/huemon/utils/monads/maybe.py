@@ -27,6 +27,18 @@ class Maybe(Generic[TA]):  # pylint: disable=too-few-public-methods
     def of(value: TA):  # pylint: disable=invalid-name
         return of(value)
 
+    def maybe(self: Maybe[TA], fallback: TB, map_: Callable[[TA], TB]) -> TB:
+        return maybe(fallback, map_, self)
+
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, Maybe):
+            return False
+
+        if __o.is_nothing() or self.is_nothing():
+            return __o.is_nothing() and self.is_nothing()
+
+        return __o.value == self.value
+
 
 class Just(Maybe[TA]):  # pylint: disable=too-few-public-methods
     value: TA
@@ -57,7 +69,7 @@ def fmap(em0: Maybe[TA], map_: Callable[[TA], TB]) -> Maybe[TB]:
 
 
 def is_nothing(em0: Maybe[TA]) -> bool:
-    return em0 == nothing
+    return isinstance(em0, Nothing)
 
 
 def maybe(fallback: TB, map_: Callable[[TA], TB], em0: Maybe[TA]) -> TB:
