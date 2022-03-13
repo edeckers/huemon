@@ -5,11 +5,10 @@
 
 import importlib.util
 import inspect
-from importlib.machinery import ModuleSpec
 from pathlib import Path
 from typing import List, Tuple, Type, TypeVar, cast
 
-from huemon.utils.monads.either import Either, Left, Right, left, right
+from huemon.utils.monads.either import Either, Left, left, right
 from huemon.utils.monads.maybe import Maybe
 
 TA = TypeVar("TA")
@@ -25,9 +24,9 @@ def __get_plugin_type(
             right,
         )
         .bind(
-            lambda spec: Left[str, ModuleSpec]("ModuleSpec has no loader")
-            if not spec.loader
-            else Right[str, ModuleSpec](spec),
+            lambda spec: Maybe.of(spec.loader).maybe(
+                left("ModuleSpec has no loader"), lambda _: right(spec)
+            )
         )
         .bind(
             lambda spec: Maybe.of(importlib.util.module_from_spec(spec)).maybe(
