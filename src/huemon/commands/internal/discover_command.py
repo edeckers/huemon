@@ -12,7 +12,7 @@ from huemon.commands.hue_command_interface import HueCommand
 from huemon.discoveries.discovery_interface import Discovery
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.infrastructure.plugin_loader import load_plugins
-from huemon.processors.processor_interface import ProcessorInterface
+from huemon.sinks.sink_interface import SinkInterface
 from huemon.utils.assertions import assert_exists, assert_num_args
 from huemon.utils.monads.either import Either, rights
 from huemon.utils.monads.maybe import Maybe, maybe, of
@@ -96,7 +96,7 @@ class Discover:  # pylint: disable=too-few-public-methods
 
 
 class DiscoverCommand(HueCommand):
-    def __init__(self, config: dict, api: ApiInterface, processor: ProcessorInterface):
+    def __init__(self, config: dict, api: ApiInterface, processor: SinkInterface):
         super().__init__(config, api, processor)
 
         self.discovery = Discover(config, api)

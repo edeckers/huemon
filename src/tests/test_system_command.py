@@ -11,7 +11,7 @@ from huemon.commands.command_handler import (
     create_name_to_command_mapping,
 )
 from huemon.commands.internal.system_command import SystemCommand
-from huemon.processors.stdout_processor import StdoutProcessor
+from huemon.sinks.stdout_sink import StdoutSink
 from tests.fixtures import MutableApi
 
 
@@ -20,9 +20,7 @@ def _ch(system_config: dict):
     mutable_api.set_system_config(system_config)
 
     return CommandHandler(
-        create_name_to_command_mapping(
-            {}, mutable_api, StdoutProcessor(), [SystemCommand]
-        )
+        create_name_to_command_mapping({}, mutable_api, StdoutSink(), [SystemCommand])
     )
 
 

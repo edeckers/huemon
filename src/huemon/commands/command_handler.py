@@ -12,7 +12,7 @@ from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.infrastructure.plugin_loader import load_plugins
-from huemon.processors.processor_interface import ProcessorInterface
+from huemon.sinks.sink_interface import SinkInterface
 from huemon.utils.errors import exit_fail
 from huemon.utils.monads.either import rights
 from huemon.utils.paths import create_local_path
@@ -23,14 +23,14 @@ LOG = create_logger()
 def create_name_to_command_mapping(
     config: dict,
     api: ApiInterface,
-    processor: ProcessorInterface,
+    processor: SinkInterface,
     plugins: List[Type[HueCommand]],
 ) -> dict:
     return reduce(lambda p, c: {**p, c.name(): c(config, api, processor)}, plugins, {})
 
 
 def __load_command_plugins(
-    config: dict, processor: ProcessorInterface, command_plugins_path: str = None
+    config: dict, processor: SinkInterface, command_plugins_path: str = None
 ) -> dict:
     LOG.debug("Loading command plugins (path=%s)", command_plugins_path)
     if not command_plugins_path:
@@ -50,7 +50,7 @@ def __load_command_plugins(
 
 
 def __load_plugins_and_hardwired_handlers(
-    config: dict, processor: ProcessorInterface, command_plugins_path: str = None
+    config: dict, processor: SinkInterface, command_plugins_path: str = None
 ) -> dict:
     hardwired_commands_path = create_local_path(os.path.join("commands", "internal"))
 
@@ -61,7 +61,7 @@ def __load_plugins_and_hardwired_handlers(
 
 
 def create_default_command_handler(
-    config: dict, processor: ProcessorInterface, command_plugins_path: str = None
+    config: dict, processor: SinkInterface, command_plugins_path: str = None
 ):
     return CommandHandler(
         __load_plugins_and_hardwired_handlers(config, processor, command_plugins_path)

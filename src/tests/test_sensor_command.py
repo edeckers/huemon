@@ -12,7 +12,7 @@ from huemon.commands.command_handler import (
     create_name_to_command_mapping,
 )
 from huemon.commands.internal.sensor_command import SensorCommand
-from huemon.processors.stdout_processor import StdoutProcessor
+from huemon.sinks.stdout_sink import StdoutSink
 from tests.fixtures import MutableApi
 
 SOME_SENSOR_MAC_0 = "SO:ME:SE:NS:OR:MA:C0"
@@ -24,9 +24,7 @@ def _ch(sensors: List[dict]):
     mutable_api.set_sensors(sensors)
 
     return CommandHandler(
-        create_name_to_command_mapping(
-            {}, mutable_api, StdoutProcessor(), [SensorCommand]
-        )
+        create_name_to_command_mapping({}, mutable_api, StdoutSink(), [SensorCommand])
     )
 
 

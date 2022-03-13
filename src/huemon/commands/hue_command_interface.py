@@ -6,11 +6,11 @@
 from functools import reduce
 
 from huemon.api.api_interface import ApiInterface
-from huemon.processors.processor_interface import ProcessorInterface
+from huemon.sinks.sink_interface import SinkInterface
 
 
 class HueCommand:
-    def __init__(self, config: dict, api: ApiInterface, processor: ProcessorInterface):
+    def __init__(self, config: dict, api: ApiInterface, processor: SinkInterface):
         self.config = config
         self.api = api
         self.processor = processor

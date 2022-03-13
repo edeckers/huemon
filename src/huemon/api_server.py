@@ -12,7 +12,7 @@ from fastapi import FastAPI, HTTPException, Query, Response, status
 
 from huemon.commands.command_handler import create_default_command_handler
 from huemon.infrastructure.logger_factory import create_logger
-from huemon.processors.stdout_processor import StdoutProcessor
+from huemon.sinks.stdout_sink import StdoutSink
 from huemon.utils.plugins import get_command_plugins_path
 
 LOG = create_logger()
@@ -48,7 +48,7 @@ class HuemonServerFactory:  # pylint: disable=too-few-public-methods
         app = FastAPI()
 
         command_handler = create_default_command_handler(
-            config, StdoutProcessor(), get_command_plugins_path(config)
+            config, StdoutSink(), get_command_plugins_path(config)
         )
 
         for command_name in command_handler.available_commands():
