@@ -16,7 +16,7 @@ TC = TypeVar("TC")
 class Either(Generic[TA, TB]):  # pylint: disable=too-few-public-methods
     value: Union[TA, TB]
 
-    def bind(self, map_: Callable[[TB], Either[TA, TB]]) -> Either[TA, TB]:
+    def bind(self, map_: Callable[[TB], Either[TA, TC]]) -> Either[TA, TC]:
         return bind(self, map_)
 
     def chain(self, em1: Either[TA, TB]) -> Either[TA, TB]:
@@ -33,6 +33,10 @@ class Either(Generic[TA, TB]):  # pylint: disable=too-few-public-methods
 
     def is_right(self) -> bool:
         return is_right(self)
+
+    @staticmethod
+    def pure(value: TB) -> Either[TA, TB]:  # pylint: disable=invalid-name
+        return pure(value)
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, Either):
@@ -105,13 +109,12 @@ def lefts(eithers: List[Either[TA, TB]]) -> List[TA]:
     return list(map(lambda either: cast(TA, either.value), filter(is_left, eithers)))
 
 
-def pure(value: TB) -> Either[TA, TB]:
-    return Right(value)
-
-
 def rights(eithers: List[Either[TA, TB]]) -> List[TB]:
     return list(map(lambda either: cast(TB, either.value), filter(is_right, eithers)))
 
 
 def right(value: TB) -> Either[TA, TB]:
     return Right(value)
+
+
+pure = Right  # pylint: disable=invalid-name
