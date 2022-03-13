@@ -10,18 +10,13 @@ from pathlib import Path
 from types import ModuleType
 from typing import List, Tuple, Type, TypeVar
 
-from huemon.utils.monads.either import (
-    Either,
-    Left,
-    Right,
-    bind,
-    chain,
-    fmap,
-    left,
-    pure,
-    right,
-)
-from huemon.utils.monads.maybe import maybe, mb_of
+from huemon.utils.monads.either import Either, Left, Right, bind, chain
+from huemon.utils.monads.either import fmap as e_fmap
+from huemon.utils.monads.either import left
+from huemon.utils.monads.either import pure as e_pure
+from huemon.utils.monads.either import right
+from huemon.utils.monads.maybe import maybe
+from huemon.utils.monads.maybe import of as m_of
 
 TA = TypeVar("TA")
 
@@ -32,7 +27,7 @@ def __get_plugin_type(
     error_or_module_spec: Either[str, ModuleSpec] = maybe(
         left("ModuleSpec could not be loaded from the provided path"),
         right,
-        mb_of(importlib.util.spec_from_file_location(module_name, path)),
+        m_of(importlib.util.spec_from_file_location(module_name, path)),
     )
 
     error_or_spec_loader = bind(
@@ -47,18 +42,21 @@ def __get_plugin_type(
         lambda spec: maybe(
             left("Module could not be loaded from ModuleSpec"),
             lambda module: right((spec, module)),
-            mb_of(importlib.util.module_from_spec(spec)),
+            m_of(importlib.util.module_from_spec(spec)),
         ),
     )
 
     error_or_module = chain(
         bind(
-            error_or_spec_and_module, lambda sm: pure(sm[0].loader.exec_module(sm[1]))
+            error_or_spec_and_module,
+            lambda sm: e_pure(
+                m_of(sm[0].loader).fmap(lambda loader: loader.exec_module(sm[1]))
+            ),
         ),
-        fmap(error_or_spec_and_module, lambda sm: sm[1]),
+        e_fmap(error_or_spec_and_module, lambda sm: sm[1]),
     )
 
-    error_or_plugin_types = fmap(
+    error_or_plugin_types = e_fmap(
         error_or_module,
         lambda module: list(
             filter(
@@ -72,7 +70,7 @@ def __get_plugin_type(
 
     return bind(
         error_or_plugin_types,
-        lambda plugin_types: pure(plugin_types[0][1])
+        lambda plugin_types: e_pure(plugin_types[0][1])
         if len(plugin_types) > 0
         else Left(f"No plugin of type `{sub_class}` found"),
     )

@@ -3,6 +3,8 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
+from __future__ import annotations
+
 from typing import Callable, Generic, TypeVar
 
 TA = TypeVar("TA")
@@ -12,8 +14,23 @@ TB = TypeVar("TB")
 class Maybe(Generic[TA]):  # pylint: disable=too-few-public-methods
     value: TA
 
+    def bind(self, map_: Callable[[TA], Maybe[TB]]) -> Maybe[TB]:
+        return bind(self, map_)
+
+    def fmap(self, map_: Callable[[TA], TB]) -> Maybe[TB]:
+        return fmap(self, map_)
+
+    def is_nothing(self) -> bool:
+        return is_nothing(self)
+
+    @staticmethod
+    def of(value: TA):  # pylint: disable=invalid-name
+        return of(value)
+
 
 class Just(Maybe[TA]):  # pylint: disable=too-few-public-methods
+    value: TA
+
     def __init__(self, value: TA):
         self.value = value
 
@@ -27,6 +44,8 @@ class Nothing(Maybe[TA]):  # pylint: disable=too-few-public-methods
 
 
 nothing: Maybe = Nothing()
+
+pure = Just  # pylint: disable=invalid-name
 
 
 def bind(em0: Maybe[TA], map_: Callable[[TA], Maybe[TB]]) -> Maybe[TB]:
@@ -45,9 +64,5 @@ def maybe(fallback: TB, map_: Callable[[TA], TB], em0: Maybe[TA]) -> TB:
     return fallback if is_nothing(em0) else map_(em0.value)
 
 
-def mb_of(value: TA):
+def of(value: TA):  # pylint: disable=invalid-name
     return nothing if not value else pure(value)
-
-
-def pure(value: TA):
-    return Just(value)

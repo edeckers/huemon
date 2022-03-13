@@ -14,7 +14,7 @@ from huemon.infrastructure.logger_factory import create_logger
 from huemon.infrastructure.plugin_loader import load_plugins
 from huemon.utils.assertions import assert_exists, assert_num_args
 from huemon.utils.monads.either import Either, rights
-from huemon.utils.monads.maybe import Maybe, fmap, maybe, mb_of
+from huemon.utils.monads.maybe import Maybe, maybe, of
 from huemon.utils.paths import create_local_path
 from huemon.utils.plugins import get_discovery_plugins_path
 
@@ -64,7 +64,7 @@ class Discover:  # pylint: disable=too-few-public-methods
             self.api,
             rights(
                 Discover.__load_plugins_and_hardwired_handlers(
-                    mb_of(self.discovery_plugins_path)
+                    of(self.discovery_plugins_path)
                 )
             ),
         )
@@ -95,7 +95,9 @@ class Discover:  # pylint: disable=too-few-public-methods
 
 
 class DiscoverCommand(HueCommand):
-    def __init__(self, config: dict, api: ApiInterface):  # type: ignore
+    def __init__(
+        self, config: dict, api: ApiInterface
+    ):  # pylint: disable=super-init-not-called
         self.discovery = Discover(config, api)
 
     @staticmethod
