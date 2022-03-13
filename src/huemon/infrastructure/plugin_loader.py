@@ -8,29 +8,38 @@ import inspect
 from pathlib import Path
 from typing import List, Tuple, Type, TypeVar, cast
 
-from huemon.utils.monads.either import Either, left, right
+from huemon.utils.errors import E_CODE_PLUGIN_LOADER, HueError
+from huemon.utils.monads.either import Either, Left, right
 from huemon.utils.monads.maybe import Maybe
 
 TA = TypeVar("TA")
 
 
+def __error(message: str) -> HueError:
+    return HueError(E_CODE_PLUGIN_LOADER, message)
+
+
+def __lerror(message: str) -> Left[HueError, TA]:
+    return Left[HueError, TA](__error(message))
+
+
 def __get_plugin_type(
     module_name: str, path: str, sub_class: Type[TA]
-) -> Either[str, Type[TA]]:
+) -> Either[HueError, Type[TA]]:
     return (
         Maybe.of(importlib.util.spec_from_file_location(module_name, path))
         .maybe(
-            left("ModuleSpec could not be loaded from the provided path"),
+            __lerror("ModuleSpec could not be loaded from the provided path"),
             right,
         )
         .bind(
             lambda spec: Maybe.of(spec.loader).maybe(
-                left("ModuleSpec has no loader"), lambda _: right(spec)
+                __lerror("ModuleSpec has no loader"), lambda _: right(spec)
             )
         )
         .bind(
             lambda spec: Maybe.of(importlib.util.module_from_spec(spec)).maybe(
-                left("Module could not be loaded from ModuleSpec"),
+                __lerror("Module could not be loaded from ModuleSpec"),
                 lambda module: right((spec, module)),
             ),
         )
@@ -57,7 +66,7 @@ def __get_plugin_type(
         )
         .bind(
             lambda plugin_types: Maybe.of(len(plugin_types) > 0).maybe(
-                left(f"No plugin of type `{sub_class}` found"),
+                __lerror(f"No plugin of type `{sub_class}` found"),
                 lambda _: right(plugin_types[0][1]),
             )
         )
@@ -66,7 +75,7 @@ def __get_plugin_type(
 
 def load_plugins(
     module_name: str, path: str, plugin_type: Type[TA]
-) -> List[Either[str, Type[TA]]]:
+) -> List[Either[HueError, Type[TA]]]:
     return list(
         map(
             lambda plugin_path: __get_plugin_type(
