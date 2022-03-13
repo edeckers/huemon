@@ -14,6 +14,9 @@ LOG = create_logger()
 E_CODE_PLUGIN_LOADER = -2
 E_CODE_CONFIG_NOT_FOUND = -3
 
+E_CODE_ASSERT_NUM_ARGS = -4
+E_CODE_ASSERT_EXISTS = -5
+
 
 class HueError(NamedTuple):
     code: int

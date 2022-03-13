@@ -19,11 +19,11 @@ class Either(Generic[TA, TB]):  # pylint: disable=too-few-public-methods
     def bind(self, map_: Callable[[TB], Either[TA, TC]]) -> Either[TA, TC]:
         return bind(self, map_)
 
-    def chain(self, em1: Either[TA, TB]) -> Either[TA, TB]:
-        return chain(self, em1)
+    def then(self, em1: Either[TA, TB]) -> Either[TA, TB]:
+        return then(self, em1)
 
     def discard(self, map_: Callable[[TB], Either[TA, TB]]) -> Either[TA, TB]:
-        return self.bind(map_).chain(self)
+        return self.bind(map_).then(self)
 
     def either(self, map_left: Callable[[TA], TC], map_right: Callable[[TB], TC]) -> TC:
         return either(map_left, map_right, self)
@@ -88,7 +88,7 @@ def bind(em0: Either[TC, TA], map_: Callable[[TA], Either[TC, TB]]) -> Either[TC
     return result
 
 
-def chain(em0: Either[TC, TA], em1: Either[TC, TB]) -> Either[TC, TB]:
+def then(em0: Either[TC, TA], em1: Either[TC, TB]) -> Either[TC, TB]:
     return bind(em0, lambda _: em1)
 
 

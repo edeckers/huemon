@@ -5,7 +5,7 @@
 
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
-from huemon.utils.assertions import assert_exists, assert_num_args
+from huemon.utils.assertions import assert_exists_e, assert_num_args_e
 
 LOG = create_logger()
 
@@ -32,11 +32,11 @@ class LightCommand(HueCommand):
 
     def exec(self, arguments):
         LOG.debug("Running `%s` command (arguments=%s)", LightCommand.name(), arguments)
-        assert_num_args(2, arguments, LightCommand.name())
+        assert_num_args_e(2, arguments, LightCommand.name())
 
         light_id, action = arguments
 
-        assert_exists(list(LightCommand.__LIGHT_ACTION_MAP), action)
+        assert_exists_e(list(LightCommand.__LIGHT_ACTION_MAP), action)
 
         self._process(
             self.__map_light(light_id, LightCommand.__LIGHT_ACTION_MAP[action])

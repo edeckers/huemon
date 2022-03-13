@@ -5,13 +5,17 @@
 
 import json
 from functools import reduce
+from typing import List
 
 from huemon.api.api_interface import ApiInterface
+from huemon.sinks.sink_interface import SinkInterface
 
 
 class Discovery:
-    def __init__(self, api: ApiInterface):
-        raise NotImplementedError("Discoveries is missing its required constructor")
+    def __init__(self, api: ApiInterface, sink: SinkInterface):
+        self.api = api
+
+        self.sink = sink
 
     @staticmethod
     def _item_to_discovery(item: dict):
@@ -29,18 +33,18 @@ class Discovery:
         )
 
     @staticmethod
-    def _print_array_as_discovery(items):
-        print(
-            json.dumps(
-                {
-                    "data": reduce(
-                        lambda p, item: [*p, Discovery._item_to_discovery(item)],
-                        items,
-                        [],
-                    )
-                }
+    def _array_as_discovery(items: List[dict]):
+        return {
+            "data": reduce(
+                lambda p, item: [*p, Discovery._item_to_discovery(item)],
+                items,
+                [],
             )
-        )
+        }
+
+    @staticmethod
+    def _print_array_as_discovery(items: List[dict]):
+        print(json.dumps(Discovery._array_as_discovery(items)))
 
     @staticmethod
     def name():

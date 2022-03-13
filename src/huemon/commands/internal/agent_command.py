@@ -8,7 +8,7 @@ import uvicorn  # type: ignore
 from huemon.api_server import HuemonServerFactory
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
-from huemon.utils.assertions import assert_exists, assert_num_args
+from huemon.utils.assertions import assert_exists_e, assert_num_args_e
 
 LOG = create_logger()
 
@@ -43,13 +43,17 @@ class AgentCommand(HueCommand):
 
     def exec(self, arguments):
         LOG.debug("Running `%s` command (arguments=%s)", AgentCommand.name(), arguments)
-        assert_num_args(1, arguments, AgentCommand.name())
 
-        action, *_ = arguments
+        self._process(
+            assert_num_args_e(1, arguments, AgentCommand.name())
+            .bind(
+                lambda ax: assert_exists_e(
+                    list(AgentCommand.__SYSTEM_ACTION_MAP), ax[0]
+                )
+            )
+            .fmap(lambda action: self.__SYSTEM_ACTION_MAP[action](self.config))
+        )
 
-        assert_exists(list(AgentCommand.__SYSTEM_ACTION_MAP), action)
-
-        self._process(self.__SYSTEM_ACTION_MAP[action](self.config))
         LOG.debug(
             "Finished `%s` command (arguments=%s)", AgentCommand.name(), arguments
         )
