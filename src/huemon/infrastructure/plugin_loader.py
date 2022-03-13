@@ -7,7 +7,6 @@ import importlib.util
 import inspect
 from importlib.machinery import ModuleSpec
 from pathlib import Path
-from types import ModuleType
 from typing import List, Tuple, Type, TypeVar, cast
 
 from huemon.utils.monads.either import Either, Left, Right, left, right
@@ -19,7 +18,7 @@ TA = TypeVar("TA")
 def __get_plugin_type(
     module_name: str, path: str, sub_class: Type[TA]
 ) -> Either[str, Type[TA]]:
-    error_or_spec_loader: Either[str, ModuleSpec] = (
+    return (
         Maybe.of(importlib.util.spec_from_file_location(module_name, path))
         .maybe(
             left("ModuleSpec could not be loaded from the provided path"),
@@ -30,26 +29,20 @@ def __get_plugin_type(
             if not spec.loader
             else Right[str, ModuleSpec](spec),
         )
-    )
-
-    error_or_spec_and_module: Either[
-        str, Tuple[ModuleSpec, ModuleType]
-    ] = error_or_spec_loader.bind(
-        lambda spec: Maybe.of(importlib.util.module_from_spec(spec)).maybe(
-            left("Module could not be loaded from ModuleSpec"),
-            lambda module: right((spec, module)),
-        ),
-    )
-
-    return (
-        error_or_spec_and_module.bind(
+        .bind(
+            lambda spec: Maybe.of(importlib.util.module_from_spec(spec)).maybe(
+                left("Module could not be loaded from ModuleSpec"),
+                lambda module: right((spec, module)),
+            ),
+        )
+        .discard(
             lambda sm: Either.pure(
                 Maybe.of(sm[0].loader).bind(
                     lambda loader: Maybe.of(loader.exec_module(sm[1]))
                 )
             )
         )
-        .chain(error_or_spec_and_module.fmap(lambda sm: sm[1]))
+        .fmap(lambda sm: sm[1])
         .fmap(
             lambda module: list(
                 map(
