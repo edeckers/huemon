@@ -5,7 +5,6 @@
 
 import uvicorn  # type: ignore
 
-from huemon.api.api_interface import ApiInterface
 from huemon.api_server import HuemonServerFactory
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
@@ -38,11 +37,6 @@ class AgentCommand(HueCommand):
         "start": MyServer.start,
     }
 
-    def __init__(
-        self, config: dict, _: ApiInterface
-    ):  # pylint: disable=unused-argument
-        self.config = config
-
     @staticmethod
     def name():
         return "agent"
@@ -55,7 +49,7 @@ class AgentCommand(HueCommand):
 
         assert_exists(list(AgentCommand.__SYSTEM_ACTION_MAP), action)
 
-        HueCommand._process(self.__SYSTEM_ACTION_MAP[action](self.config))
+        self._process(self.__SYSTEM_ACTION_MAP[action](self.config))
         LOG.debug(
             "Finished `%s` command (arguments=%s)", AgentCommand.name(), arguments
         )

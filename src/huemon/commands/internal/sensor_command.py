@@ -3,7 +3,6 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
-from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.utils.assertions import assert_exists, assert_num_args
@@ -12,11 +11,6 @@ LOG = create_logger()
 
 
 class SensorCommand(HueCommand):
-    def __init__(
-        self, config: dict, api: ApiInterface
-    ):  # pylint: disable=unused-argument
-        self.api = api
-
     def __get_sensor(self, device_id):
         return HueCommand.get_by_unique_id(device_id, self.api.get_sensors())
 
@@ -45,7 +39,7 @@ class SensorCommand(HueCommand):
 
         assert_exists(list(SensorCommand.__SENSOR_ACTION_MAP), action)
 
-        HueCommand._process(
+        self._process(
             self.__map_sensor(device_id, SensorCommand.__SENSOR_ACTION_MAP[action])
         )
         LOG.debug(

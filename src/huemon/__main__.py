@@ -9,6 +9,7 @@ from huemon.commands.command_handler import create_default_command_handler
 from huemon.infrastructure.bootstrapper import bootstrap
 from huemon.infrastructure.config_factory import create_config
 from huemon.infrastructure.logger_factory import bootstrap_logger
+from huemon.processors.stdout_processor import StdoutProcessor
 from huemon.utils.const import EXIT_OK
 from huemon.utils.errors import exit_fail
 from huemon.utils.plugins import get_command_plugins_path
@@ -24,7 +25,7 @@ class Main:  # pylint: disable=too-few-public-methods
         bootstrap()
 
         command_handler = create_default_command_handler(
-            CONFIG, get_command_plugins_path(CONFIG)
+            CONFIG, StdoutProcessor(), get_command_plugins_path(CONFIG)
         )
 
         if len(argv) <= 1:

@@ -6,11 +6,14 @@
 from functools import reduce
 
 from huemon.api.api_interface import ApiInterface
+from huemon.processors.processor_interface import ProcessorInterface
 
 
 class HueCommand:
-    def __init__(self, config: dict, api: ApiInterface):
-        raise NotImplementedError("Command requires a constructor")
+    def __init__(self, config: dict, api: ApiInterface, processor: ProcessorInterface):
+        self.config = config
+        self.api = api
+        self.processor = processor
 
     @staticmethod
     def get_by_unique_id(unique_id: str, items: list) -> list:
@@ -21,10 +24,6 @@ class HueCommand:
         )[0]
 
     @staticmethod
-    def _process(value):
-        print(value)
-
-    @staticmethod
     def _mapper(path: str, value_type):
         return lambda value: value_type(
             reduce(lambda p, field: p[field], path.split("."), value)
@@ -33,6 +32,9 @@ class HueCommand:
     @staticmethod
     def name():
         pass
+
+    def _process(self, value):
+        self.processor.process(value)
 
     def exec(self, arguments):
         pass
