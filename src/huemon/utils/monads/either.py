@@ -6,15 +6,33 @@
 from __future__ import annotations
 
 from argparse import ArgumentTypeError
-from typing import Callable, Generic, List, TypeVar, Union, cast
+from typing import Callable, List, Tuple, TypeVar, Union, cast
 
 TA = TypeVar("TA")
 TB = TypeVar("TB")
 TC = TypeVar("TC")
 
 
-class Either(Generic[TA, TB]):  # pylint: disable=too-few-public-methods
+class Either(Tuple[TA, TB]):  # pylint: disable=too-few-public-methods
     value: Union[TA, TB]
+
+    def __new__(cls, _):
+        return super(Either, cls).__new__(cls)
+
+    def __init__(self, value: Union[TA, TB]):
+        self.value = value
+
+    def __len__(self):
+        return 2
+
+    def __iter__(self):
+        return (self.if_right(None), self.if_left(None)).__iter__()
+
+    def __or__(self, map_: Callable[[TB], TC]) -> Either[TA, TC]:
+        return self.fmap(map_)
+
+    def __ge__(self, map_: Callable[[TB], Either[TA, TC]]) -> Either[TA, TC]:
+        return bind(self, map_)
 
     def bind(self, map_: Callable[[TB], Either[TA, TC]]) -> Either[TA, TC]:
         return bind(self, map_)
@@ -57,18 +75,12 @@ class Either(Generic[TA, TB]):  # pylint: disable=too-few-public-methods
         return __o.value == self.value
 
 
-class Left(Either[TA, TB]):  # pylint: disable=too-few-public-methods
-    def __init__(self, value: TA):
-        self.value = value
-
+class _Left(Either[TA, TB]):  # pylint: disable=too-few-public-methods
     def __str__(self) -> str:
         return f"Left(value={self.value.__str__()})"
 
 
-class Right(Either[TA, TB]):  # pylint: disable=too-few-public-methods
-    def __init__(self, value: TB):
-        self.value = value
-
+class _Right(Either[TA, TB]):  # pylint: disable=too-few-public-methods
     def __str__(self) -> str:
         return f"Right(value={self.value.__str__()})"
 
@@ -79,7 +91,7 @@ def __id(value):
 
 def bind(em0: Either[TC, TA], map_: Callable[[TA], Either[TC, TB]]) -> Either[TC, TB]:
     if is_left(em0):
-        return cast(Left[TC, TB], em0)
+        return cast(_Left[TC, TB], em0)
 
     result = map_(cast(TA, em0.value))
     if not isinstance(result, Either):
@@ -115,7 +127,7 @@ def if_right(em0: Either[TA, TB], rgt: TA) -> TA:
 
 
 def is_left(em0: Either[TA, TB]) -> bool:
-    return isinstance(em0, Left)
+    return isinstance(em0, _Left)
 
 
 def is_right(em0: Either[TA, TB]) -> bool:
@@ -123,7 +135,7 @@ def is_right(em0: Either[TA, TB]) -> bool:
 
 
 def left(value: TA) -> Either[TA, TB]:
-    return Left(value)
+    return _Left(value)
 
 
 def lefts(eithers: List[Either[TA, TB]]) -> List[TA]:
@@ -135,7 +147,7 @@ def rights(eithers: List[Either[TA, TB]]) -> List[TB]:
 
 
 def right(value: TB) -> Either[TA, TB]:
-    return Right(value)
+    return pure(value)
 
 
-pure = Right  # pylint: disable=invalid-name
+pure = _Right  # pylint: disable=invalid-name

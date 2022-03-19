@@ -3,6 +3,8 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
+from typing import List
+
 from huemon.utils.errors import (
     E_CODE_ASSERT_EXISTS,
     E_CODE_ASSERT_NUM_ARGS,
@@ -26,8 +28,8 @@ def assert_num_args(expected_number_of_arguments: int, arguments: list, context:
 
 
 def assert_num_args_e(
-    expected_number_of_arguments: int, arguments: list, context: str
-) -> Either[HueError, list]:
+    expected_number_of_arguments: int, arguments: List[str], context: str
+) -> Either[HueError, List[str]]:
     try:
         assert_num_args(expected_number_of_arguments, arguments, context)
 

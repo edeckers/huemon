@@ -15,6 +15,12 @@ TB = TypeVar("TB")
 class Maybe(Generic[TA]):  # pylint: disable=too-few-public-methods
     value: TA
 
+    def __or__(self, map_: Callable[[TA], TB]) -> Maybe[TA, TB]:
+        return self.fmap(map_)
+
+    def __ge__(self, map_: Callable[[TA], Maybe[TB]]) -> Maybe[TB]:
+        return bind(self, map_)
+
     def bind(self, map_: Callable[[TA], Maybe[TB]]) -> Maybe[TB]:
         return bind(self, map_)
 
@@ -28,7 +34,7 @@ class Maybe(Generic[TA]):  # pylint: disable=too-few-public-methods
         return is_nothing(self)
 
     @staticmethod
-    def of(value: TA):  # pylint: disable=invalid-name
+    def of(value: TA | None) -> Maybe[TA]:  # pylint: disable=invalid-name
         return of(value)
 
     def maybe(self: Maybe[TA], fallback: TB, map_: Callable[[TA], TB]) -> TB:
@@ -44,7 +50,7 @@ class Maybe(Generic[TA]):  # pylint: disable=too-few-public-methods
         return __o.value == self.value
 
 
-class Just(Maybe[TA]):  # pylint: disable=too-few-public-methods
+class _Just(Maybe[TA]):  # pylint: disable=too-few-public-methods
     value: TA
 
     def __init__(self, value: TA):
@@ -54,14 +60,14 @@ class Just(Maybe[TA]):  # pylint: disable=too-few-public-methods
         return f"Just(value={self.value.__str__()})"
 
 
-class Nothing(Maybe[TA]):  # pylint: disable=too-few-public-methods
+class _Nothing(Maybe[TA]):  # pylint: disable=too-few-public-methods
     def __str__(self) -> str:
         return "Nothing"
 
 
-nothing: Maybe = Nothing()
+nothing: Maybe = _Nothing()
 
-pure = Just  # pylint: disable=invalid-name
+pure = _Just  # pylint: disable=invalid-name
 
 
 def bind(em0: Maybe[TA], map_: Callable[[TA], Maybe[TB]]) -> Maybe[TB]:
@@ -87,12 +93,12 @@ def from_just(em0: Maybe[TA]):
 
 
 def is_nothing(em0: Maybe[TA]) -> bool:
-    return isinstance(em0, Nothing)
+    return isinstance(em0, _Nothing)
 
 
 def maybe(fallback: TB, map_: Callable[[TA], TB], em0: Maybe[TA]) -> TB:
     return fallback if is_nothing(em0) else map_(em0.value)
 
 
-def of(value: TA):  # pylint: disable=invalid-name
+def of(value: TA | None) -> Maybe[TA]:  # pylint: disable=invalid-name
     return nothing if not value else pure(value)

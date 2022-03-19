@@ -5,7 +5,7 @@
 
 import os
 from functools import reduce
-from typing import Dict, List, Type
+from typing import Dict, List, Type, TypeVar
 
 from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
@@ -14,12 +14,17 @@ from huemon.infrastructure.logger_factory import create_logger
 from huemon.infrastructure.plugin_loader import load_plugins
 from huemon.sinks.sink_interface import SinkInterface
 from huemon.utils.assertions import assert_exists_e, assert_num_args_e
-from huemon.utils.monads.either import Either, rights
+from huemon.utils.common import fst
+from huemon.utils.errors import HueError
+from huemon.utils.monads.either import Either, if_left, if_right, left, right, rights
 from huemon.utils.monads.maybe import Maybe, maybe, of
 from huemon.utils.paths import create_local_path
 from huemon.utils.plugins import get_discovery_plugins_path
 
 LOG = create_logger()
+
+TA = TypeVar("TA")
+TB = TypeVar("TB")
 
 
 def create_discovery_handlers(
@@ -104,13 +109,18 @@ class DiscoverCommand(HueCommand):
     def name():
         return "discover"
 
-    def exec(self, arguments):
+    def exec(self, arguments: List[str]):
         LOG.debug(
             "Running `%s` command (arguments=%s)", DiscoverCommand.name(), arguments
         )
-        assert_num_args_e(1, arguments, DiscoverCommand.name()).fmap(
-            lambda ax: ax[0]
-        ).fmap(self.discovery.discover)
+
+        error, param = assert_num_args_e(1, arguments, DiscoverCommand.name()) | fst
+
+        if error:
+            self.processor.process(error)
+            return
+
+        self.discovery.discover(param)
 
         LOG.debug(
             "Finished `%s` command (arguments=%s)", DiscoverCommand.name(), arguments
