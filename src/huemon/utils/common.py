@@ -1,11 +1,11 @@
 from typing import Sequence, TypeVar
 
-TA = TypeVar("TA")
+TS = TypeVar("TS")
 
 
-def fst(seq: Sequence[TA]) -> TA:
+def fst(seq: Sequence[TS]) -> TS:
     return seq[0]
 
 
-def snd(seq: Sequence[TA]) -> TA:
+def snd(seq: Sequence[TS]) -> TS:
     return seq[1]

@@ -15,7 +15,7 @@ TB = TypeVar("TB")
 class Maybe(Generic[TA]):  # pylint: disable=too-few-public-methods
     value: TA
 
-    def __or__(self, map_: Callable[[TA], TB]) -> Maybe[TA, TB]:
+    def __or__(self, map_: Callable[[TA], TB]) -> Maybe[TB]:
         return self.fmap(map_)
 
     def __ge__(self, map_: Callable[[TA], Maybe[TB]]) -> Maybe[TB]:

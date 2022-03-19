@@ -15,8 +15,7 @@ from huemon.infrastructure.plugin_loader import load_plugins
 from huemon.sinks.sink_interface import SinkInterface
 from huemon.utils.assertions import assert_exists_e, assert_num_args_e
 from huemon.utils.common import fst
-from huemon.utils.errors import HueError
-from huemon.utils.monads.either import Either, if_left, if_right, left, right, rights
+from huemon.utils.monads.either import Either, rights
 from huemon.utils.monads.maybe import Maybe, maybe, of
 from huemon.utils.paths import create_local_path
 from huemon.utils.plugins import get_discovery_plugins_path
@@ -114,7 +113,9 @@ class DiscoverCommand(HueCommand):
             "Running `%s` command (arguments=%s)", DiscoverCommand.name(), arguments
         )
 
-        error, param = assert_num_args_e(1, arguments, DiscoverCommand.name()) | fst
+        error, param = assert_num_args_e(1, arguments, DiscoverCommand.name()).fmap(
+            fst  # type: ignore
+        )
 
         if error:
             self.processor.process(error)

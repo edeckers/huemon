@@ -6,18 +6,18 @@
 from __future__ import annotations
 
 from argparse import ArgumentTypeError
-from typing import Callable, List, Tuple, TypeVar, Union, cast
+from typing import Callable, Generic, List, TypeVar, Union, cast
 
 TA = TypeVar("TA")
 TB = TypeVar("TB")
 TC = TypeVar("TC")
 
 
-class Either(Tuple[TA, TB]):  # pylint: disable=too-few-public-methods
+class Either(Generic[TA, TB]):  # pylint: disable=too-few-public-methods
     value: Union[TA, TB]
 
-    def __new__(cls, _):
-        return super(Either, cls).__new__(cls)
+    # def __new__(cls, _):
+    #     return super(Either, cls).__new__(cls)
 
     def __init__(self, value: Union[TA, TB]):
         self.value = value
@@ -28,7 +28,7 @@ class Either(Tuple[TA, TB]):  # pylint: disable=too-few-public-methods
     def __iter__(self):
         return (self.if_right(None), self.if_left(None)).__iter__()
 
-    def __or__(self, map_: Callable[[TB], TC]) -> Either[TA, TC]:
+    def __or__(self, map_: Callable[[TB], TC]):
         return self.fmap(map_)
 
     def __ge__(self, map_: Callable[[TB], Either[TA, TC]]) -> Either[TA, TC]:
@@ -114,7 +114,7 @@ def either(
     )
 
 
-def fmap(em0: Either[TC, TA], map_: Callable[[TA], TB]) -> Either[TC, TB]:
+def fmap(em0: Either[TA, TB], map_: Callable[[TB], TC]) -> Either[TA, TC]:
     return bind(em0, lambda m0: pure(map_(m0)))
 
 
@@ -147,7 +147,7 @@ def rights(eithers: List[Either[TA, TB]]) -> List[TB]:
 
 
 def right(value: TB) -> Either[TA, TB]:
-    return pure(value)
+    return _Right(value)
 
 
-pure = _Right  # pylint: disable=invalid-name
+pure = right = _Right  # pylint: disable=invalid-name

@@ -3,7 +3,7 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import List
+from typing import List, Sequence
 
 from huemon.utils.errors import (
     E_CODE_ASSERT_EXISTS,
@@ -29,7 +29,7 @@ def assert_num_args(expected_number_of_arguments: int, arguments: list, context:
 
 def assert_num_args_e(
     expected_number_of_arguments: int, arguments: List[str], context: str
-) -> Either[HueError, List[str]]:
+) -> Either[HueError, Sequence[str]]:
     try:
         assert_num_args(expected_number_of_arguments, arguments, context)
 
