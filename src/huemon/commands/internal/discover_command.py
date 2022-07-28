@@ -5,14 +5,16 @@
 
 import os
 from functools import reduce
-from typing import Dict, List, Type
+from typing import Dict, List, Type, TypeVar
 
 from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.discoveries.discovery_interface import Discovery
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.infrastructure.plugin_loader import load_plugins
-from huemon.utils.assertions import assert_exists, assert_num_args
+from huemon.sinks.sink_interface import SinkInterface
+from huemon.utils.assertions import assert_exists_e, assert_num_args_e
+from huemon.utils.common import fst
 from huemon.utils.monads.either import Either, rights
 from huemon.utils.monads.maybe import Maybe, maybe, of
 from huemon.utils.paths import create_local_path
@@ -20,11 +22,14 @@ from huemon.utils.plugins import get_discovery_plugins_path
 
 LOG = create_logger()
 
+TA = TypeVar("TA")
+TB = TypeVar("TB")
+
 
 def create_discovery_handlers(
-    api: ApiInterface, plugins: List[Type[Discovery]]
+    api: ApiInterface, sink: SinkInterface, plugins: List[Type[Discovery]]
 ) -> Dict[str, Discovery]:
-    return reduce(lambda p, c: {**p, c.name(): c(api)}, plugins, {})
+    return reduce(lambda p, c: {**p, c.name(): c(api, sink)}, plugins, {})
 
 
 class DiscoveryHandler:  # pylint: disable=too-few-public-methods
@@ -39,9 +44,9 @@ class DiscoveryHandler:  # pylint: disable=too-few-public-methods
         )
         target, maybe_sub_target, *_ = discovery_type.split(":") + [None]
 
-        assert_exists(list(self.handlers), target)
-
-        self.handlers[target].exec([maybe_sub_target] if maybe_sub_target else [])
+        assert_exists_e(list(self.handlers), target).fmap(
+            lambda tx: self.handlers[tx]
+        ).fmap(lambda hlr: hlr.exec([maybe_sub_target] if maybe_sub_target else []))
 
         LOG.debug(
             "Finished `%s` command (discovery_type=%s)",
@@ -51,17 +56,16 @@ class DiscoveryHandler:  # pylint: disable=too-few-public-methods
 
 
 class Discover:  # pylint: disable=too-few-public-methods
-    def __init__(self, config: dict, api: ApiInterface):
-        self.api = api
-
+    def __init__(self, config: dict, api: ApiInterface, sink: SinkInterface):
         self.discovery_plugins_path = get_discovery_plugins_path(config)
 
-        self.handler = self.__create_discovery_handler()
+        self.handler = self.__create_discovery_handler(api, sink)
 
-    def __create_discovery_handler(self):
+    def __create_discovery_handler(self, api: ApiInterface, sink: SinkInterface):
         LOG.debug("Loading discovery plugins (path=%s)", self.discovery_plugins_path)
         discovery_handler_plugins = create_discovery_handlers(
-            self.api,
+            api,
+            sink,
             rights(
                 Discover.__load_plugins_and_hardwired_handlers(
                     of(self.discovery_plugins_path)
@@ -95,22 +99,30 @@ class Discover:  # pylint: disable=too-few-public-methods
 
 
 class DiscoverCommand(HueCommand):
-    def __init__(
-        self, config: dict, api: ApiInterface
-    ):  # pylint: disable=super-init-not-called
-        self.discovery = Discover(config, api)
+    def __init__(self, config: dict, api: ApiInterface, processor: SinkInterface):
+        super().__init__(config, api, processor)
+
+        self.discovery = Discover(config, api, processor)
 
     @staticmethod
     def name():
         return "discover"
 
-    def exec(self, arguments):
+    def exec(self, arguments: List[str]):
         LOG.debug(
             "Running `%s` command (arguments=%s)", DiscoverCommand.name(), arguments
         )
-        assert_num_args(1, arguments, DiscoverCommand.name())
 
-        discovery_type, *_ = arguments
+        error, param = assert_num_args_e(1, arguments, DiscoverCommand.name()).fmap(
+            fst  # type: ignore
+        )
 
-        self.discovery.discover(discovery_type)
-        LOG.debug("Finished `discover` command (arguments=%s)", arguments)
+        if error:
+            self.processor.process(error)
+            return
+
+        self.discovery.discover(param)
+
+        LOG.debug(
+            "Finished `%s` command (arguments=%s)", DiscoverCommand.name(), arguments
+        )

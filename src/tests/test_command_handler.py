@@ -11,17 +11,25 @@ from huemon.commands.command_handler import (
     create_name_to_command_mapping,
 )
 from huemon.commands.internal.system_command import SystemCommand
+from huemon.sinks.stdout_sink import StdoutSink
 from huemon.utils.const import EXIT_FAIL
 from tests.fixtures import MutableApi, create_system_config
+
+
+def _ch(system_config: dict):
+    mutable_api = MutableApi()
+    mutable_api.set_system_config(system_config)
+
+    return CommandHandler(
+        create_name_to_command_mapping({}, mutable_api, StdoutSink(), [SystemCommand])
+    )
 
 
 class TestCachedApi(unittest.TestCase):
     def test_when_command_is_loaded_it_should_be_listed_as_available(self):
         vanilla_command_handler = CommandHandler([])
 
-        command_handler = CommandHandler(
-            create_name_to_command_mapping({}, MutableApi(), [SystemCommand])
-        )
+        command_handler = _ch({})
 
         expected_command = SystemCommand.name()
 
@@ -41,25 +49,17 @@ class TestCachedApi(unittest.TestCase):
     def test_when_cache_not_expired_return_cache(mock_print: MagicMock):
         some_version = "TEST_VERSION"
 
-        mutable_api = MutableApi()
-
-        system_config_pre = create_system_config(version=some_version)
-
-        mutable_api.set_system_config(system_config_pre)
-
-        command_handler = CommandHandler(
-            create_name_to_command_mapping({}, mutable_api, [SystemCommand])
-        )
+        command_handler = _ch(create_system_config(version=some_version))
 
         command_handler.exec("system", ["version"])
 
         mock_print.assert_called_once_with(some_version)
 
     def test_when_unknown_command_received_system_exit_is_called(self):
-        command_handler = CommandHandler([])
+        vanilla_command_handler = CommandHandler([])
 
         with self.assertRaises(SystemExit) as failed_call_context:
-            command_handler.exec("system", ["version"])
+            vanilla_command_handler.exec("system", ["version"])
 
         self.assertEqual(
             EXIT_FAIL,

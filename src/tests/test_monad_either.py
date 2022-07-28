@@ -85,7 +85,7 @@ class TestMonadeither(unittest.TestCase):
         either_left = left(0)
         either_right = right(0)
 
-        result = either_left.chain(either_right)
+        result = either_left.then(either_right)
 
         self.assertEqual(
             either_left,
@@ -97,7 +97,7 @@ class TestMonadeither(unittest.TestCase):
         either_right_0 = right(21)
         either_right_1 = right(42)
 
-        result = either_right_0.chain(either_right_1)
+        result = either_right_0.then(either_right_1)
 
         self.assertEqual(
             either_right_1,

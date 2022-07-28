@@ -10,6 +10,7 @@ import yaml
 from genericpath import isfile
 
 from huemon.utils.errors import exit_fail
+from huemon.utils.monads.maybe import Maybe, nothing
 
 CONFIG_PATH_LOCAL = path.join(str(Path(__file__).parent.parent), "config.yml")
 CONFIG_PATH_ENV_VARIABLE = environ.get("HUEMON_CONFIG_PATH")
@@ -25,21 +26,25 @@ CONFIG_PATHS_ORDERED_PREFERENCE = list(
 )
 
 
-def __first_existing_config_file():
+def __first_existing_config_file() -> Maybe[str]:
     for config_path in CONFIG_PATHS_ORDERED_PREFERENCE:
         if isfile(config_path):
-            return config_path
+            return Maybe.of(config_path)
 
-    return None
+    return nothing
 
 
-def create_config():
-    maybe_config_path = __first_existing_config_file()
-    if not maybe_config_path:
+def __read_yaml_file(yaml_path: str):
+    with open(yaml_path, "r") as file:
+        return yaml.safe_load(file.read())
+
+
+def create_config() -> dict:
+    maybe_config_file = __first_existing_config_file()
+    if maybe_config_file.is_nothing():
         exit_fail(
             "No configuration file found in %s",
             ",".join(CONFIG_PATHS_ORDERED_PREFERENCE),
         )
 
-    with open(maybe_config_path, "r") as file:
-        return yaml.safe_load(file.read())
+    return __read_yaml_file(maybe_config_file.from_just())
