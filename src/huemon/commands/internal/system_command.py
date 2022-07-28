@@ -22,7 +22,7 @@ class SystemCommand(HueCommand):
 
     __SYSTEM_ACTION_MAP = {
         "is_upgrade_available": lambda config: int(
-            config["swupdate2"]["state"] != "noupdates"
+            config["swupdate2"]["bridge"]["state"] != "noupdates"
         ),
         "version": HueCommand._mapper("swversion", str),
     }

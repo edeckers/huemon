@@ -42,7 +42,9 @@ class TestCachedApi(unittest.TestCase):
         mutable_api_0.set_system_config(
             {
                 "swupdate2": {
-                    "state": "noupdates",
+                    "bridge": {
+                        "state": "noupdates",
+                    },
                 }
             }
         )
@@ -51,7 +53,9 @@ class TestCachedApi(unittest.TestCase):
         mutable_api_1.set_system_config(
             {
                 "swupdate2": {
-                    "state": "updates",
+                    "bridge": {
+                        "state": "updates",
+                    },
                 }
             }
         )
@@ -66,4 +70,4 @@ class TestCachedApi(unittest.TestCase):
         command_handler_0.exec("system", ["is_upgrade_available"])
         command_handler_1.exec("system", ["is_upgrade_available"])
 
-        mock_print.assert_has_calls(map(call, [0, 1]))
+        mock_print.assert_has_calls(list(map(call, [0, 1])))

@@ -12,6 +12,7 @@ FIELD_STATE = "state"
 
 FIELD_SYSTEM_IS_UPDATE_AVAILABLE = "is_update_available"
 FIELD_SYSTEM_SWUPDATE2 = "swupdate2"
+FIELD_SYSTEM_SWUPDATE2_BRIDGE = "bridge"
 FIELD_SYSTEM_SWUPDATE2_NOUPDATES = "noupdates"
 FIELD_SYSTEM_SWVERSION = "swversion"
 
@@ -23,7 +24,11 @@ def __generate_version():
 def create_system_config(version: str = None, is_update_available: bool = False):
     return {
         FIELD_SYSTEM_SWUPDATE2: {
-            FIELD_STATE: FIELD_SYSTEM_SWUPDATE2_NOUPDATES if is_update_available else ""
+            FIELD_SYSTEM_SWUPDATE2_BRIDGE: {
+                FIELD_STATE: FIELD_SYSTEM_SWUPDATE2_NOUPDATES
+                if is_update_available
+                else ""
+            }
         },
         FIELD_SYSTEM_SWVERSION: version if version else __generate_version(),
     }
