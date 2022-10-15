@@ -7,7 +7,7 @@ version: "2.3"
 
 services:
   huemon:
-    image: ghrc.io/edeckers/huemon:0.9.2
+    image: ghrc.io/edeckers/huemon:0.10.0
     volumes:
     - huemon-config:/etc/huemon
     - huemon-opt:/opt/huemon
