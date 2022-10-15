@@ -36,8 +36,8 @@ Create a command or discovery plugin by implementing [HueCommand](src/huemon/com
 ```
 # file:/path/to/zabbix/agent/conf.d/hue.conf
 
-UserParameter=hue.discovery[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/python3 -m huemon discover $1
-UserParameter=hue.value[*],HUEMON_CONFIG_PATH=/path/to/config.yml /usr/bin/python3 -m huemon $1 $2 $3
+UserParameter=hue.discovery[*],HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon discover $1
+UserParameter=hue.value[*],HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon $1 $2 $3
 ```
 
 Or Docker
@@ -71,13 +71,13 @@ assets/service-installer.sh install
 ### Shell
 
 ```bash
-HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon discover lights
+HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon discover lights
 ```
 
 Or _agent mode_
 
 ```bash
-HUEMON_CONFIG_PATH=/usr/bin/python3 -m huemon agent start
+HUEMON_CONFIG_PATH=/path/to/config.yml python3 -m huemon agent start
 ```
 
 ### Docker
