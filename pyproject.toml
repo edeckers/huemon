@@ -8,7 +8,6 @@ classifiers = [
     "Environment :: Console",
     "Operating System :: MacOS",
     "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -36,13 +35,15 @@ version = "0.9.2"
 
 [tool.poetry.dependencies]
 fastapi = "^0.75.0"
-python = "^3.7"
+python = "^3.8"
 PyYAML = "^6.0"
 types-PyYAML = "^6.0.4"
 uvicorn = "^0.17.5"
+pyella = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7"
+black = {version = "^22.6.0", allow-prereleases = true}
 coverage = {extras = ["toml"], version = "^6.3.2"}
 mypy = "^0.931"
 nox = "^2022.1.7"
@@ -54,7 +55,6 @@ python-semantic-release = "^7.25.2"
 
 #########################################################################################
 # Testing
-black = {version = "^22.6.0", allow-prereleases = true}
 #########################################################################################
 
 [tool.pytest.ini_options]
@@ -95,7 +95,6 @@ build_command = "poetry build"
 commit_subject = "chore: release {version}"
 changelog_file = "README.md"
 changelog_placeholder = "DISABLE_CHANGELOG_HACK"
-major_on_zero = false
 version_pattern = [
     "assets/release/release-docker.sh:huemon:{version}",
     "docker-compose.yml:huemon:{version}",

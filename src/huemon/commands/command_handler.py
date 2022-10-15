@@ -7,13 +7,14 @@ import os
 from functools import reduce
 from typing import List, Type
 
+from pyella.either import rights
+
 from huemon.api.api_factory import create_api
 from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.infrastructure.plugin_loader import load_plugins
 from huemon.utils.errors import exit_fail
-from huemon.utils.monads.either import rights
 from huemon.utils.paths import create_local_path
 
 LOG = create_logger()

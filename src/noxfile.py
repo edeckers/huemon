@@ -3,7 +3,6 @@ import nox
 
 def __load_poetry_venv(session):
     # https://stackoverflow.com/a/59904246
-    session.run("poetry", "shell")
     session.run("poetry", "install")
 
 

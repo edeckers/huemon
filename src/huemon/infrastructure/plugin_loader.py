@@ -8,9 +8,10 @@ import inspect
 from pathlib import Path
 from typing import List, Tuple, Type, TypeVar, cast
 
+from pyella.either import Either, Left, right
+from pyella.maybe import Maybe
+
 from huemon.utils.errors import E_CODE_PLUGIN_LOADER, HueError
-from huemon.utils.monads.either import Either, Left, right
-from huemon.utils.monads.maybe import Maybe
 
 TA = TypeVar("TA")
 
@@ -19,8 +20,8 @@ def __error(message: str) -> HueError:
     return HueError(E_CODE_PLUGIN_LOADER, message)
 
 
-def __lerror(message: str) -> Left[HueError, TA]:
-    return Left[HueError, TA](__error(message))
+def __lerror(message: str) -> Left[HueError, Type[TA]]:
+    return Left(__error(message))
 
 
 def __get_plugin_type(
