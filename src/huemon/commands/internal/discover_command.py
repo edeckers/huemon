@@ -7,14 +7,15 @@ import os
 from functools import reduce
 from typing import Dict, List, Type
 
+from pyella.either import Either, rights
+from pyella.maybe import Maybe, maybe, of
+
 from huemon.api.api_interface import ApiInterface
 from huemon.commands.hue_command_interface import HueCommand
 from huemon.discoveries.discovery_interface import Discovery
 from huemon.infrastructure.logger_factory import create_logger
 from huemon.infrastructure.plugin_loader import load_plugins
 from huemon.utils.assertions import assert_exists, assert_num_args
-from huemon.utils.monads.either import Either, rights
-from huemon.utils.monads.maybe import Maybe, maybe, of
 from huemon.utils.paths import create_local_path
 from huemon.utils.plugins import get_discovery_plugins_path
 
