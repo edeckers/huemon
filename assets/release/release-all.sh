@@ -22,7 +22,7 @@ function publish_semantic_release () {
   git add -u
   echo "Updated all versions in files"
 
-  version_result=`p run semantic-release version 2>&1`
+  version_result=`p run semantic-release version --no-changelog 2>&1`
   error_code=`echo $?`
   is_error_code=`[ ${error_code} -ne 0 ] && echo 1 || echo 0`
   

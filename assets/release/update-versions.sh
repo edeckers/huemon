@@ -9,7 +9,7 @@ cd_to_root_directory
 source src/bin/shared.sh
 
 VERSION=$(cat pyproject.toml | grep "^version *= *\"[0-9]\.[0-9]\.[0-9]\"$" | sed -r 's/^version *= *\"(.*)\"$/\1/')
-NEXT_VERSION=$(p run semantic-release --noop version --print)
+NEXT_VERSION=$(p run semantic-release version --print)
 
 echo "Replacing all occurences of ${VERSION} with ${NEXT_VERSION}"
 
