@@ -3,7 +3,7 @@
 # This source code is licensed under the MPL-2.0 license found in the
 # LICENSE file in the root directory of this source tree.
 
-FROM python:3.8-alpine3.15
+FROM python:3.8-alpine3.18
 
 ARG HUEMON_VERSION=1.0.3
 
@@ -17,7 +17,13 @@ COPY assets/docker/entrypoint.sh /sbin/entrypoint.sh
 RUN chmod +x /sbin/entrypoint.sh
 
 COPY dist/huemon-${HUEMON_VERSION}-py3-none-any.whl /tmp
-RUN pip3 install /tmp/huemon-${HUEMON_VERSION}-py3-none-any.whl
+
+# Fixes "Cargo not installed" error: exact version is not important, as long as it
+# includes the required musl wheels
+# https://github.com/pydantic/pydantic/discussions/4230#discussioncomment-3163410
+RUN pip install pydantic==1.10.12
+
+RUN pip install /tmp/huemon-${HUEMON_VERSION}-py3-none-any.whl
 
 LABEL \
     maintainer="noreply@nonono.com" \
