@@ -14,14 +14,22 @@ function publish_semantic_release () {
 
   set_github_actions_git_details
 
-  publish_result=`p run semantic-release publish 2>&1`
+  echo "Running semantic-release version"
+
+  echo "Update versions in files"
+  assets/release/update-versions.sh
+
+  git add -u
+  echo "Updated all versions in files"
+
+  version_result=`p run semantic-release version 2>&1`
   error_code=`echo $?`
   is_error_code=`[ ${error_code} -ne 0 ] && echo 1 || echo 0`
   
-  no_release_count=`echo "${publish_result}" | grep -cim1 "no release"`
+  no_release_count=`echo "${version_result}" | grep -cim1 "no release"`
   is_release=`[ ${no_release_count} -eq 0 ] && echo 1 || echo 0`
 
-  echo "${publish_result}"
+  echo "${version_result}"
 
   if [[ ${is_error_code} -eq 1 || ${is_release} -ne 1 ]]; then
     echo "has error code: ${is_error_code}"
@@ -30,6 +38,15 @@ function publish_semantic_release () {
     echo "Received error code or no release was created. Aborting."
     exit 0
   fi
+  echo "Ran semantic-release version"
+
+  echo "Running semantic-release publish"
+  p run semantic-release publish
+  echo "Ran semantic-release publish"
+
+  echo "Releasing to PyPi through Twine"
+  p run twine upload dist/* --username __token__ --password ${PYPI_TOKEN}
+  echo "Released to PyPi through Twine"
 
   echo "Published release"
 }

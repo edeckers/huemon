@@ -52,7 +52,8 @@ pre-commit = "^2.17"
 pre-commit-hooks = "^4.1"
 pytest = "^7"
 pytest-cov = "^4"
-python-semantic-release = "^7.25.2"
+python-semantic-release = "^8.0.8"
+twine = "^4.0.2"
 
 #########################################################################################
 # Testing
@@ -91,15 +92,9 @@ profile = "black"
 #########################################################################################
 
 [tool.semantic_release]
-branch = "develop"
 build_command = "poetry build"
-commit_subject = "chore: release {version}"
-changelog_file = "README.md"
-changelog_placeholder = "DISABLE_CHANGELOG_HACK"
-version_pattern = [
-    "assets/release/release-docker.sh:huemon:{version}",
-    "docker-compose.yml:huemon:{version}",
-    "Dockerfile:ARG HUEMON_VERSION={version}",
-]
-version_toml = "pyproject.toml:tool.poetry.version"
-upload_to_repository = true
+commit_message = "chore: release {version}"
+version_toml = ["pyproject.toml:tool.poetry.version"]
+
+[tool.semantic_release.branches.develop]
+match = "develop"
