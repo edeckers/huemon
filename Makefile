@@ -1,8 +1,5 @@
-# source: https://github.com/mozilla-services/telescope/pull/752/files
+.PHONY: clean format help install lint release test
 
-.PHONY: clean format help lint test
-
-INSTALL_STAMP := .install.stamp
 NAME := huemon
 
 .DEFAULT_GOAL := help
@@ -19,21 +16,27 @@ help:
 	@echo ""
 	@echo "Check the Makefile to know exactly what each target is doing."
 
+# PHONY
 clean:
 	src/bin/clean.sh
 
-format: $(INSTALL_STAMP)
+format: poetry.lock
 	src/bin/format.sh
 
-install: $(INSTALL_STAMP)
-$(INSTALL_STAMP): pyproject.toml poetry.lock
-	src/bin/install.sh
+install: poetry.lock
 
-lint: $(INSTALL_STAMP)
+lint: poetry.lock
 	src/bin/lint.sh
 
-release: $(INSTALL_STAMP)
+release: poetry.lock
 	assets/release/release-all.sh
 
-test: $(INSTALL_STAMP)
+test: poetry.lock
 	src/bin/test.sh
+
+# FILES
+poetry.lock: .venv pyproject.toml
+	touch poetry.lock
+
+.venv: # assumption: .venv existst -> poetry is installed
+	src/bin/install.sh

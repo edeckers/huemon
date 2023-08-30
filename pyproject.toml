@@ -34,26 +34,24 @@ repository = "https://github.com/edeckers/huemon.git"
 version = "1.0.1"
 
 [tool.poetry.dependencies]
-fastapi = "^0.75.0"
+fastapi = "^0.103.0"
 python = "^3.8"
 PyYAML = "^6.0"
 types-PyYAML = "^6.0.4"
 uvicorn = "^0.17.5"
-pyella = "^0.1.0"
+pyella = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
-bandit = "^1.7.0"
-black = {version = "^23.1.0", allow-prereleases = true}
+black = "^23.3.0"
+bandit = "^1.7"
 coverage = {extras = ["toml"], version = "^6.3.2"}
-gitlint = "^0.18.0"
 isort = "^5.12.0"
 mypy = "^1.0.0"
 nox = "^2022.1.7"
 pre-commit = "^2.17"
 pre-commit-hooks = "^4.1"
-pylint = "^2.16.0"
 pytest = "^7"
-pytest-cov = "^3"
+pytest-cov = "^4"
 python-semantic-release = "^7.25.2"
 
 #########################################################################################

@@ -19,7 +19,6 @@ function install_poetry () {
 
 function install () {
   p install
-  touch ${INSTALL_STAMP_PATH}
 }
 
 cd_to_source_directory
