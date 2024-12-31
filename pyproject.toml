@@ -16,7 +16,7 @@ classifiers = [
 ]
 description = "Monitor your Philips Hue network"
 documentation = "https://github.com/edeckers/huemon"
-homepage = ""
+homepage = "https://github.com/edeckers/huemon"
 include = [
     "LICENSE",
 ]
