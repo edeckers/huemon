@@ -5,7 +5,7 @@
 
 FROM python:3.9.21-alpine3.21
 
-ARG HUEMON_VERSION=2.0.3
+ARG HUEMON_VERSION=2.0.4
 
 ENV HUEMON_CONFIG_PATH="/etc/huemon/config.yml"
 
