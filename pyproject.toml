@@ -31,7 +31,7 @@ maintainers = ["Ely Deckers"]
 name = "huemon"
 readme = "README.md"
 repository = "https://github.com/edeckers/huemon.git"
-version = "1.0.4"
+version = "1.0.5"
 
 [tool.poetry.dependencies]
 fastapi = "^0.103.0"
