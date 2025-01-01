@@ -13,7 +13,7 @@ Zabbix monitoring with low-level discovery for Philips Hue networks.
 
 - Zabbix server 5.0+
 - Zabbix agent 5.0+
-- Python 3.8+ on Zabbix agent machine
+- Python 3.9+ on Zabbix agent machine
 
 ## Installation
 

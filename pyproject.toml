@@ -34,15 +34,15 @@ repository = "https://github.com/edeckers/huemon.git"
 version = "1.0.5"
 
 [tool.poetry.dependencies]
-fastapi = "^0.103.0"
-python = "^3.8"
+fastapi = "^0.115.6"
+pyella = "^2.0.0"
+python = "^3.9"
 PyYAML = "^6.0"
 types-PyYAML = "^6.0.4"
 uvicorn = "^0.17.5"
-pyella = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
-black = "^23.3.0"
+black = "^24.10.0"
 bandit = "^1.7"
 coverage = {extras = ["toml"], version = "^6.3.2"}
 isort = "^5.12.0"
