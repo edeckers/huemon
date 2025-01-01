@@ -4,7 +4,7 @@ on:
 
 env:
   gh-release-user-name: Ely Deckers
-  python-version: 3.8
+  python-version: 3.9
 
 jobs:
   build:
