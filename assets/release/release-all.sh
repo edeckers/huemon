@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 function cd_to_root_directory () {
   cd `dirname ${0}`/../../
 }
@@ -44,9 +46,9 @@ function publish_semantic_release () {
   p run semantic-release publish
   echo "Ran semantic-release publish"
 
-  echo "Releasing to PyPi through Twine"
-  p run twine upload dist/* --username __token__ --password ${PYPI_TOKEN}
-  echo "Released to PyPi through Twine"
+  echo "Releasing to PyPi"
+  POETRY_PYPI_TOKEN_PYPI=${PYPI_TOKEN} p publish
+  echo "Released to PyPi"
 
   echo "Published release"
 }
