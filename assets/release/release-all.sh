@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+# set -euo pipefail
 
 function cd_to_root_directory () {
   cd `dirname ${0}`/../../
