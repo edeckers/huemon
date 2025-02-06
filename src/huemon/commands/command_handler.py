@@ -26,7 +26,9 @@ def create_name_to_command_mapping(
     return reduce(lambda p, c: {**p, c.name(): c(config, api)}, plugins, {})
 
 
-def __load_command_plugins(config: dict, command_plugins_path: str = None) -> dict:
+def __load_command_plugins(
+    config: dict, command_plugins_path: str | None = None
+) -> dict:
     LOG.debug("Loading command plugins (path=%s)", command_plugins_path)
     if not command_plugins_path:
         return {}
@@ -44,7 +46,7 @@ def __load_command_plugins(config: dict, command_plugins_path: str = None) -> di
 
 
 def __load_plugins_and_hardwired_handlers(
-    config: dict, command_plugins_path: str = None
+    config: dict, command_plugins_path: str | None = None
 ) -> dict:
     hardwired_commands_path = create_local_path(os.path.join("commands", "internal"))
 

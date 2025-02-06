@@ -92,7 +92,7 @@ class TestLightCommand(unittest.TestCase):
         command_handler.exec("light", [SOME_LIGHT_MAC_0, "status"])
         command_handler.exec("light", [SOME_LIGHT_MAC_1, "status"])
 
-        mock_print.assert_has_calls(map(call, [1, 0]))
+        mock_print.assert_has_calls(list(map(call, [1, 0])))
 
     @staticmethod
     @patch("builtins.print")
@@ -122,7 +122,7 @@ class TestLightCommand(unittest.TestCase):
         command_handler.exec("light", [SOME_LIGHT_MAC_0, "is_upgrade_available"])
         command_handler.exec("light", [SOME_LIGHT_MAC_1, "is_upgrade_available"])
 
-        mock_print.assert_has_calls(map(call, [0, 1]))
+        mock_print.assert_has_calls(list(map(call, [0, 1])))
 
     @staticmethod
     @patch("builtins.print")
@@ -147,7 +147,7 @@ class TestLightCommand(unittest.TestCase):
         command_handler.exec("light", [SOME_LIGHT_MAC_0, "reachable"])
         command_handler.exec("light", [SOME_LIGHT_MAC_1, "reachable"])
 
-        mock_print.assert_has_calls(map(call, [0, 1]))
+        mock_print.assert_has_calls(list(map(call, [0, 1])))
 
     @staticmethod
     @patch("builtins.print")
@@ -176,4 +176,4 @@ class TestLightCommand(unittest.TestCase):
         command_handler.exec("light", [SOME_LIGHT_MAC_0, "version"])
         command_handler.exec("light", [SOME_LIGHT_MAC_1, "version"])
 
-        mock_print.assert_has_calls(map(call, [some_version_0, some_version_1]))
+        mock_print.assert_has_calls(list(map(call, [some_version_0, some_version_1])))

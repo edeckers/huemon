@@ -8,24 +8,18 @@ classifiers = [
     "Environment :: Console",
     "Operating System :: MacOS",
     "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: System :: Logging",
     "Topic :: System :: Monitoring",
 ]
 description = "Monitor your Philips Hue network"
 documentation = "https://github.com/edeckers/huemon"
 homepage = "https://github.com/edeckers/huemon"
-include = [
-    "LICENSE",
-]
-keywords = [
-    "Hue",
-    "Monitoring",
-    "Zabbix",
-    "Zigbee",
-]
+include = ["LICENSE"]
+keywords = ["Hue", "Monitoring", "Zabbix", "Zigbee"]
 license = "MPL-2.0"
 maintainers = ["Ely Deckers"]
 name = "huemon"
@@ -35,7 +29,7 @@ version = "2.0.4"
 
 [tool.poetry.dependencies]
 fastapi = "^0.115.6"
-pyella = "^2.0.0"
+pyella = "^3.1.0"
 python = "^3.9"
 PyYAML = "^6.0"
 types-PyYAML = "^6.0.4"
@@ -44,7 +38,7 @@ uvicorn = "^0.17.5"
 [tool.poetry.dev-dependencies]
 black = "^24.10.0"
 bandit = "^1.7"
-coverage = {extras = ["toml"], version = "^6.3.2"}
+coverage = { extras = ["toml"], version = "^6.3.2" }
 isort = "^5.12.0"
 mypy = "^1.0.0"
 nox = "^2022.1.7"
@@ -53,10 +47,6 @@ pre-commit-hooks = "^4.1"
 pytest = "^7"
 pytest-cov = "^4"
 python-semantic-release = "^8.0.8"
-
-#########################################################################################
-# Testing
-#########################################################################################
 
 [tool.pytest.ini_options]
 log_cli = true
@@ -74,22 +64,6 @@ directory = "reports/coverage/html"
 [tool.coverage.xml]
 output = "reports/coverage/coverage.xml"
 
-#########################################################################################
-# Style checking
-#########################################################################################
-
-[tool.bandit]
-
-[tool.black]
-target-version = ["py38", "py39"]
-
-[tool.isort]
-profile = "black"
-
-#########################################################################################
-# Publishing
-#########################################################################################
-
 [tool.semantic_release]
 build_command = "poetry build"
 commit_message = "chore: release {version}"
@@ -97,3 +71,30 @@ version_toml = ["pyproject.toml:tool.poetry.version"]
 
 [tool.semantic_release.branches.develop]
 match = "develop"
+
+[tool.bandit]
+assert_used = { skips = ["**/test_*.py"] }
+
+[tool.black]
+target-version = ["py312"]
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint.BASIC]
+good-names = "log"
+
+[tool.pylint.MASTER]
+disable = [
+    "C0114", # missing-module-docstring
+    "C0115", # missing-class-docstring
+    "C0116", # missing-function-docstring
+    "R0801", # duplicate-code
+    "W0511", # fixme
+]
+
+[tool.pylint.pre-commit-hook]
+limit = 10
+
+[tool.mypy]
+strict = true

@@ -60,7 +60,7 @@ class TestSensorCommand(unittest.TestCase):
         command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "battery:level"])
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "battery:level"])
 
-        mock_print.assert_has_calls(map(call, [some_level_0, some_level_1]))
+        mock_print.assert_has_calls(list(map(call, [some_level_0, some_level_1])))
 
     @staticmethod
     @patch("builtins.print")
@@ -93,7 +93,7 @@ class TestSensorCommand(unittest.TestCase):
         command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "light:level"])
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "light:level"])
 
-        mock_print.assert_has_calls(map(call, [some_level_0, some_level_1]))
+        mock_print.assert_has_calls(list(map(call, [some_level_0, some_level_1])))
 
     @staticmethod
     @patch("builtins.print")
@@ -127,7 +127,7 @@ class TestSensorCommand(unittest.TestCase):
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "temperature"])
 
         mock_print.assert_has_calls(
-            map(call, [some_temperature_0 * 0.01, some_temperature_1 * 0.01])
+            list(map(call, [some_temperature_0 * 0.01, some_temperature_1 * 0.01]))
         )
 
     @staticmethod
@@ -161,7 +161,7 @@ class TestSensorCommand(unittest.TestCase):
         command_handler.exec("sensor", [SOME_SENSOR_MAC_0, "presence"])
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "presence"])
 
-        mock_print.assert_has_calls(map(call, [some_presence_0, some_presence_1]))
+        mock_print.assert_has_calls(list(map(call, [some_presence_0, some_presence_1])))
 
     @staticmethod
     @patch("builtins.print")
@@ -195,5 +195,5 @@ class TestSensorCommand(unittest.TestCase):
         command_handler.exec("sensor", [SOME_SENSOR_MAC_1, "reachable"])
 
         mock_print.assert_has_calls(
-            map(call, [some_reachability_0, some_reachability_1])
+            list(map(call, [some_reachability_0, some_reachability_1]))
         )

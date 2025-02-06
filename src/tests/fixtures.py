@@ -21,13 +21,13 @@ def __generate_version():
     return str(time.process_time())
 
 
-def create_system_config(version: str = None, is_update_available: bool = False):
+def create_system_config(version: str | None = None, is_update_available: bool = False):
     return {
         FIELD_SYSTEM_SWUPDATE2: {
             FIELD_SYSTEM_SWUPDATE2_BRIDGE: {
-                FIELD_STATE: FIELD_SYSTEM_SWUPDATE2_NOUPDATES
-                if is_update_available
-                else ""
+                FIELD_STATE: (
+                    FIELD_SYSTEM_SWUPDATE2_NOUPDATES if is_update_available else ""
+                )
             }
         },
         FIELD_SYSTEM_SWVERSION: version if version else __generate_version(),

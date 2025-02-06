@@ -4,7 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 
 
-def __create_plugins_path(plugin_type: str, config: dict, fallback_path: str = None):
+def __create_plugins_path(
+    plugin_type: str, config: dict, fallback_path: str | None = None
+):
     plugins_section_exists = "plugins" in config
     if not plugins_section_exists:
         return fallback_path
@@ -20,9 +22,9 @@ def __create_plugins_path(plugin_type: str, config: dict, fallback_path: str = N
     )
 
 
-def get_command_plugins_path(config: dict, fallback_path: str = None):
+def get_command_plugins_path(config: dict, fallback_path: str | None = None):
     return __create_plugins_path("commands", config, fallback_path)
 
 
-def get_discovery_plugins_path(config: dict, fallback_path: str = None):
+def get_discovery_plugins_path(config: dict, fallback_path: str | None = None):
     return __create_plugins_path("discoveries", config, fallback_path)

@@ -10,7 +10,7 @@ LOG = create_logger()
 
 
 class WhitelistedSchemaOpener(urllib.request.OpenerDirector):
-    def __init__(self, handlers: typing.Iterable = None):
+    def __init__(self, handlers: typing.Iterable | None = None):
         super().__init__()
         handlers = handlers or (
             urllib.request.UnknownHandler,
